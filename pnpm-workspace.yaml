@@ -1,0 +1,8 @@
+packages:
+  - app
+  - bot
+  - docs
+
+workspaces:
+  bot:
+    store: ./bot
