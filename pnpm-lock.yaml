@@ -41,6 +41,12 @@ importers:
       '@trpc/server':
         specifier: ^10.38.5
         version: 10.38.5
+      bot:
+        specifier: workspace:*
+        version: link:../bot
+      discord.js:
+        specifier: ^14.13.0
+        version: 14.13.0
       next:
         specifier: 13.5.4
         version: 13.5.4(react-dom@18.2.0)(react@18.2.0)
@@ -93,6 +99,12 @@ importers:
 
   bot:
     dependencies:
+      '@prisma/client':
+        specifier: ^5.4.1
+        version: 5.4.1(prisma@5.4.1)
+      '@trpc/server':
+        specifier: ^10.38.5
+        version: 10.38.5
       discord.js:
         specifier: ^14.13.0
         version: 14.13.0

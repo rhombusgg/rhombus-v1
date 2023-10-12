@@ -1,7 +1,11 @@
-import { channel } from "diagnostics_channel";
-import { ChannelType, Client, IntentsBitField, TextChannel } from "discord.js";
+import { Client, TextChannel } from "discord.js";
 import dotenv from "dotenv";
 import { z } from "zod";
+import { createHTTPServer } from "@trpc/server/adapters/standalone";
+
+import { botRouter } from "./trpc";
+
+export type BotRouter = typeof botRouter;
 
 dotenv.config();
 
@@ -16,9 +20,11 @@ const client = new Client({
   intents: ["GuildMembers"],
 });
 
-client.on("debug", (info) => {
-  console.log(info);
-});
+// client.on("debug", (info) => {
+//   console.log(info);
+// });
+
+export let generalChannel: TextChannel;
 
 client.on("ready", async () => {
   if (!client.user || !client.application) {
@@ -27,7 +33,7 @@ client.on("ready", async () => {
 
   const guild = client.guilds.cache.first();
   const channels = await guild.channels.fetch();
-  const generalChannel = channels.find(
+  generalChannel = channels.find(
     (channel) => channel.name === "general"
   ) as TextChannel;
   await generalChannel.send("Hello world!");
@@ -41,3 +47,9 @@ client.on("guildMemberAdd", async (member) => {
 });
 
 client.login(DISCORD_TOKEN);
+
+const server = createHTTPServer({
+  router: botRouter,
+});
+
+server.listen(3001);

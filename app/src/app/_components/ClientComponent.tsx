@@ -18,12 +18,15 @@ export default function ClientComponent({
     refetchOnReconnect: false,
   });
 
+  const botExample = trpc.botExample.useMutation();
+
   return (
     <div>
       <div>{JSON.stringify(session)}</div>
       <div>{JSON.stringify(users.data, undefined)}</div>
       <button onClick={() => signIn("discord")}>Sign In with Discord</button>
       <button onClick={() => signOut()}>Sign Out</button>
+      <button onClick={() => botExample.mutate()}>Bot Example</button>
     </div>
   );
 }

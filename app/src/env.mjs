@@ -31,6 +31,8 @@ export const env = createEnv({
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
     DISCORD_CLIENT_ID: z.string(),
     DISCORD_CLIENT_SECRET: z.string(),
+    DISCORD_TOKEN: z.string().min(1),
+    DISCORD_BOT_URL: z.string().url(),
     EMAIL_PASSWORD: z.string().min(1),
   },
 
@@ -54,6 +56,8 @@ export const env = createEnv({
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+    DISCORD_TOKEN: process.env.DISCORD_TOKEN,
+    DISCORD_BOT_URL: process.env.DISCORD_BOT_URL,
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
   },
   /**
