@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
 
-import { getNextAuthOptions } from "~/app/api/auth/[...nextauth]/route";
+import { authOptions } from "~/app/api/auth/[...nextauth]/route";
 import SessionProvider from "~/app/_components/SessionProvider";
 import Provider from "~/app/_trpc/Provider";
 
@@ -20,7 +20,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(getNextAuthOptions());
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en">

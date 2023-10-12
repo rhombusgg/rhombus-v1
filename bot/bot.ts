@@ -36,8 +36,10 @@ client.on("ready", async () => {
   generalChannel = channels.find(
     (channel) => channel.name === "general"
   ) as TextChannel;
-  await generalChannel.send("Hello world!");
 
+  await generalChannel.send(
+    `Rhombus is online! <t:${Math.floor(Date.now() / 1000)}>`
+  );
   console.log(`${client.user.username} is online`);
 });
 

@@ -1,16 +1,15 @@
-import { publicProcedure, router } from "./trpc";
-import { db } from "./db";
+import { publicProcedure, createTRPCRouter } from "./trpc";
 import { bot } from "./bot";
 
-export const appRouter = router({
+export const appRouter = createTRPCRouter({
   getUsers: publicProcedure.query(async () => {
-    return [];
+    return ["a", "b"];
   }),
 
   setUsers: publicProcedure.mutation(async () => {}),
 
-  botExample: publicProcedure.mutation(async () => {
-    await bot.example.query();
+  botExample: publicProcedure.mutation(async ({ ctx }) => {
+    await bot.at.query({ discordId: ctx.session?.user.discordId! });
   }),
 });
 

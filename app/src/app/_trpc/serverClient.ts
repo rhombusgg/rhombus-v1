@@ -1,7 +1,12 @@
 import { httpBatchLink } from "@trpc/client";
+import { Session } from "next-auth";
 
 import { appRouter } from "~/server";
 
-export const serverClient = appRouter.createCaller({
-  links: [httpBatchLink({ url: "/api/trpc" })],
-});
+import { db } from "~/server/db";
+
+export const serverClient = (session: Session | null) =>
+  appRouter.createCaller({
+    db,
+    session,
+  });

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "esbuild --bundle bot.ts --outdir=dist --platform=node --sourcemap=inline --minify",
     "start": "pnpm run build && node dist/bot.js",
-    "dev": "tsx watch bot.ts"
+    "dev": "tsx watch --no-warnings bot.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/node": "^20.8.3",
     "esbuild": "^0.19.4",
+    "prisma": "^5.4.1",
     "tsx": "^3.13.0"
   }
 }

@@ -8,7 +8,9 @@ import { trpc } from "~/app/_trpc/client";
 export default function ClientComponent({
   initialUsers: initalTodos,
 }: {
-  initialUsers: Awaited<ReturnType<(typeof serverClient)["getUsers"]>>;
+  initialUsers: Awaited<
+    ReturnType<ReturnType<typeof serverClient>["getUsers"]>
+  >;
 }) {
   const { data: session } = useSession();
 
