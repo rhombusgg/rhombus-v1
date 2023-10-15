@@ -1,8 +1,12 @@
-import { DefaultSession, NextAuthOptions, getServerSession } from "next-auth";
+import {
+  type DefaultSession,
+  type NextAuthOptions,
+  getServerSession,
+} from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { Adapter } from "next-auth/adapters";
+import { type Adapter } from "next-auth/adapters";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
@@ -30,9 +34,9 @@ export const authOptions: NextAuthOptions = {
           where: { discordId: params.user.discordId },
         });
 
-        if (existingUser && existingUser.emailVerified) {
+        if (existingUser?.emailVerified) {
           throw new Error(
-            `This Discord account is already linked! Please sign in with your email ${existingUser.email} instead.`
+            `This Discord account is already linked! Please sign in with your email ${existingUser.email} instead.`,
           );
         }
 
@@ -69,6 +73,7 @@ export const authOptions: NextAuthOptions = {
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
       authorization: "https://discord.com/api/oauth2/authorize?scope=identify",
+      /* eslint-disable */
       profile(profile) {
         let profileImage: string;
         if (profile.avatar === null) {
@@ -87,6 +92,7 @@ export const authOptions: NextAuthOptions = {
           discordId: profile.id,
         };
       },
+      /* eslint-enable */
     }),
     EmailProvider({
       server: {

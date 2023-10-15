@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 
 import { authOptions } from "~/server/nextauth";
 
@@ -8,6 +8,7 @@ type RouteHandlerContext = {
 };
 
 const handler = (req: NextRequest, context: RouteHandlerContext) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return NextAuth(req, context, authOptions);
 };
 

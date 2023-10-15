@@ -2,7 +2,7 @@
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
-import { serverClient } from "~/server/trpc/serverClient";
+import { type serverClient } from "~/server/trpc/serverClient";
 import { trpc } from "~/server/trpc/client";
 
 export default function ClientComponent({
@@ -26,8 +26,10 @@ export default function ClientComponent({
     <div>
       <div>{JSON.stringify(session)}</div>
       <div>{JSON.stringify(users.data, undefined)}</div>
-      <button onClick={() => signIn("discord")}>Sign In with Discord</button>
-      <button onClick={() => signOut()}>Sign Out</button>
+      <button onClick={() => void signIn("discord")}>
+        Sign In with Discord
+      </button>
+      <button onClick={() => void signOut()}>Sign Out</button>
       <button onClick={() => botExample.mutate()}>Bot Example</button>
     </div>
   );
