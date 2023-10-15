@@ -30,7 +30,7 @@ jobs:
           node-version: 18
           cache: pnpm
 
-      - name: Install
+      - name: Install dependencies
         shell: "bash"
         run: cd docs && pnpm install
 

@@ -24,9 +24,13 @@ jobs:
           node-version: 18
           cache: pnpm
 
-      - name: Install
+      - name: Install dependencies
         shell: "bash"
         run: pnpm install
+
+      - name: Generate Prisma schema
+        shell: "bash"
+        run: cd app && pnpm prisma generate
 
       - name: Build
         shell: "bash"
