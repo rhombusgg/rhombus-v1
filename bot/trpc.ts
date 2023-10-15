@@ -21,6 +21,8 @@ export const botRouter = router({
         where: { discordId: input.discordId },
       });
 
+      if (!user) return;
+
       console.log(`@${user.name}`);
       generalChannel.send(`<@${input.discordId}> [${user.name} from db]`);
     }),

@@ -7,7 +7,7 @@ type RouteHandlerContext = {
   params: { nextauth: string[] };
 };
 
-export const handler = (req: NextRequest, context: RouteHandlerContext) => {
+const handler = (req: NextRequest, context: RouteHandlerContext) => {
   return NextAuth(req, context, authOptions);
 };
 

@@ -1,4 +1,4 @@
-import { Client, TextChannel } from "discord.js";
+import { Client, Guild, TextChannel } from "discord.js";
 import dotenv from "dotenv";
 import { z } from "zod";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
@@ -31,10 +31,10 @@ client.on("ready", async () => {
     return;
   }
 
-  const guild = client.guilds.cache.first();
+  const guild = client.guilds.cache.first()!;
   const channels = await guild.channels.fetch();
   generalChannel = channels.find(
-    (channel) => channel.name === "general"
+    (channel) => channel && channel.name === "general"
   ) as TextChannel;
 
   await generalChannel.send(
