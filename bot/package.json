@@ -8,7 +8,8 @@
   "scripts": {
     "build": "esbuild --bundle bot.ts --outdir=dist --platform=node --sourcemap=inline --minify",
     "start": "pnpm run build && node dist/bot.js",
-    "dev": "tsx watch --no-warnings bot.ts"
+    "dev": "tsx watch --no-warnings bot.ts",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",

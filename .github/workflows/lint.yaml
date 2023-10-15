@@ -1,4 +1,4 @@
-name: Build
+name: Lint
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - docs/**
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,6 +32,10 @@ jobs:
         shell: "bash"
         run: cd app && pnpm prisma generate
 
-      - name: Build
+      - name: Lint
         shell: "bash"
-        run: pnpm build
+        run: pnpm lint
+
+      - name: Typecheck
+        shell: "bash"
+        run: pnpm typecheck
