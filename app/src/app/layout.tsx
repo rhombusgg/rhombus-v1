@@ -1,9 +1,8 @@
-import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
 
-import { authOptions } from "~/app/api/auth/[...nextauth]/route";
-import SessionProvider from "~/app/_components/SessionProvider";
-import Provider from "~/app/_trpc/Provider";
+import { getServerAuthSession } from "~/server/nextauth";
+import SessionProvider from "~/components/SessionProvider";
+import TrpcProvider from "~/components/TrpcProvider";
 
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -20,13 +19,13 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerAuthSession();
 
   return (
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider session={session}>
-          <Provider>{children}</Provider>
+          <TrpcProvider>{children}</TrpcProvider>
         </SessionProvider>
       </body>
     </html>

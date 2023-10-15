@@ -1,11 +1,10 @@
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "~/server/nextauth";
 
-import { authOptions } from "~/app/api/auth/[...nextauth]/route";
-import ClientComponent from "~/app/_components/ClientComponent";
-import { serverClient } from "~/app/_trpc/serverClient";
+import ClientComponent from "~/components/ClientComponent";
+import { serverClient } from "~/server/trpc/serverClient";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerAuthSession();
   const users = await serverClient(session).getUsers();
 
   return (

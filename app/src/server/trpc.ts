@@ -1,10 +1,9 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { getServerSession, type Session } from "next-auth";
-import superjson from "superjson";
+import { type Session } from "next-auth";
 import { ZodError } from "zod";
+import superjson from "superjson";
 
-import { authOptions } from "~/app/api/auth/[...nextauth]/route";
+import { getServerAuthSession } from "~/server/nextauth";
 import { db } from "~/server/db";
 
 interface CreateContextOptions {
@@ -18,8 +17,8 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   };
 };
 
-export const createTRPCContext = async (opts: { req: Request }) => {
-  const session = await getServerSession(authOptions);
+export const createTRPCContext = async () => {
+  const session = await getServerAuthSession();
 
   return createInnerTRPCContext({
     session,

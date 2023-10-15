@@ -2,8 +2,8 @@
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
-import { serverClient } from "~/app/_trpc/serverClient";
-import { trpc } from "~/app/_trpc/client";
+import { serverClient } from "~/server/trpc/serverClient";
+import { trpc } from "~/server/trpc/client";
 
 export default function ClientComponent({
   initialUsers: initalTodos,
