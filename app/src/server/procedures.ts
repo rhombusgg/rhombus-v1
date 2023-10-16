@@ -7,7 +7,19 @@ export const appRouter = createTRPCRouter({
   }),
 
   botExample: protectedProcedure.mutation(async ({ ctx }) => {
-    await bot.at.query({ discordId: ctx.session.user.discordId });
+    const discordId = ctx.session.user.discordId;
+    if (!discordId) throw new Error("Discord not linked!");
+
+    await bot.at.query({ discordId: discordId });
+  }),
+
+  userInServer: protectedProcedure.query(async ({ ctx }) => {
+    const discordId = ctx.session.user.discordId;
+    if (!discordId) return false;
+
+    return await bot.userInServer.query({
+      discordId: discordId,
+    });
   }),
 });
 

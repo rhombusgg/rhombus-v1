@@ -6,7 +6,7 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 
 import { db } from "./db";
-import { generalChannel } from "./bot";
+import { generalChannel, guild } from "./bot";
 import { z } from "zod";
 
 export const botRouter = router({
@@ -25,6 +25,21 @@ export const botRouter = router({
 
       console.log(`@${user.name}`);
       generalChannel.send(`<@${input.discordId}> [${user.name} from db]`);
+    }),
+
+  userInServer: publicProcedure
+    .input(
+      z.object({
+        discordId: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const members = await guild.members.fetch();
+      const member = members.find(
+        (member) => member.user.id === input.discordId
+      );
+
+      return member !== undefined;
     }),
 });
 

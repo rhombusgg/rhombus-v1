@@ -54,11 +54,17 @@ export default function AuthForm() {
           </DialogHeader>
           <div className="inline-flex items-center justify-center">
             {emailSent ? (
-              <BsCheck2 className="mr-2 h-4 w-4" />
+              <>
+                <BsCheck2 className="mr-2 h-4 w-4" />
+                Sent
+              </>
             ) : (
-              <CgSpinnerTwoAlt className="mr-2 h-4 w-4 animate-spin" />
+              <>
+                <CgSpinnerTwoAlt className="mr-2 h-4 w-4 animate-spin" />
+                Sending
+              </>
             )}{" "}
-            Sending sign-in email to {email}
+            sign-in email to {email}
           </div>
           <DialogFooter className="sm:justify-start">
             <DialogClose asChild>
@@ -101,9 +107,6 @@ export default function AuthForm() {
                     pattern: /\S+@\S+\.\S+/,
                   })}
                   placeholder="name@example.com"
-                  //   autoComplete="email"
-                  //   autoCapitalize="none"
-                  //   autoCorrect="off"
                 />
                 {errors.email && (
                   <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">

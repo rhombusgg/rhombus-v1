@@ -15,12 +15,14 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
       id: string;
-      discordId: string;
+      discordId?: string | null;
+      discordUsername?: string | null;
     };
   }
 
   interface User {
-    discordId: string;
+    discordId?: string | null;
+    discordUsername?: string | null;
   }
 }
 
@@ -46,13 +48,14 @@ export const authOptions: NextAuthOptions = {
             where: { id: currentSession?.user.id },
             data: {
               name: params.user.name,
+              discordUsername: params.user.discordUsername,
               discordId: params.user.discordId,
               image: params.user.image,
               secondaryEmail: params.user.email,
             },
           });
 
-          return "/";
+          return "/dashboard";
         }
       }
 
@@ -65,6 +68,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: user.id,
         discordId: user.discordId,
+        discordUsername: user.discordUsername,
       },
     }),
   },
@@ -86,9 +90,10 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: profile.id,
-          name: profile.username,
+          name: profile.global_name,
           image: profileImage,
           email: profile.email,
+          discordUsername: profile.username,
           discordId: profile.id,
         };
       },
@@ -106,7 +111,6 @@ export const authOptions: NextAuthOptions = {
       from: "Rhombus <nextcloud@mbund.org>",
     }),
   ],
-
   adapter: PrismaAdapter(db) as Adapter,
 };
 

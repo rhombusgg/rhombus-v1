@@ -25,13 +25,14 @@ const client = new Client({
 // });
 
 export let generalChannel: TextChannel;
+export let guild: Guild;
 
 client.on("ready", async () => {
   if (!client.user || !client.application) {
     return;
   }
 
-  const guild = client.guilds.cache.first()!;
+  guild = client.guilds.cache.first()!;
   const channels = await guild.channels.fetch();
   generalChannel = channels.find(
     (channel) => channel && channel.name === "general"
