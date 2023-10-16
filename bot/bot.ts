@@ -33,6 +33,8 @@ client.on("ready", async () => {
   }
 
   guild = client.guilds.cache.first()!;
+  const preview = await guild.fetchPreview();
+  console.log(preview);
   const channels = await guild.channels.fetch();
   generalChannel = channels.find(
     (channel) => channel && channel.name === "general"

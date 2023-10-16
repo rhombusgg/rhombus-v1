@@ -41,6 +41,17 @@ export const botRouter = router({
 
       return member !== undefined;
     }),
+
+  guildPreview: publicProcedure.query(async () => {
+    const preview = await guild.fetchPreview();
+
+    return {
+      name: preview.name,
+      image: `https://cdn.discordapp.com/icons/${preview.id}/${preview.icon}`,
+      onlineCount: preview.approximatePresenceCount,
+      memberCount: preview.approximateMemberCount,
+    };
+  }),
 });
 
 export type BotRouter = typeof botRouter;
