@@ -70,7 +70,7 @@ export async function DiscordIntegrationCard({
                   <div className="ml-2">
                     <div>{session.user.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {session.user.discordUsername}
+                      @{session.user.discordUsername}
                     </div>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { getServerAuthSession } from "~/server/nextauth";
 import { ThemeProvider } from "~/components/ThemeProvider";
 import SessionProvider from "~/components/SessionProvider";
 import TrpcProvider from "~/components/TrpcProvider";
+import { Toaster } from "sonner";
 
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -27,7 +28,10 @@ export default async function RootLayout({
       <body className={`${inter.className}`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <SessionProvider session={session}>
-            <TrpcProvider>{children}</TrpcProvider>
+            <TrpcProvider>
+              <Toaster richColors />
+              {children}
+            </TrpcProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

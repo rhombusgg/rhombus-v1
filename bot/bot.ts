@@ -40,9 +40,9 @@ client.on("ready", async () => {
     (channel) => channel && channel.name === "general"
   ) as TextChannel;
 
-  await generalChannel.send(
-    `Rhombus is online! <t:${Math.floor(Date.now() / 1000)}>`
-  );
+  // await generalChannel.send(
+  //   `Rhombus is online! <t:${Math.floor(Date.now() / 1000)}>`
+  // );
   console.log(`${client.user.username} is online`);
 });
 

@@ -109,7 +109,7 @@ export default function AuthForm() {
                   placeholder="name@example.com"
                 />
                 {errors.email && (
-                  <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                     <BsXLg className="h-4 w-4 text-destructive" />
                   </div>
                 )}

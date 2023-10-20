@@ -45,6 +45,21 @@ model User {
     secondaryEmail  String?
     accounts        Account[]
     sessions        Session[]
+    team            Team?     @relation(fields: [teamId], references: [id], name: "member")
+    teamId          String?
+    ownerTeam       Team?     @relation(name: "owner")
+    ownerTeamId     String?
+}
+
+model Team {
+    id   String @id @default(cuid())
+    name String
+
+    users   User[] @relation(name: "member")
+    owner   User   @relation(fields: [ownerId], references: [id], name: "owner", onDelete: Cascade)
+    ownerId String @unique
+
+    inviteToken String @unique
 }
 
 model VerificationToken {
