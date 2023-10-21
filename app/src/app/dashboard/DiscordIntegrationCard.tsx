@@ -1,7 +1,13 @@
-import Image from "next/image";
 import { type Session } from "next-auth";
-import { BsCheck2, BsLink45Deg, BsPeopleFill } from "react-icons/bs";
+import Image from "next/image";
 
+import { bot } from "~/server/bot";
+import { serverClient } from "~/server/trpc/serverClient";
+
+import { BsCheck2, BsLink45Deg, BsPeopleFill } from "react-icons/bs";
+import { TbExternalLink } from "react-icons/tb";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/Avatar";
+import { Button } from "~/components/ui/Button";
 import {
   Card,
   CardContent,
@@ -9,12 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
-import { Button } from "~/components/ui/Button";
-import { LinkDiscordButton } from "~/components/page/LinkDiscordButton";
-import { bot } from "~/server/bot";
-import { serverClient } from "~/server/trpc/serverClient";
-import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/Avatar";
-import { TbExternalLink } from "react-icons/tb";
+
+import { LinkDiscordButton } from "./DiscordIntegrationCardClient";
 
 export async function DiscordIntegrationCard({
   session,

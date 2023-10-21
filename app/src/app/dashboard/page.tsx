@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
+
 import { getServerAuthSession } from "~/server/nextauth";
 
-import { DiscordIntegrationCard } from "~/components/page/DiscordIntegrationCard";
-import { TeamCard } from "~/components/page/TeamCard";
+import { DiscordIntegrationCard } from "./DiscordIntegrationCard";
+import { TeamCard } from "./TeamCard";
 
 export default async function Dashboard() {
   const session = await getServerAuthSession();

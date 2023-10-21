@@ -1,10 +1,10 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type Session } from "next-auth";
-import { ZodError } from "zod";
 import superjson from "superjson";
+import { ZodError } from "zod";
 
-import { getServerAuthSession } from "~/server/nextauth";
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/nextauth";
 
 interface CreateContextOptions {
   session: Session | null;

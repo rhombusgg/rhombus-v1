@@ -3,7 +3,10 @@
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "exclude": ["node_modules"]
 }

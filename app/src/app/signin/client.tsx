@@ -1,26 +1,27 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
+import { BsCheck2, BsDiscord, BsXLg } from "react-icons/bs";
+import { CgSpinnerTwoAlt } from "react-icons/cg";
+import { Button } from "~/components/ui/Button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogDescription,
   DialogTitle,
-  DialogClose,
 } from "~/components/ui/Dialog";
-import { Button } from "~/components/ui/Button";
-import { Label } from "~/components/ui/Label";
 import { Input } from "~/components/ui/Input";
+import { Label } from "~/components/ui/Label";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { CgSpinnerTwoAlt } from "react-icons/cg";
-import { BsCheck2, BsDiscord, BsXLg } from "react-icons/bs";
-
-export default function AuthForm() {
+export function AuthForm() {
   const [emailSent, setEmailSent] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -124,4 +125,21 @@ export default function AuthForm() {
       </div>
     </>
   );
+}
+
+export type RouterError = {
+  text: string;
+  routerReplace?: undefined | string;
+};
+
+export function Error({ errors }: { errors: RouterError[] }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    errors.forEach((error) => {
+      if (error.routerReplace) router.replace(error.routerReplace);
+      toast.error(error.text, { id: error.text });
+    });
+  });
+  return <></>;
 }

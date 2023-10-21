@@ -1,20 +1,20 @@
 import { initTRPC } from "@trpc/server";
+import { z } from "zod";
+
+import { generalChannel, guild } from "~/bot";
+import { db } from "~/db";
 
 const t = initTRPC.create();
 
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-import { db } from "./db";
-import { generalChannel, guild } from "./bot";
-import { z } from "zod";
-
 export const botRouter = router({
   at: publicProcedure
     .input(
       z.object({
         discordId: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const user = await db.user.findFirst({
@@ -31,12 +31,12 @@ export const botRouter = router({
     .input(
       z.object({
         discordId: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const members = await guild.members.fetch();
       const member = members.find(
-        (member) => member.user.id === input.discordId
+        (member) => member.user.id === input.discordId,
       );
 
       return member !== undefined;

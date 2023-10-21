@@ -2,9 +2,9 @@
 
 import { signIn } from "next-auth/react";
 
-import { Button } from "~/components/ui/Button";
 import { BsDiscord } from "react-icons/bs";
 import { TbExternalLink } from "react-icons/tb";
+import { Button } from "~/components/ui/Button";
 
 export function LinkDiscordButton() {
   return (

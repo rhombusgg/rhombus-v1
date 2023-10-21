@@ -1,9 +1,9 @@
+import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { Client, Guild, TextChannel } from "discord.js";
 import dotenv from "dotenv";
 import { z } from "zod";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
 
-import { botRouter } from "./trpc";
+import { botRouter } from "~/trpc";
 
 export type BotRouter = typeof botRouter;
 
@@ -35,7 +35,7 @@ client.on("ready", async () => {
   guild = client.guilds.cache.first()!;
   const channels = await guild.channels.fetch();
   generalChannel = channels.find(
-    (channel) => channel && channel.name === "general"
+    (channel) => channel && channel.name === "general",
   ) as TextChannel;
 
   // await generalChannel.send(
@@ -45,8 +45,8 @@ client.on("ready", async () => {
 });
 
 client.on("guildMemberAdd", async (member) => {
-  console.log(member.id);
-  await member.send("Welcome!");
+  // console.log(member.id);
+  // await member.send("Welcome!");
 });
 
 client.login(DISCORD_TOKEN);

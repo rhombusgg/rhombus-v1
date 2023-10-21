@@ -1,20 +1,10 @@
-import { publicProcedure, createTRPCRouter, protectedProcedure } from "./trpc";
-import { bot } from "./bot";
-import { generateInviteToken } from "./nextauth";
 import { z } from "zod";
 
+import { bot } from "./bot";
+import { generateInviteToken } from "./nextauth";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "./trpc";
+
 export const appRouter = createTRPCRouter({
-  getUsers: publicProcedure.query(() => {
-    return ["a", "b"];
-  }),
-
-  botExample: protectedProcedure.mutation(async ({ ctx }) => {
-    const discordId = ctx.session.user.discordId;
-    if (!discordId) throw new Error("Discord not linked!");
-
-    await bot.at.query({ discordId: discordId });
-  }),
-
   rerollInviteToken: protectedProcedure.mutation(async ({ ctx }) => {
     const t = await ctx.db.team.findFirst({
       where: { id: ctx.session.user.teamId },

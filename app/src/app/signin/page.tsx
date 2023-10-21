@@ -1,10 +1,10 @@
-import { getServerAuthSession } from "~/server/nextauth";
-
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AuthForm from "~/components/page/AuthForm";
+
 import { db } from "~/server/db";
-import { Error, type RouterError } from "~/components/page/Error";
+import { getServerAuthSession } from "~/server/nextauth";
+
+import { AuthForm, Error, type RouterError } from "./client";
 
 export default async function Page({
   searchParams,

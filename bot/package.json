@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "bot.ts",
-  "types": "bot.ts",
+  "main": "src/bot.ts",
+  "types": "src/bot.ts",
   "scripts": {
-    "build": "esbuild --bundle bot.ts --outdir=dist --platform=node --sourcemap=inline --minify",
+    "build": "esbuild --bundle src/bot.ts --outdir=dist --platform=node --sourcemap=inline --minify",
     "start": "pnpm run build && node dist/bot.js",
-    "dev": "tsx watch --no-warnings bot.ts",
+    "dev": "tsx watch --no-warnings src/bot.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
@@ -23,6 +23,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
     "@types/node": "^20.8.3",
     "esbuild": "^0.19.4",
     "prisma": "^5.4.1",

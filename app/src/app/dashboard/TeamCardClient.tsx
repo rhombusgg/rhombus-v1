@@ -1,23 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "~/components/ui/Button";
-import { Input } from "~/components/ui/Input";
+
+import { trpc } from "~/server/trpc/client";
+import { generateInviteLink } from "~/lib/utils";
 
 import { BiCopy } from "react-icons/bi";
+import { BsXLg } from "react-icons/bs";
 import { RxExit } from "react-icons/rx";
+import { Button } from "~/components/ui/Button";
+import { Input } from "~/components/ui/Input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { trpc } from "~/server/trpc/client";
-import { generateInviteLink } from "~/lib/utils";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { BsXLg } from "react-icons/bs";
 
 export function InviteBar({
   initialInviteLink,

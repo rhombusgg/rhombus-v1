@@ -1,17 +1,18 @@
+import { randomBytes } from "node:crypto";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { type PrismaClient } from "@prisma/client";
+import DiscordProvider from "next-auth/providers/discord";
+import EmailProvider from "next-auth/providers/email";
+import { Adapter } from "next-auth/adapters";
 import {
   type DefaultSession,
   type NextAuthOptions,
   getServerSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
-import EmailProvider from "next-auth/providers/email";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { randomBytes } from "node:crypto";
+
+import { db } from "~/server/db";
 
 import { env } from "~/env.mjs";
-import { db } from "~/server/db";
-import { PrismaClient } from "@prisma/client";
-import { Adapter } from "next-auth/adapters";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {

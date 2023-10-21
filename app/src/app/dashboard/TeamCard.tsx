@@ -1,5 +1,10 @@
 import { type Session } from "next-auth";
 
+import { db } from "~/server/db";
+import { generateInviteLink } from "~/lib/utils";
+
+import { FaCrown } from "react-icons/fa";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/Avatar";
 import {
   Card,
   CardContent,
@@ -7,18 +12,15 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
-import { FaCrown } from "react-icons/fa";
 import { Separator } from "~/components/ui/Separator";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/Avatar";
-import { InviteBar, KickUserButton, TeamNameBar } from "./InviteBar";
-import { db } from "~/server/db";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { generateInviteLink } from "~/lib/utils";
+
+import { InviteBar, KickUserButton, TeamNameBar } from "./TeamCardClient";
 
 export async function TeamCard({ session }: { session: Session }) {
   const query = await db.user.findUnique({
