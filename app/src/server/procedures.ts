@@ -59,8 +59,24 @@ export const appRouter = createTRPCRouter({
         where: { id: userToKick.ownerTeamId! },
         data: { users: { connect: { id: userToKick.id } } },
       });
+    }),
 
-      return { displayName: userToKick.name ?? userToKick.email };
+  updateTeamName: protectedProcedure
+    .input(z.object({ name: z.string().min(3).max(50) }))
+    .mutation(async ({ ctx, input }) => {
+      const team = await ctx.db.team.findFirst({
+        where: { id: ctx.session.user.teamId },
+      });
+
+      if (ctx.session.user.id !== team?.ownerId)
+        throw new Error("Your are not the onwer of this team!");
+
+      await ctx.db.team.update({
+        where: { id: team?.id },
+        data: {
+          name: input.name,
+        },
+      });
     }),
 
   userInServer: protectedProcedure.query(async ({ ctx }) => {

@@ -10,7 +10,7 @@ import {
 import { FaCrown } from "react-icons/fa";
 import { Separator } from "~/components/ui/Separator";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/Avatar";
-import { InviteBar, KickUserButton } from "./InviteBar";
+import { InviteBar, KickUserButton, TeamNameBar } from "./InviteBar";
 import { db } from "~/server/db";
 import {
   Tooltip,
@@ -48,10 +48,17 @@ export async function TeamCard({ session }: { session: Session }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{query?.team?.name}</CardTitle>
-        <CardDescription>Manage your team</CardDescription>
+        <CardTitle>Team Management</CardTitle>
+        <CardDescription>{query?.team?.name}</CardDescription>
       </CardHeader>
       <CardContent>
+        {query?.team?.ownerId === session.user.id && (
+          <>
+            <h4 className="mb-2 text-sm font-medium">Team Name</h4>
+            <TeamNameBar intialTeamName={query.team!.name!} />
+            <Separator className="my-4" />
+          </>
+        )}
         <h4 className="text-sm font-medium">Invite Link</h4>
         <p className="mb-2 text-sm text-muted-foreground">
           Send this invite link to your team members
@@ -60,7 +67,7 @@ export async function TeamCard({ session }: { session: Session }) {
           initialInviteLink={inviteLink}
           owner={query?.team?.ownerId === session.user.id}
         />
-        <Separator className="my-4" />
+        <div className="mb-4" />
         <div className="space-y-4">
           <h4 className="text-sm font-medium">
             Members ({query?.team?.users?.length}/4)
@@ -73,7 +80,7 @@ export async function TeamCard({ session }: { session: Session }) {
               >
                 <div className="flex items-center space-x-4">
                   <Avatar>
-                    <AvatarImage src={member.image ?? ""} />
+                    <AvatarImage src={member.image!} />
                     <AvatarFallback>
                       {(member.name ?? member.email)
                         .match(/^([^@]{0,2})/)?.[0]

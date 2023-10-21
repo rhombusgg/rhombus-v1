@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
@@ -16,6 +16,8 @@ import {
 import { trpc } from "~/server/trpc/client";
 import { generateInviteLink } from "~/lib/utils";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { BsXLg } from "react-icons/bs";
 
 export function InviteBar({
   initialInviteLink,
@@ -71,16 +73,68 @@ export function InviteBar({
                 className="shrink-0"
                 onClick={() => void reroll()}
               >
-                Reroll
+                Reroll Token
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Reroll the invite link</p>
+              <p>Reroll the token and generate a new invite link</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       )}
     </div>
+  );
+}
+
+export function TeamNameBar({ intialTeamName }: { intialTeamName: string }) {
+  const updateTeamName = trpc.updateTeamName.useMutation();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{
+    name: string;
+  }>();
+
+  const onSubmit = handleSubmit(async ({ name }) => {
+    await updateTeamName.mutateAsync({ name });
+    toast.success("Updated team name");
+  });
+
+  return (
+    <form onSubmit={(event) => void onSubmit(event)} className="flex space-x-2">
+      <div className="relative flex-grow">
+        <div className="relative">
+          <Input
+            defaultValue={intialTeamName}
+            {...register("name", {
+              minLength: 3,
+              maxLength: 50,
+              required: true,
+            })}
+            className="overflow-ellipsis pr-10"
+          />
+          {errors.name && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="absolute inset-y-0 right-3 flex cursor-pointer items-center">
+                    <BsXLg className="h-4 w-4 text-destructive" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Team name must be between 3 and 50 characters</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+      </div>
+      <Button variant="secondary" className="shrink-0" type="submit">
+        Set Team Name
+      </Button>
+    </form>
   );
 }
 

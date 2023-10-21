@@ -13,6 +13,8 @@ import { Button } from "~/components/ui/Button";
 import { LinkDiscordButton } from "~/components/page/LinkDiscordButton";
 import { bot } from "~/server/bot";
 import { serverClient } from "~/server/trpc/serverClient";
+import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/Avatar";
+import { TbExternalLink } from "react-icons/tb";
 
 export async function DiscordIntegrationCard({
   session,
@@ -50,28 +52,28 @@ export async function DiscordIntegrationCard({
                   <BsLink45Deg className="h-3.5 w-3.5 text-accent-foreground" />
                 )}
               </span>
-              <h3 className="ml-6 font-medium leading-tight">
+              <h3 className="ml-7 font-medium leading-tight">
                 Link your Discord account
               </h3>
             </div>
             <div className="sm:ml-6">
               {session.user.discordId ? (
-                <div className="flex items-center">
-                  <div className="relative">
-                    <Image
-                      src={session.user.image!}
-                      className="rounded-full ring-2 ring-background"
-                      width={50}
-                      height={50}
-                      alt={`${session.user.name}'s profile picture`}
-                    />
-                    <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-4 ring-background" />
-                  </div>
-                  <div className="ml-2">
-                    <div>{session.user.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                <div className="flex items-center space-x-4">
+                  <Avatar>
+                    <AvatarImage src={session.user.image!} />
+                    <AvatarFallback>
+                      {(session.user.name ?? session.user.email!)
+                        .match(/^([^@]{0,2})/)?.[0]
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium leading-none">
+                      {session.user.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
                       @{session.user.discordUsername}
-                    </div>
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -94,15 +96,12 @@ export async function DiscordIntegrationCard({
                   <BsPeopleFill className="h-3.5 w-3.5 text-accent-foreground" />
                 )}
               </span>
-              <h3 className="ml-6 font-medium leading-tight">Join server</h3>
+              <h3 className="ml-7 font-medium leading-tight">Join server</h3>
             </div>
-            <a
-              href={inviteLink}
-              className="flex w-fit items-center rounded-md border border-input bg-background p-4 sm:ml-6"
-            >
+            <div className="flex w-fit items-center sm:ml-6">
               <Image
                 src={guildPreview.image}
-                className="rounded-2xl"
+                className="rounded-xl"
                 width={50}
                 height={50}
                 alt={`${guildPreview.name}'s icon`}
@@ -126,10 +125,12 @@ export async function DiscordIntegrationCard({
                 </Button>
               ) : (
                 <Button className="ml-8 bg-green-600 hover:bg-green-600/90">
-                  Join
+                  <a className="inline-flex items-center" href={inviteLink}>
+                    Join <TbExternalLink className="ml-2 h-4 w-4" />
+                  </a>
                 </Button>
               )}
-            </a>
+            </div>
           </li>
         </ol>
       </CardContent>
