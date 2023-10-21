@@ -70,17 +70,14 @@ export async function TeamCard({ session }: { session: Session }) {
           owner={query?.team?.ownerId === session.user.id}
         />
         <div className="mb-4" />
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <h4 className="text-sm font-medium">
             Members ({query?.team?.users?.length}/4)
           </h4>
           <div className="grid gap-6">
             {query?.team?.users?.map((member, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between space-x-4"
-              >
-                <div className="flex items-center space-x-4">
+              <div key={i} className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
                   <Avatar>
                     <AvatarImage src={member.image!} />
                     <AvatarFallback>

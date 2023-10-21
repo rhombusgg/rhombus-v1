@@ -42,7 +42,7 @@ export function InviteBar({
   };
 
   return (
-    <div className="flex space-x-2">
+    <div className="flex gap-2">
       <div className="relative flex-grow">
         <Input
           value={inviteLink}
@@ -104,7 +104,7 @@ export function TeamNameBar({ intialTeamName }: { intialTeamName: string }) {
   });
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex space-x-2">
+    <form onSubmit={(event) => void onSubmit(event)} className="flex gap-2">
       <div className="relative flex-grow">
         <div className="relative">
           <Input
