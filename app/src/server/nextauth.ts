@@ -10,21 +10,23 @@ import { randomBytes } from "node:crypto";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
+import { PrismaClient } from "@prisma/client";
+import { Adapter } from "next-auth/adapters";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
       id: string;
+      teamId: string;
       discordId?: string | null;
       discordUsername?: string | null;
     };
   }
 
   interface User {
+    teamId?: string | null;
     discordId?: string | null;
     discordUsername?: string | null;
-    teamId?: string | null;
-    ownerTeamId?: string | null;
   }
 }
 
@@ -64,37 +66,16 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    session: async ({ session, user }) => {
-      if (!user.teamId) {
-        const team = await db.team.create({
-          data: {
-            name: `${
-              user.name ?? user.email.match(/.{1,8}(?=@)|[^@]*/)?.join()
-            }'s team`,
-            ownerId: user.id,
-            inviteToken: randomBytes(16).toString("hex"),
-          },
-        });
-
-        await db.user.update({
-          where: { id: user.id },
-          data: {
-            teamId: team.id,
-            ownerTeamId: team.id,
-          },
-        });
-      }
-
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: user.id,
-          discordId: user.discordId,
-          discordUsername: user.discordUsername,
-        },
-      };
-    },
+    session: ({ session, user }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: user.id,
+        discordId: user.discordId,
+        discordUsername: user.discordUsername,
+        teamId: user.teamId,
+      },
+    }),
   },
   providers: [
     DiscordProvider({
@@ -135,67 +116,36 @@ export const authOptions: NextAuthOptions = {
       from: "Rhombus <nextcloud@mbund.org>",
     }),
   ],
-  // adapter: PrismaAdapter(db) as Adapter,
-  adapter: PrismaAdapter(db),
+  adapter: Adapter(db),
 };
 
-// function PrismaAdapter(p: PrismaClient): Adapter {
-//   return {
-//     createUser: (data) => p.user.create({ data }),
-//     getUser: (id) => p.user.findUnique({ where: { id } }),
-//     getUserByEmail: (email) => p.user.findUnique({ where: { email } }),
-//     async getUserByAccount(provider_providerAccountId) {
-//       const account = await p.account.findUnique({
-//         where: { provider_providerAccountId },
-//         select: { user: true },
-//       });
-//       return account?.user ?? null;
-//     },
-//     updateUser: ({ id, ...data }) => p.user.update({ where: { id }, data }),
-//     deleteUser: (id) => p.user.delete({ where: { id } }),
-//     linkAccount: (data) =>
-//       p.account.create({ data }) as unknown as AdapterAccount,
-//     unlinkAccount: (provider_providerAccountId) =>
-//       p.account.delete({
-//         where: { provider_providerAccountId },
-//       }) as unknown as AdapterAccount,
-//     async getSessionAndUser(sessionToken) {
-//       const userAndSession = await p.session.findUnique({
-//         where: { sessionToken },
-//         include: { user: true },
-//       });
-//       if (!userAndSession) return null;
-//       const { user, ...session } = userAndSession;
-//       return { user, session };
-//     },
-//     createSession: (data) => p.session.create({ data }),
-//     updateSession: (data) =>
-//       p.session.update({ where: { sessionToken: data.sessionToken }, data }),
-//     deleteSession: (sessionToken) =>
-//       p.session.delete({ where: { sessionToken } }),
-//     async createVerificationToken(data) {
-//       const verificationToken = await p.verificationToken.create({ data });
-//       // @ts-expect-errors // MongoDB needs an ID, but we don't
-//       if (verificationToken.id) delete verificationToken.id;
-//       return verificationToken;
-//     },
-//     async useVerificationToken(identifier_token) {
-//       try {
-//         const verificationToken = await p.verificationToken.delete({
-//           where: { identifier_token },
-//         });
-//         // @ts-expect-errors // MongoDB needs an ID, but we don't
-//         if (verificationToken.id) delete verificationToken.id;
-//         return verificationToken;
-//       } catch (error) {
-//         // If token already used/deleted, just return null
-//         // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
-//         if ((error as Prisma.PrismaClientKnownRequestError).code === "P2025")
-//           return null;
-//         throw error;
-//       }
-//     },
-//   };
-// }
+function Adapter(p: PrismaClient): Adapter {
+  return {
+    ...PrismaAdapter(p),
+    createUser: async (data) => {
+      const user = await p.user.create({ data });
+
+      const team = await p.team.create({
+        data: {
+          name: `${user.name ?? user.email.match(/^([^@]{0,8})/)?.[0]}'s team`,
+          ownerId: user.id,
+          inviteToken: generateInviteToken(),
+        },
+      });
+
+      await p.user.update({
+        where: { id: user.id },
+        data: {
+          teamId: team.id,
+          ownerTeamId: team.id,
+        },
+      });
+
+      return user;
+    },
+  };
+}
+
+export const generateInviteToken = () => randomBytes(16).toString("hex");
 
 export const getServerAuthSession = async () => getServerSession(authOptions);

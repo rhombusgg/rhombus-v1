@@ -1,5 +1,7 @@
 import { publicProcedure, createTRPCRouter, protectedProcedure } from "./trpc";
 import { bot } from "./bot";
+import { generateInviteToken } from "./nextauth";
+import { z } from "zod";
 
 export const appRouter = createTRPCRouter({
   getUsers: publicProcedure.query(() => {
@@ -12,6 +14,54 @@ export const appRouter = createTRPCRouter({
 
     await bot.at.query({ discordId: discordId });
   }),
+
+  rerollInviteToken: protectedProcedure.mutation(async ({ ctx }) => {
+    const t = await ctx.db.team.findFirst({
+      where: { id: ctx.session.user.teamId },
+    });
+
+    if (ctx.session.user.id !== t?.ownerId)
+      throw new Error("Your are not the onwer of this team!");
+
+    const team = await ctx.db.team.update({
+      where: { id: t?.id },
+      data: {
+        inviteToken: generateInviteToken(),
+      },
+    });
+
+    return team.inviteToken;
+  }),
+
+  kickUser: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const team = await ctx.db.team.findUnique({
+        where: { id: ctx.session.user.teamId },
+        select: {
+          id: true,
+          ownerId: true,
+          users: {
+            select: { id: true, ownerTeamId: true, name: true, email: true },
+          },
+        },
+      });
+      if (!team) return;
+
+      if (ctx.session.user.id !== team.ownerId)
+        throw new Error("Your are not the onwer of this team!");
+
+      const userToKick = team.users.find((user) => user.id === input.userId);
+
+      if (!userToKick) throw new Error("User is not in your team!");
+
+      await ctx.db.team.update({
+        where: { id: userToKick.ownerTeamId! },
+        data: { users: { connect: { id: userToKick.id } } },
+      });
+
+      return { displayName: userToKick.name ?? userToKick.email };
+    }),
 
   userInServer: protectedProcedure.query(async ({ ctx }) => {
     const discordId = ctx.session.user.discordId;

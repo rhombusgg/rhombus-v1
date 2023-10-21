@@ -37,15 +37,11 @@ export default async function Page({
     });
 
   if (session) {
-    if (team) {
-      if (team.users.map((user) => user.id).includes(session.user.id))
-        redirect("/dashboard");
-
+    if (team)
       await db.team.update({
         where: { id: team.id },
         data: { users: { connect: { id: session.user.id } } },
       });
-    }
 
     redirect("/dashboard");
   }

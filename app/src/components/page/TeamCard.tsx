@@ -10,7 +10,7 @@ import {
 import { FaCrown } from "react-icons/fa";
 import { Separator } from "~/components/ui/Separator";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/Avatar";
-import { InviteBar } from "./InviteBar";
+import { InviteBar, KickUserButton } from "./InviteBar";
 import { db } from "~/server/db";
 import {
   Tooltip,
@@ -18,8 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { BsTrash } from "react-icons/bs";
-import { env } from "~/env.mjs";
+import { generateInviteLink } from "~/lib/utils";
 
 export async function TeamCard({ session }: { session: Session }) {
   const query = await db.user.findUnique({
@@ -44,10 +43,12 @@ export async function TeamCard({ session }: { session: Session }) {
     },
   });
 
+  const inviteLink = generateInviteLink(query!.team!.inviteToken);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Team {query?.team?.name}</CardTitle>
+        <CardTitle>{query?.team?.name}</CardTitle>
         <CardDescription>Manage your team</CardDescription>
       </CardHeader>
       <CardContent>
@@ -56,7 +57,8 @@ export async function TeamCard({ session }: { session: Session }) {
           Send this invite link to your team members
         </p>
         <InviteBar
-          inviteLink={`${env.NEXTAUTH_URL}/signin?token=${query?.team?.inviteToken}`}
+          initialInviteLink={inviteLink}
+          owner={query?.team?.ownerId === session.user.id}
         />
         <Separator className="my-4" />
         <div className="space-y-4">
@@ -73,8 +75,8 @@ export async function TeamCard({ session }: { session: Session }) {
                   <Avatar>
                     <AvatarImage src={member.image ?? ""} />
                     <AvatarFallback>
-                      {(member.name ? member.name : member.email!)
-                        .substring(0, 2)
+                      {(member.name ?? member.email)
+                        .match(/^([^@]{0,2})/)?.[0]
                         .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -100,11 +102,13 @@ export async function TeamCard({ session }: { session: Session }) {
                     </p>
                   </div>
                 </div>
-                {session.user.id === query?.team?.ownerId && (
-                  <button>
-                    <BsTrash className="h-4 w-4 text-destructive hover:text-destructive/90" />
-                  </button>
-                )}
+                {session.user.id === query?.team?.ownerId &&
+                  session.user.id !== member.id && (
+                    <KickUserButton
+                      userId={member.id}
+                      displayName={member.name ?? member.email}
+                    />
+                  )}
               </div>
             ))}
           </div>
