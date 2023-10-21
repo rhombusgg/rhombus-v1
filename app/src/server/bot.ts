@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import type { BotRouter } from "bot";
+import { type BotRouter } from "bot";
 
 import { env } from "~/env.mjs";
 

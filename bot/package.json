@@ -6,8 +6,8 @@
   "main": "src/bot.ts",
   "types": "src/bot.ts",
   "scripts": {
-    "build": "esbuild --bundle src/bot.ts --outdir=dist --platform=node --sourcemap=inline --minify",
-    "start": "pnpm run build && node dist/bot.js",
+    "build": "esbuild --bundle src/bot.ts --platform=node --sourcemap=inline --outfile=dist/bot.cjs --minify",
+    "start": "pnpm run build && node dist/bot.cjs",
     "dev": "tsx watch --no-warnings src/bot.ts",
     "typecheck": "tsc --noEmit"
   },

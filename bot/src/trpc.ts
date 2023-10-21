@@ -1,8 +1,8 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 
-import { generalChannel, guild } from "~/bot";
-import { db } from "~/db";
+import { generalChannel, guild } from "./bot";
+import { db } from "./db";
 
 const t = initTRPC.create();
 
