@@ -15,13 +15,17 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { trpc } from "~/server/trpc/client";
 import { type serverClient } from "~/server/trpc/serverClient";
+import { stringToColor } from "~/lib/color";
 import useLocalStorage from "~/lib/useLocalStorage";
 
+import { ImTicket } from "react-icons/im";
+import { RiDraggable } from "react-icons/ri";
 import { Button } from "~/components/ui/Button";
 
 type Challenge = Awaited<
@@ -253,7 +257,7 @@ function KanbanBoard() {
                 tasks={tasks.filter((task) => task.columnId === column.id)}
               />
             ))}
-            <AddColumnDrop />
+            {activeTask && <AddColumnDrop />}
           </SortableContext>
         </div>
         {isMounted &&
@@ -307,25 +311,24 @@ function ColumnContainer({
     transform: CSS.Transform.toString(transform),
   };
 
-  if (isDragging)
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="bg-background w-[350px] h-[500px] border-2 flex flex-col border-primary rounded-md"
-      ></div>
-    );
+  const color = stringToColor(column.title);
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-card w-[350px] h-[500px] flex flex-col rounded-md"
+      className={clsx(
+        "w-[500px] h-full flex flex-col rounded-md",
+        isDragging && "opacity-70",
+      )}
     >
       <div
         {...attributes}
         {...listeners}
-        className="p-4 font-bold bg-background m-1 rounded-md flex justify-between"
+        className={clsx(
+          "p-4 bg-card font-bold m-1 rounded-md flex justify-between",
+          color.background,
+        )}
       >
         <span>{column.title}</span>
         {!column.static && (
@@ -339,7 +342,6 @@ function ColumnContainer({
           ))}
         </SortableContext>
       </div>
-      <div>Footer</div>
     </div>
   );
 }
@@ -362,28 +364,32 @@ function Task({ task }: { task: Task }) {
     transform: CSS.Transform.toString(transform),
   };
 
-  if (isDragging)
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        key={task.id}
-        className="bg-background opacity-40 m-1 rounded-md p-4 ring-primary ring-2"
-      >
-        {task.challenge.name}
-      </div>
-    );
+  const color = stringToColor(task.challenge.category);
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       key={task.id}
-      {...attributes}
-      {...listeners}
-      className="bg-background m-1 rounded-md p-4 hover:ring-primary hover:ring-2"
+      className={clsx(
+        "bg-card m-1 p-4 border-l-4",
+        color.border,
+        isDragging && "opacity-40",
+      )}
     >
-      {task.challenge.name} [{task.challenge.category}]
+      <div className="flex justify-between">
+        <div className="font-bold">
+          <span className={color.text}>{task.challenge.category} / </span>
+          <span>{task.challenge.name}</span>
+          <span className="text-slate-400"> / easy / mbund</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+          <ImTicket className="w-5 h-5" />
+          <RiDraggable {...attributes} {...listeners} className="w-5 h-5" />
+        </div>
+      </div>
+      <p>{task.challenge.description}</p>
     </div>
   );
 }

@@ -26,7 +26,6 @@
     "@trpc/client": "^10.38.5",
     "@trpc/react-query": "^10.38.5",
     "@trpc/server": "^10.38.5",
-    "@uidotdev/usehooks": "^2.4.0",
     "bot": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
