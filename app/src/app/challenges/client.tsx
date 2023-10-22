@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -47,14 +48,14 @@ export function KanbanBoard({
     refetchOnReconnect: false,
   });
 
-  const [columns, setColumns] = useState<Column[]>([]);
+  const [columns, setColumns] = useLocalStorage<Column[]>("columns", []);
   const columnsId = useMemo(
     () => columns.map((column) => column.id),
     [columns],
   );
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useLocalStorage<Task[]>("tasks", []);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   // fix hydration issue with document.body react portal
@@ -118,7 +119,11 @@ export function KanbanBoard({
     if (active.data.current?.type === "task" && over.id === "placeholder") {
       const activeIndex = tasks.findIndex((task) => task.id === active.id);
       const newColumn = createNewColumn();
-      tasks[activeIndex].columnId = newColumn.id;
+      setTasks((tasks) => {
+        tasks[activeIndex].columnId = newColumn.id;
+
+        return arrayMove(tasks, activeIndex, activeIndex);
+      });
       return;
     }
 
@@ -156,7 +161,7 @@ export function KanbanBoard({
     }
 
     const isOverColumn = over.data.current?.type === "column";
-    if (isOverColumn)
+    if (isOverColumn) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((task) => task.id === active.id);
 
@@ -164,6 +169,8 @@ export function KanbanBoard({
 
         return arrayMove(tasks, activeIndex, activeIndex);
       });
+      return;
+    }
   }
 
   function createTask(columnId: UniqueIdentifier) {
