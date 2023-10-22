@@ -77,6 +77,12 @@ export const appRouter = createTRPCRouter({
       discordId: discordId,
     });
   }),
+
+  getChallenges: protectedProcedure.query(async ({ ctx }) => {
+    const challenges = await ctx.db.challenge.findMany({});
+
+    return challenges;
+  }),
 });
 
 export type AppRouter = typeof appRouter;
