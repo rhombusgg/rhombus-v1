@@ -16,7 +16,7 @@ import {
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { trpc } from "~/server/trpc/client";
@@ -381,10 +381,10 @@ function Task({ task }: { task: Task }) {
         <div className="font-bold">
           <span className={color.text}>{task.challenge.category} / </span>
           <span>{task.challenge.name}</span>
-          <span className="text-slate-400"> / easy / mbund</span>
+          <span className="text-gray-400"> / easy / mbund</span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+          <Ping challengeId={task.challenge.id} />
           <ImTicket className="w-5 h-5" />
           <RiDraggable {...attributes} {...listeners} className="w-5 h-5" />
         </div>
@@ -392,6 +392,53 @@ function Task({ task }: { task: Task }) {
       <p>{task.challenge.description}</p>
     </div>
   );
+}
+
+function Ping({ challengeId }: { challengeId: string }) {
+  const health = trpc.getHealth.useQuery(
+    { challengeId },
+    {
+      refetchInterval: 60 * 1000,
+      refetchOnMount: false,
+    },
+  );
+
+  const [isPinging, setIsPinging] = useState(false);
+
+  useEffect(() => {
+    if (health.fetchStatus === "fetching" && health.isFetched) {
+      setIsPinging(true);
+      setTimeout(() => {
+        setIsPinging(false);
+      }, 1500);
+    }
+  }, [health.fetchStatus, health.isFetched]);
+
+  if (!health.data) return <></>;
+
+  if (health.data.status)
+    return (
+      <div className="h-3 w-3 rounded-full bg-green-500 relative">
+        <div
+          className={clsx(
+            "h-3 w-3 absolute rounded-full bg-green-500",
+            isPinging && "ping",
+          )}
+        />
+      </div>
+    );
+
+  if (!health.data.status)
+    return (
+      <div className="h-3 w-3 rounded-full bg-red-500 relative">
+        <div
+          className={clsx(
+            "h-3 w-3 absolute rounded-full bg-red-500",
+            isPinging && "ping",
+          )}
+        />
+      </div>
+    );
 }
 
 function AddColumnDrop() {

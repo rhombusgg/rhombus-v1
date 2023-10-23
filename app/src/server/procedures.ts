@@ -83,6 +83,20 @@ export const appRouter = createTRPCRouter({
 
     return challenges;
   }),
+
+  getHealth: protectedProcedure
+    .input(z.object({ challengeId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const challenge = await ctx.db.challenge.findUnique({
+        where: { id: input.challengeId },
+      });
+
+      if (!challenge) throw new Error("Challenge not found!");
+
+      const health = Math.random() < 0.5;
+
+      return { status: health };
+    }),
 });
 
 export type AppRouter = typeof appRouter;
