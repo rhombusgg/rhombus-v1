@@ -15,9 +15,15 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import MDEditor, { commands } from "@uiw/react-md-editor";
 import clsx from "clsx";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { toast } from "sonner";
 
 import { trpc } from "~/server/trpc/client";
 import { type serverClient } from "~/server/trpc/serverClient";
@@ -27,6 +33,30 @@ import useLocalStorage from "~/lib/useLocalStorage";
 import { ImTicket } from "react-icons/im";
 import { RiDraggable } from "react-icons/ri";
 import { Button } from "~/components/ui/Button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/Dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "~/components/ui/Sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/Tooltip";
+
+dayjs.extend(duration);
 
 type Challenge = Awaited<
   ReturnType<ReturnType<typeof serverClient>["getChallenges"]>
@@ -46,7 +76,7 @@ type Task = {
 
 export default function Page() {
   return (
-    <main className="m-4">
+    <main className="overflow-x-auto h-screen">
       <KanbanBoard />
     </main>
   );
@@ -246,7 +276,7 @@ function KanbanBoard() {
       onDragOver={onDragOver}
       sensors={sensors}
     >
-      <div className="flex gap-4">
+      <div className="flex gap-4 w-max h-full">
         <div className="flex gap-4">
           <SortableContext items={columnsId}>
             {columns.map((column) => (
@@ -385,12 +415,104 @@ function Task({ task }: { task: Task }) {
         </div>
         <div className="flex items-center gap-4">
           <Ping challengeId={task.challenge.id} />
-          <ImTicket className="w-5 h-5" />
+          <Ticket />
           <RiDraggable {...attributes} {...listeners} className="w-5 h-5" />
         </div>
       </div>
-      <p>{task.challenge.description}</p>
+      <Markdown remarkPlugins={[remarkGfm]}>
+        {task.challenge.description}
+      </Markdown>
     </div>
+  );
+}
+
+function Ticket() {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [content, setContent] = useState("");
+  const createTicket = trpc.createTicket.useMutation();
+
+  const submitTicket = () =>
+    createTicket.mutate(
+      { ticket: content },
+      {
+        onError: (error) =>
+          toast.error(error.data?.prettyZodError?.message ?? error.message),
+        onSuccess: () => {
+          setSheetOpen(false);
+          setDialogOpen(true);
+          setContent("");
+        },
+      },
+    );
+
+  return (
+    <>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger
+            className="inline-flex items-center"
+            onClick={() => setSheetOpen(true)}
+          >
+            <ImTicket className="w-5 h-5" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Create a ticket with the author</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent className="overflow-scroll">
+          <SheetHeader>
+            <SheetTitle>Create Support Ticket</SheetTitle>
+            <SheetDescription className="flex flex-col gap-4">
+              <p>Describe your issue with along with any relavent context</p>
+              <MDEditor
+                value={content}
+                onChange={(v) => setContent(v ?? "")}
+                commands={[
+                  commands.bold,
+                  commands.italic,
+                  commands.link,
+                  commands.title,
+                  commands.divider,
+                  commands.code,
+                  commands.codeBlock,
+                ]}
+                preview="edit"
+                extraCommands={[
+                  commands.codeEdit,
+                  commands.codePreview,
+                  commands.divider,
+                  commands.fullscreen,
+                ]}
+              />
+              <Button variant="outline" onClick={() => submitTicket()}>
+                Submit Ticket
+              </Button>
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ticket Created!</DialogTitle>
+            <DialogDescription>
+              Your ticket has been created. You&apos;ve been @&apos;d on the
+              Discord with your ticket support Channel.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -418,27 +540,71 @@ function Ping({ challengeId }: { challengeId: string }) {
 
   if (health.data.status)
     return (
-      <div className="h-3 w-3 rounded-full bg-green-500 relative">
-        <div
-          className={clsx(
-            "h-3 w-3 absolute rounded-full bg-green-500",
-            isPinging && "ping",
-          )}
-        />
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-3 w-3 rounded-full bg-green-500 relative cursor-pointer">
+              <div
+                className={clsx(
+                  "h-3 w-3 absolute rounded-full bg-green-500",
+                  isPinging && "ping",
+                )}
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Last checked <TimeSince date={health.dataUpdatedAt} /> ago and is{" "}
+              <span className="text-green-500">up</span>
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
 
   if (!health.data.status)
     return (
-      <div className="h-3 w-3 rounded-full bg-red-500 relative">
-        <div
-          className={clsx(
-            "h-3 w-3 absolute rounded-full bg-red-500",
-            isPinging && "ping",
-          )}
-        />
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-3 w-3 rounded-full bg-red-500 relative cursor-pointer">
+              <div
+                className={clsx(
+                  "h-3 w-3 absolute rounded-full bg-red-500",
+                  isPinging && "ping",
+                )}
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Last checked <TimeSince date={health.dataUpdatedAt} /> ago and is{" "}
+              <span className="text-red-500">down</span>
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
+}
+
+const timeSince = (date: number) => {
+  const seconds = dayjs().diff(date, "seconds");
+  const duration = dayjs.duration(seconds, "seconds");
+  return duration.format("H[h] m[m] s[s]").replace(/0h |0m /g, "");
+};
+
+function TimeSince({ date }: { date: number }) {
+  const [time, setTime] = useState(timeSince(date));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(timeSince(date));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [date]);
+
+  return <>{time}</>;
 }
 
 function AddColumnDrop() {

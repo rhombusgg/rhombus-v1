@@ -52,6 +52,12 @@ export const botRouter = router({
       memberCount: preview.approximateMemberCount,
     };
   }),
+
+  sendMessage: publicProcedure
+    .input(z.object({ message: z.string() }))
+    .query(async ({ input }) => {
+      generalChannel.send(input.message);
+    }),
 });
 
 export type BotRouter = typeof botRouter;

@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { bot } from "./bot";
@@ -96,6 +97,12 @@ export const appRouter = createTRPCRouter({
       const health = Math.random() < 0.5;
 
       return { status: health };
+    }),
+
+  createTicket: protectedProcedure
+    .input(z.object({ ticket: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      await bot.sendMessage.query({ message: input.ticket });
     }),
 });
 
