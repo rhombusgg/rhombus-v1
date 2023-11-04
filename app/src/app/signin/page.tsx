@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { bot } from "~/server/bot";
 import { db } from "~/server/db";
 import { getServerAuthSession } from "~/server/nextauth";
 
@@ -23,6 +24,7 @@ export default async function Page({
           id: true,
           name: true,
           inviteToken: true,
+          discordRoleId: true,
           users: { select: { id: true } },
         },
       })
@@ -37,11 +39,27 @@ export default async function Page({
     });
 
   if (session) {
-    if (team)
+    if (team) {
       await db.team.update({
         where: { id: team.id },
         data: { users: { connect: { id: session.user.id } } },
       });
+
+      const currentTeam = await db.team.findUnique({
+        where: { id: session.user.teamId },
+        select: { discordRoleId: true },
+      });
+
+      if (
+        await bot.userInServer.query({ discordId: session.user.discordId! })
+      ) {
+        await bot.joinTeam.query({
+          discordId: session.user.discordId!,
+          oldDiscordRoleId: currentTeam!.discordRoleId!,
+          newDiscordRoleId: team.discordRoleId!,
+        });
+      }
+    }
 
     redirect("/dashboard");
   }

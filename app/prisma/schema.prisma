@@ -52,8 +52,9 @@ model User {
 }
 
 model Team {
-    id   String @id @default(cuid())
-    name String
+    id            String  @id @default(cuid())
+    name          String
+    discordRoleId String?
 
     users   User[] @relation(name: "member")
     owner   User   @relation(fields: [ownerId], references: [id], name: "owner", onDelete: Cascade)

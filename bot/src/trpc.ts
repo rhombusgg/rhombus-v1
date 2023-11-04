@@ -1,7 +1,8 @@
 import { initTRPC } from "@trpc/server";
+import { GuildMember } from "discord.js";
 import { z } from "zod";
 
-import { generalChannel, guild } from "./bot";
+import { generalChannel, guild, verifiedRole } from "./bot";
 import { db } from "./db";
 
 const t = initTRPC.create();
@@ -39,7 +40,14 @@ export const botRouter = router({
         (member) => member.user.id === input.discordId,
       );
 
-      return member !== undefined;
+      const isInServer = member !== undefined;
+
+      // automatically verify the user if they are in the server
+      if (isInServer) {
+        member.roles.add(verifiedRole);
+      }
+
+      return isInServer;
     }),
 
   guildPreview: publicProcedure.query(async () => {
@@ -57,6 +65,54 @@ export const botRouter = router({
     .input(z.object({ message: z.string() }))
     .query(async ({ input }) => {
       generalChannel.send(input.message);
+    }),
+
+  createTeam: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        firstDiscordID: z.string().optional().nullable(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const teamRole = await guild.roles.create({
+        name: input.name,
+        color: "Blurple",
+        reason: `rhombus-managed team`,
+      });
+
+      const members = await guild.members.fetch();
+      const member = members.find(
+        (member) => member.user.id === input.firstDiscordID,
+      );
+
+      if (member) await member.roles.add(teamRole);
+
+      return teamRole.id;
+    }),
+
+  renameTeam: publicProcedure
+    .input(z.object({ name: z.string(), discordRoleId: z.string() }))
+    .query(async ({ input }) => {
+      const teamRole = await guild.roles.fetch(input.discordRoleId);
+      await teamRole.setName(input.name);
+    }),
+
+  joinTeam: publicProcedure
+    .input(
+      z.object({
+        discordId: z.string(),
+        oldDiscordRoleId: z.string(),
+        newDiscordRoleId: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const member = await guild.members.fetch({ user: input.discordId });
+      const oldTeamRole = await guild.roles.fetch(input.oldDiscordRoleId);
+      const newTeamRole = await guild.roles.fetch(input.newDiscordRoleId);
+
+      await member.roles.remove(oldTeamRole);
+      await member.roles.add(newTeamRole);
     }),
 });
 

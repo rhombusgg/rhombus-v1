@@ -1,8 +1,9 @@
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import { Client, Guild, TextChannel } from "discord.js";
+import { Client, Guild, Role, TextChannel } from "discord.js";
 import dotenv from "dotenv";
 import { z } from "zod";
 
+import { db } from "./db";
 import { botRouter } from "./trpc";
 
 export type BotRouter = typeof botRouter;
@@ -26,6 +27,7 @@ const client = new Client({
 
 export let generalChannel: TextChannel;
 export let guild: Guild;
+export let verifiedRole: Role;
 
 client.on("ready", async () => {
   if (!client.user || !client.application) {
@@ -38,6 +40,16 @@ client.on("ready", async () => {
     (channel) => channel && channel.name === "general",
   ) as TextChannel;
 
+  const roles = await guild.roles.fetch();
+  console.log(roles.map((role) => role.name));
+  verifiedRole = roles.find((role) => role.name === "Verified");
+  if (!verifiedRole)
+    verifiedRole = await guild.roles.create({
+      name: "Verified",
+      color: "Blue",
+      reason: "rhombus-managed verified",
+    });
+
   // await generalChannel.send(
   //   `Rhombus is online! <t:${Math.floor(Date.now() / 1000)}>`
   // );
@@ -47,6 +59,17 @@ client.on("ready", async () => {
 client.on("guildMemberAdd", async (member) => {
   // console.log(member.id);
   // await member.send("Welcome!");
+
+  const user = await db.user.findFirst({
+    where: { discordId: member.id },
+    select: { team: { select: { discordRoleId: true } } },
+  });
+  if (user) {
+    await member.roles.add(verifiedRole);
+
+    const teamRole = await guild.roles.fetch(user.team.discordRoleId);
+    await member.roles.add(teamRole);
+  }
 });
 
 client.login(DISCORD_TOKEN);

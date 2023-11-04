@@ -13,6 +13,7 @@ import {
 import { db } from "~/server/db";
 
 import { env } from "~/env.mjs";
+import { bot } from "~/server/bot";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -50,7 +51,7 @@ export const authOptions: NextAuthOptions = {
         // if user is already logged in (via email), and is trying to link their discord account
         if (currentSession) {
           await db.user.update({
-            where: { id: currentSession?.user.id },
+            where: { id: currentSession.user.id },
             data: {
               name: params.user.name,
               discordUsername: params.user.discordUsername,
@@ -60,6 +61,18 @@ export const authOptions: NextAuthOptions = {
             },
           });
 
+          const team = await db.team.findFirst({
+            where: { id: currentSession.user.teamId },
+            select: { name: true }
+          });
+          const discordRoleId = await bot.createTeam.query({ name: team!.name, firstDiscordID: params.user.discordId });
+          await db.team.update({
+            where: { id: currentSession.user.teamId },
+            data: {
+              discordRoleId: discordRoleId,
+            },
+          });
+          
           return "/dashboard";
         }
       }
@@ -141,6 +154,16 @@ function Adapter(p: PrismaClient): Adapter {
           ownerTeamId: team.id,
         },
       });
+
+      if (data.discordId) {
+        const discordRoleId = await bot.createTeam.query({ name: team.name, firstDiscordID: data.discordId });
+        await p.team.update({
+          where: { id: team.id },
+          data: {
+            discordRoleId: discordRoleId,
+          },
+        });
+      }
 
       return user;
     },

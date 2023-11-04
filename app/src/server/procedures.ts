@@ -32,15 +32,22 @@ export const appRouter = createTRPCRouter({
         select: {
           id: true,
           ownerId: true,
+          discordRoleId: true,
           users: {
-            select: { id: true, ownerTeamId: true, name: true, email: true },
+            select: {
+              id: true,
+              ownerTeamId: true,
+              name: true,
+              email: true,
+              discordId: true,
+            },
           },
         },
       });
       if (!team) return;
 
       if (ctx.session.user.id !== team.ownerId)
-        throw new Error("Your are not the onwer of this team!");
+        throw new Error("Your are not the owner of this team!");
 
       const userToKick = team.users.find((user) => user.id === input.userId);
 
@@ -50,6 +57,19 @@ export const appRouter = createTRPCRouter({
         where: { id: userToKick.ownerTeamId! },
         data: { users: { connect: { id: userToKick.id } } },
       });
+
+      const newTeam = await ctx.db.team.findUnique({
+        where: { id: userToKick.ownerTeamId! },
+        select: { discordRoleId: true },
+      });
+
+      if (userToKick.discordId) {
+        await bot.joinTeam.query({
+          discordId: userToKick.discordId,
+          oldDiscordRoleId: team.discordRoleId!,
+          newDiscordRoleId: newTeam!.discordRoleId!,
+        });
+      }
     }),
 
   updateTeamName: protectedProcedure
@@ -67,6 +87,11 @@ export const appRouter = createTRPCRouter({
         data: {
           name: input.name,
         },
+      });
+
+      await bot.renameTeam.query({
+        name: input.name,
+        discordRoleId: team.discordRoleId!,
       });
     }),
 
