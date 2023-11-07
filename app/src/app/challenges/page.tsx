@@ -525,17 +525,6 @@ function Ping({ challengeId }: { challengeId: string }) {
     },
   );
 
-  const [isPinging, setIsPinging] = useState(false);
-
-  useEffect(() => {
-    if (health.fetchStatus === "fetching" && health.isFetched) {
-      setIsPinging(true);
-      setTimeout(() => {
-        setIsPinging(false);
-      }, 1500);
-    }
-  }, [health.fetchStatus, health.isFetched]);
-
   if (!health.data) return <></>;
 
   if (health.data.status)
@@ -544,12 +533,7 @@ function Ping({ challengeId }: { challengeId: string }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="h-3 w-3 rounded-full bg-green-500 relative cursor-pointer">
-              <div
-                className={clsx(
-                  "h-3 w-3 absolute rounded-full bg-green-500",
-                  isPinging && "ping",
-                )}
-              />
+              <div className="h-3 w-3 absolute rounded-full bg-green-500" />
             </div>
           </TooltipTrigger>
           <TooltipContent>
@@ -568,12 +552,7 @@ function Ping({ challengeId }: { challengeId: string }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="h-3 w-3 rounded-full bg-red-500 relative cursor-pointer">
-              <div
-                className={clsx(
-                  "h-3 w-3 absolute rounded-full bg-red-500",
-                  isPinging && "ping",
-                )}
-              />
+              <div className="h-3 w-3 absolute rounded-full bg-red-500" />
             </div>
           </TooltipTrigger>
           <TooltipContent>
