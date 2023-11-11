@@ -1,5 +1,5 @@
 import { initTRPC } from "@trpc/server";
-import { GuildMember } from "discord.js";
+import { ChannelType, GuildMember, TextChannel } from "discord.js";
 import { z } from "zod";
 
 import { generalChannel, guild, verifiedRole } from "./bot";
@@ -11,23 +11,6 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 
 export const botRouter = router({
-  at: publicProcedure
-    .input(
-      z.object({
-        discordId: z.string(),
-      }),
-    )
-    .query(async ({ input }) => {
-      const user = await db.user.findFirst({
-        where: { discordId: input.discordId },
-      });
-
-      if (!user) return;
-
-      console.log(`@${user.name}`);
-      generalChannel.send(`<@${input.discordId}> [${user.name} from db]`);
-    }),
-
   userInServer: publicProcedure
     .input(
       z.object({
@@ -61,10 +44,23 @@ export const botRouter = router({
     };
   }),
 
-  sendMessage: publicProcedure
-    .input(z.object({ message: z.string() }))
+  createTicket: publicProcedure
+    .input(z.object({ message: z.string(), discordId: z.string().nullish() }))
     .query(async ({ input }) => {
-      generalChannel.send(input.message);
+      const channels = await guild.channels.fetch();
+
+      const supportChannel = channels.find(
+        (channel) => channel && channel.name === "support",
+      ) as TextChannel;
+
+      const ticketThread = await supportChannel.threads.create({
+        name: "Ticket #1",
+        type: ChannelType.PrivateThread,
+      });
+
+      ticketThread.send(input.message);
+
+      if (input.discordId) await ticketThread.members.add(input.discordId);
     }),
 
   createTeam: publicProcedure
@@ -95,6 +91,7 @@ export const botRouter = router({
     .input(z.object({ name: z.string(), discordRoleId: z.string() }))
     .query(async ({ input }) => {
       const teamRole = await guild.roles.fetch(input.discordRoleId);
+      if (!teamRole) return;
       await teamRole.setName(input.name);
     }),
 
@@ -110,6 +107,9 @@ export const botRouter = router({
       const member = await guild.members.fetch({ user: input.discordId });
       const oldTeamRole = await guild.roles.fetch(input.oldDiscordRoleId);
       const newTeamRole = await guild.roles.fetch(input.newDiscordRoleId);
+
+      if (!oldTeamRole) return;
+      if (!newTeamRole) return;
 
       await member.roles.remove(oldTeamRole);
       await member.roles.add(newTeamRole);

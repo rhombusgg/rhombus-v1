@@ -127,7 +127,10 @@ export const appRouter = createTRPCRouter({
   createTicket: protectedProcedure
     .input(z.object({ ticket: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      await bot.sendMessage.query({ message: input.ticket });
+      await bot.createTicket.query({
+        message: input.ticket,
+        discordId: ctx.session.user.discordId,
+      });
     }),
 });
 
