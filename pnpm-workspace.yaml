@@ -1,4 +1,5 @@
 packages:
+  - webapp
   - app
   - bot
   - docs
