@@ -16,6 +16,7 @@ declare global {
 	}
 
 	interface Session {
+		id: string;
 		discord?: {
 			id: string;
 			image: string;

@@ -15,6 +15,7 @@ const auth: Handle = async ({ event, resolve }) => {
 		select: {
 			user: {
 				select: {
+					id: true,
 					discord: {
 						select: {
 							id: true,
@@ -36,6 +37,7 @@ const auth: Handle = async ({ event, resolve }) => {
 	if (!session) return resolve(event);
 
 	event.locals.session = {
+		id: session.user.id,
 		emails: session.user.emails.map((email) => email.email),
 		avatarFallback: session.user.emails[0].email.match(/^([^@]{0,2})/)![0].toUpperCase()
 	};
@@ -56,12 +58,36 @@ const auth: Handle = async ({ event, resolve }) => {
 };
 
 const ip: Handle = async ({ event, resolve }) => {
-	const ip = event.getClientAddress();
-	// const session = await event.locals.getSession();
-	console.log(ip);
-	// console.log(session);
+	const address = event.getClientAddress();
+	const session = event.locals.session;
+
+	await prisma.iP.upsert({
+		where: {
+			address
+		},
+		create: {
+			address,
+			users: session
+				? {
+						connect: {
+							id: session.id
+						}
+				  }
+				: undefined
+		},
+		update: {
+			address,
+			users: session
+				? {
+						connect: {
+							id: session.id
+						}
+				  }
+				: undefined
+		}
+	});
+
 	return resolve(event);
 };
 
 export const handle = sequence(auth, ip);
-// export const handle = ip;

@@ -1,8 +1,18 @@
-import { clearJwt } from '$lib/serverAuth.js';
+import prisma from '$lib/db.js';
+import { clearJwt, getJwt } from '$lib/serverAuth.js';
 import { redirect } from '@sveltejs/kit';
 
 export async function GET({ url, cookies }) {
-	clearJwt(cookies);
+	const jwt = await getJwt(cookies);
+	if (jwt) {
+		await prisma.session.delete({
+			where: {
+				id: jwt.sessionId
+			}
+		});
+
+		clearJwt(cookies);
+	}
 
 	const callbackUrl = url.searchParams.get('callbackUrl');
 	if (!callbackUrl) {

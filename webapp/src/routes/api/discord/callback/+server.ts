@@ -83,6 +83,14 @@ export async function GET({ url, cookies }) {
 	const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 
 	if (existing) {
+		await prisma.session.deleteMany({
+			where: {
+				expires: {
+					lte: new Date()
+				}
+			}
+		});
+
 		const session = await prisma.session.create({
 			data: {
 				userId: existing.userId,
