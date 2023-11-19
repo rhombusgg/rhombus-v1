@@ -1,0 +1,54 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Session {
+    id      String   @id @default(cuid())
+    expires DateTime
+    userId  String
+    user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Email {
+    id       String    @id @default(cuid())
+    email    String    @unique
+    verified DateTime?
+    User     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId   String?
+}
+
+model Discord {
+    id             String @unique
+    username       String
+    globalUsername String
+    image          String
+    email          String
+    user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId         String @unique
+}
+
+model User {
+    id       String    @id @default(cuid())
+    discord  Discord?
+    emails   Email[]
+    sessions Session[]
+    ips      IP[]
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model IP {
+    address String @id @unique
+    users   User[]
+}

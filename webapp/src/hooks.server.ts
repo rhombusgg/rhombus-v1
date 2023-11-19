@@ -1,26 +1,67 @@
-import { SvelteKitAuth } from '@auth/sveltekit';
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import Discord from '@auth/core/providers/discord';
 
-import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET } from '$env/static/private';
+import prisma from '$lib/db';
+import { getJwt } from '$lib/serverAuth';
 
-const auth = SvelteKitAuth({
-	providers: [
-		Discord({
-			clientId: DISCORD_CLIENT_ID,
-			clientSecret: DISCORD_CLIENT_SECRET,
-			authorization: 'https://discord.com/api/oauth2/authorize?scope=identify'
-		})
-	]
-});
+const auth: Handle = async ({ event, resolve }) => {
+	const data = await getJwt(event.cookies);
+	if (!data) return resolve(event);
+
+	const session = await prisma.session.findUnique({
+		where: {
+			id: data.sessionId
+		},
+		select: {
+			user: {
+				select: {
+					discord: {
+						select: {
+							id: true,
+							image: true,
+							username: true,
+							globalUsername: true
+						}
+					},
+					emails: {
+						select: {
+							email: true
+						}
+					}
+				}
+			}
+		}
+	});
+
+	if (!session) return resolve(event);
+
+	event.locals.session = {
+		emails: session.user.emails.map((email) => email.email),
+		avatarFallback: session.user.emails[0].email.match(/^([^@]{0,2})/)![0].toUpperCase()
+	};
+
+	if (session.user.discord) {
+		event.locals.session.discord = {
+			id: session.user.discord.id,
+			image: session.user.discord.image,
+			username: session.user.discord.username,
+			globalUsername: session.user.discord.globalUsername
+		};
+		event.locals.session.avatarFallback = session.user.discord.username
+			.substring(0, 2)
+			.toUpperCase();
+	}
+
+	return resolve(event);
+};
 
 const ip: Handle = async ({ event, resolve }) => {
 	const ip = event.getClientAddress();
-	const session = await event.locals.getSession();
+	// const session = await event.locals.getSession();
 	console.log(ip);
-	console.log(session);
+	// console.log(session);
 	return resolve(event);
 };
 
 export const handle = sequence(auth, ip);
+// export const handle = ip;

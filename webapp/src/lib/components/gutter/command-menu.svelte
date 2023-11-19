@@ -7,8 +7,8 @@
 	import * as Command from '$lib/components/ui/command';
 	import Logo from '$lib/components/icons/logo.svelte';
 	import { LineChart, LogIn, LogOut, Swords, User, UserPlus, Users } from 'lucide-svelte';
-	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { page } from '$app/stores';
+	import { signInDiscord, signOut } from '$lib/clientAuth';
 
 	let open = false;
 
@@ -46,7 +46,7 @@
 		<span class="text-xs">⌘</span>K
 	</kbd>
 </Button>
-<Command.Dialog bind:open>
+<Command.Dialog loop bind:open>
 	<Command.Input placeholder="Type a command or search" />
 	<Command.List>
 		<Command.Empty>No results found.</Command.Empty>
@@ -93,17 +93,17 @@
 		</Command.Group>
 		<Command.Group heading="Account">
 			{#if $page.data.session}
-				<Command.Item value="logout" onSelect={() => runCommand(() => signOut())}>
+				<Command.Item value="Sign out" onSelect={() => runCommand(() => signOut())}>
 					<LogOut class="mr-2 h-4 w-4" />
-					Log Out
+					Sign Out
 				</Command.Item>
 			{:else}
 				<Command.Item
-					value="Log in with discord"
-					onSelect={() => runCommand(() => signIn('discord'))}
+					value="Sign in with discord"
+					onSelect={() => runCommand(() => signInDiscord())}
 				>
 					<LogIn class="mr-2 h-4 w-4" />
-					Log In with Discord
+					Sign In with Discord
 				</Command.Item>
 			{/if}
 		</Command.Group>
