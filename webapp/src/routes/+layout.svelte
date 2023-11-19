@@ -1,8 +1,8 @@
 <script>
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
-	import SiteHeader from './site-header.svelte';
-	import SiteFooter from './site-footer.svelte';
+	import SiteHeader from '$lib/components/gutter/site-header.svelte';
+	import SiteFooter from '$lib/components/gutter/site-footer.svelte';
 </script>
 
 <ModeWatcher />

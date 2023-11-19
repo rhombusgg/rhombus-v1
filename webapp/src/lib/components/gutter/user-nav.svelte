@@ -9,7 +9,7 @@
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button variant="ghost" builders={[builder]} class="relative h-8 w-8 rounded-full">
 			<Avatar.Root class="h-8 w-8">
-				<Avatar.Image src="/avatars/01.png" alt="@mbund" />
+				<Avatar.Image alt="@mbund" />
 				<Avatar.Fallback>MB</Avatar.Fallback>
 			</Avatar.Root>
 		</Button>

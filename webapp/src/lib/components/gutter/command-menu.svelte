@@ -7,6 +7,8 @@
 	import * as Command from '$lib/components/ui/command';
 	import Logo from '$lib/components/icons/logo.svelte';
 	import { LineChart, LogIn, LogOut, Swords, User, UserPlus, Users } from 'lucide-svelte';
+	import { signIn, signOut } from '@auth/sveltekit/client';
+	import { page } from '$app/stores';
 
 	let open = false;
 
@@ -90,15 +92,25 @@
 			</Command.Item>
 		</Command.Group>
 		<Command.Group heading="Account">
-			<Command.Item value="logout" onSelect={() => runCommand(() => console.log('logout'))}>
-				<LogOut class="mr-2 h-4 w-4" />
-				Log Out
-			</Command.Item>
+			{#if $page.data.session}
+				<Command.Item value="logout" onSelect={() => runCommand(() => signOut())}>
+					<LogOut class="mr-2 h-4 w-4" />
+					Log Out
+				</Command.Item>
+			{:else}
+				<Command.Item
+					value="Log in with discord"
+					onSelect={() => runCommand(() => signIn('discord'))}
+				>
+					<LogIn class="mr-2 h-4 w-4" />
+					Log In with Discord
+				</Command.Item>
+			{/if}
 		</Command.Group>
 		<Command.Group heading="Team">
 			<Command.Item value="invite" onSelect={() => runCommand(() => console.log('invite'))}>
 				<UserPlus class="mr-2 h-4 w-4" />
-				Invite
+				Copy Invite Link
 			</Command.Item>
 		</Command.Group>
 	</Command.List>
