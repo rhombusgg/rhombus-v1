@@ -54,3 +54,11 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+export const avatarFallback = (user: {
+	emails: { email: string }[];
+	discord: { username: string } | null;
+}) => {
+	if (user.discord) return user.discord.username.substring(0, 2).toUpperCase();
+	return user.emails[0].email.match(/^([^@]{0,2})/)![0].toUpperCase();
+};

@@ -3,6 +3,7 @@ import { sequence } from '@sveltejs/kit/hooks';
 
 import prisma from '$lib/db';
 import { getJwt } from '$lib/serverAuth';
+import { avatarFallback } from '$lib/utils';
 
 const auth: Handle = async ({ event, resolve }) => {
 	const data = await getJwt(event.cookies);
@@ -16,6 +17,7 @@ const auth: Handle = async ({ event, resolve }) => {
 			user: {
 				select: {
 					id: true,
+					teamId: true,
 					discord: {
 						select: {
 							id: true,
@@ -28,6 +30,29 @@ const auth: Handle = async ({ event, resolve }) => {
 						select: {
 							email: true
 						}
+					},
+					team: {
+						select: {
+							id: true,
+							ownerId: true,
+							users: {
+								select: {
+									id: true,
+									discord: {
+										select: {
+											id: true,
+											username: true,
+											globalUsername: true,
+											image: true
+										}
+									},
+									emails: {
+										select: { email: true },
+										take: 1
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -39,7 +64,9 @@ const auth: Handle = async ({ event, resolve }) => {
 	event.locals.session = {
 		id: session.user.id,
 		emails: session.user.emails.map((email) => email.email),
-		avatarFallback: session.user.emails[0].email.match(/^([^@]{0,2})/)![0].toUpperCase()
+		avatarFallback: avatarFallback(session.user),
+		isTeamOwner: session.user.team!.ownerId === session.user.id,
+		team: session.user.team!
 	};
 
 	if (session.user.discord) {
@@ -49,9 +76,6 @@ const auth: Handle = async ({ event, resolve }) => {
 			username: session.user.discord.username,
 			globalUsername: session.user.discord.globalUsername
 		};
-		event.locals.session.avatarFallback = session.user.discord.username
-			.substring(0, 2)
-			.toUpperCase();
 	}
 
 	return resolve(event);

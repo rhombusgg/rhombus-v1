@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { signInDiscord } from '$lib/clientAuth';
-	import { Button } from '$lib/components/ui/button';
+	import { signInDiscordUrl } from '$lib/clientAuth';
+	import { buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { DiscordLogo } from 'radix-icons-svelte';
 	import * as Form from '$lib/components/ui/form';
@@ -36,8 +36,8 @@
 		</Dialog.Content>
 	</Dialog.Root>
 	<div class="grid gap-4 sm:w-96">
-		<Button variant="outline" type="button" on:click={() => void signInDiscord()}
-			><DiscordLogo class="mr-2 h-4 w-4" /> Discord</Button
+		<a class={buttonVariants({ variant: 'outline' })} href={signInDiscordUrl}
+			><DiscordLogo class="mr-2 h-4 w-4" /> Discord</a
 		>
 		<div class="relative">
 			<div class="absolute inset-0 flex items-center">

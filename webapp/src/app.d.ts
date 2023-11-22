@@ -25,6 +25,23 @@ declare global {
 		};
 		emails: string[];
 		avatarFallback: string;
+		isTeamOwner: boolean;
+		team: {
+			id: string;
+			ownerId: string;
+			users: {
+				id: string;
+				discord: {
+					id: string;
+					username: string;
+					globalUsername: string;
+					image: string;
+				} | null;
+				emails: {
+					email: string;
+				}[];
+			}[];
+		};
 	}
 }
 

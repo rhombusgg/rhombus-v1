@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db.js';
 import { setJwt } from '$lib/serverAuth.js';
+import { generateInviteToken } from '$lib/team.js';
 
 export async function GET({ url, cookies }) {
 	const token = url.searchParams.get('token');
@@ -11,12 +12,16 @@ export async function GET({ url, cookies }) {
 	const emailVerificationToken = await prisma.emailVerificationToken
 		.delete({
 			where: { token },
-			select: { email: true }
+			select: { email: true, expires: true }
 		})
 		.catch(() => null);
 
 	if (!emailVerificationToken) {
 		throw error(403, 'Invalid email verification token');
+	}
+
+	if (emailVerificationToken.expires < new Date()) {
+		throw error(403, 'Expired email verification token');
 	}
 
 	const existing = await prisma.email.findUnique({
@@ -58,6 +63,26 @@ export async function GET({ url, cookies }) {
 				}
 			},
 			select: { id: true, sessions: { select: { id: true } } }
+		});
+
+		const team = await prisma.team.create({
+			data: {
+				name: emailVerificationToken.email.split('@')[0],
+				inviteToken: generateInviteToken(),
+				discordRoleId: '',
+				ownerId: user.id
+			},
+			select: {
+				id: true
+			}
+		});
+
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				teamId: team.id,
+				ownerTeamId: team.id
+			}
 		});
 
 		const inviteToken = cookies.get('inviteToken');

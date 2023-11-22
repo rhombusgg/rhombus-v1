@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { Laptop, Moon, Sun } from 'radix-icons-svelte';
+	import { DiscordLogo, Laptop, Moon, Sun } from 'radix-icons-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resetMode, setMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
+	import * as Avatar from '$lib/components/ui/avatar';
 	import Logo from '$lib/components/icons/logo.svelte';
-	import { LineChart, LogIn, LogOut, Swords, User, UserPlus, Users } from 'lucide-svelte';
+	import { LineChart, LogIn, LogOut, Mail, Swords, User, UserPlus, Users } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { signInDiscord, signOut } from '$lib/clientAuth';
+	import { avatarFallback } from '$lib/utils';
 
 	let open = false;
 
@@ -75,7 +77,7 @@
 				Scoreboard
 			</Command.Item>
 			<Command.Item value="home" onSelect={() => runCommand(() => goto('/'))}>
-				<Logo class="mr-2 h-4 w-4" />
+				<Logo class="mr-2" />
 				Home
 			</Command.Item>
 		</Command.Group>
@@ -114,8 +116,12 @@
 					value="Sign in with discord"
 					onSelect={() => runCommand(() => signInDiscord())}
 				>
-					<LogIn class="mr-2 h-4 w-4" />
+					<DiscordLogo class="mr-2 h-4 w-4" />
 					Sign In with Discord
+				</Command.Item>
+				<Command.Item value="Sign in with email" onSelect={() => runCommand(() => goto('/signin'))}>
+					<Mail class="mr-2 h-4 w-4" />
+					Sign in with Email
 				</Command.Item>
 			{/if}
 		</Command.Group>
@@ -125,6 +131,27 @@
 					<UserPlus class="mr-2 h-4 w-4" />
 					Copy Invite Link
 				</Command.Item>
+				{#if $page.data.session.isTeamOwner}
+					{#each $page.data.session.team.users as user}
+						{#if user.id !== $page.data.session.id}
+							<Command.Item
+								value={`Kick ${user.discord?.username ?? user.emails[0].email}`}
+								onSelect={() => runCommand(() => console.log('invite'))}
+							>
+								<Avatar.Root class="mr-2 h-6 w-6">
+									{#if user.discord}
+										<Avatar.Image
+											src={user.discord.image}
+											alt={`@${user.discord.globalUsername}`}
+										/>
+									{/if}
+									<Avatar.Fallback>{avatarFallback(user)}</Avatar.Fallback>
+								</Avatar.Root>
+								Kick {user.discord?.username ?? user.emails[0].email}
+							</Command.Item>
+						{/if}
+					{/each}
+				{/if}
 			</Command.Group>
 		{/if}
 	</Command.List>

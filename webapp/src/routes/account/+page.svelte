@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { signInDiscord } from '$lib/clientAuth';
-	import { Button } from '$lib/components/ui/button';
+	import { signInDiscord, signInDiscordUrl } from '$lib/clientAuth';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import clsx from 'clsx';
 	import { Check } from 'lucide-svelte';
@@ -44,7 +44,7 @@
 							better one-on-one communication with issues.
 						</p>
 						{#if !$page.data.session.discord}
-							<Button class="mt-2" on:click={() => signInDiscord()}>Link Discord</Button>
+							<a class={clsx(buttonVariants(), 'mt-2')} href={signInDiscordUrl}>Link Discord</a>
 						{/if}
 
 						<h3 class="mt-8 flex items-center text-xl font-semibold tracking-tight">
@@ -59,7 +59,7 @@
 							Join the official Discord server to get important announcements and chat with other
 							competitors.
 						</p>
-						<Button class="mt-2" on:click={() => signInDiscord()}>Join Server</Button>
+						<a class={clsx(buttonVariants(), 'mt-2')} href={'https://discord.com'}>Join Server</a>
 					</div>
 				</Card.Content>
 			</Card.Root>

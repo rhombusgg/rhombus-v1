@@ -38,6 +38,15 @@
 			>
 				Team
 			</a>
+			<a
+				href="/account"
+				class={cn(
+					'hover:text-foreground/80 transition-colors',
+					$page.url.pathname === '/account' ? 'text-foreground' : 'text-foreground/60'
+				)}
+			>
+				Account
+			</a>
 		{:else}
 			<a
 				href="/signin"
