@@ -1,7 +1,9 @@
 import prisma from '$lib/db';
 import { avatarFallback } from '$lib/utils';
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
+import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
+import { teamNameFormSchema } from './schema.js';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -58,7 +60,8 @@ export const load = async ({ locals }) => {
 		}))
 	};
 	return {
-		team
+		team,
+		teamNameForm: superValidate(teamNameFormSchema)
 	};
 };
 
@@ -98,5 +101,42 @@ export const actions = {
 		}
 
 		return error(401);
+	},
+	teamName: async (event) => {
+		const form = await superValidate(event, teamNameFormSchema);
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+
+		if (event.locals.session?.isTeamOwner) {
+			const team = await prisma.team.findFirst({
+				where: {
+					name: form.data.name
+				}
+			});
+			if (team) {
+				if (team.id === event.locals.session.team.id) {
+					return { form };
+				}
+				return message(form, 'A team with that name already exists.', { status: 400 });
+			}
+
+			await prisma.team.update({
+				where: {
+					id: event.locals.session.team.id
+				},
+				data: {
+					name: form.data.name
+				}
+			});
+		} else {
+			return error(401);
+		}
+
+		return {
+			form
+		};
 	}
 };

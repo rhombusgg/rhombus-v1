@@ -1,11 +1,15 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import * as Avatar from '$lib/components/ui/avatar';
+	import * as Form from '$lib/components/ui/form';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { Crown, LogOut } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
+	import { teamNameFormSchema } from './schema.js';
+	import { message } from 'sveltekit-superforms/server';
+	import toast from 'svelte-french-toast';
 	export let data;
 
 	const isOwner = writable();
@@ -56,6 +60,9 @@
 											{:else}
 												{user.email}
 											{/if}
+											{#if user.id === data.session?.id}
+												(You)
+											{/if}
 										</p>
 									</div>
 									{#if user.id === data.team.ownerId}
@@ -68,7 +75,6 @@
 									{/if}
 								</div>
 								{#if $isOwner !== (user.id === data.session?.id)}
-									<!-- {#if ($isOwner && user.id !== data.session?.id) || (!$isOwner && user.id === data.session?.id)} -->
 									<Tooltip.Root>
 										<Tooltip.Trigger>
 											<form
@@ -111,22 +117,50 @@
 				</Card.Header>
 				<Card.Content>A</Card.Content>
 			</Card.Root>
-			<Card.Root>
-				<Card.Header>
-					<Card.Title>Webhook</Card.Title>
-					<Card.Description>Manage webhooks for your team</Card.Description>
-				</Card.Header>
-				<Card.Content>A</Card.Content>
-			</Card.Root>
-			<Card.Root>
-				<Card.Header>
-					<Card.Title>Settings</Card.Title>
-					<Card.Description>Manage team settings</Card.Description>
-				</Card.Header>
-				<Card.Content>
-					{data.team.name}
-				</Card.Content>
-			</Card.Root>
+			{#if $isOwner}
+				<Card.Root>
+					<Card.Header>
+						<Card.Title>Webhook</Card.Title>
+						<Card.Description>Manage webhooks for your team</Card.Description>
+					</Card.Header>
+					<Card.Content>A</Card.Content>
+				</Card.Root>
+			{/if}
+			{#if $isOwner}
+				<Card.Root>
+					<Card.Header>
+						<Card.Title>Settings</Card.Title>
+						<Card.Description>Manage team settings</Card.Description>
+					</Card.Header>
+					<Card.Content>
+						<Form.Root
+							method="POST"
+							action="?/teamName"
+							form={data.teamNameForm}
+							options={{
+								onUpdate({ form }) {
+									if (form.message) {
+										toast.error(form.message);
+									}
+								}
+							}}
+							schema={teamNameFormSchema}
+							let:config
+						>
+							<Form.Field {config} name="name">
+								<Form.Item>
+									<Form.Label>Team Name</Form.Label>
+									<Form.Validation />
+									<div class="flex gap-2">
+										<Form.Input placeholder={data.team.name} />
+										<Form.Button>Change Name</Form.Button>
+									</div>
+								</Form.Item>
+							</Form.Field>
+						</Form.Root>
+					</Card.Content>
+				</Card.Root>
+			{/if}
 		</div>
 	</div>
 {/if}
