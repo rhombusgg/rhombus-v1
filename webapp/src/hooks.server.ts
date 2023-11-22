@@ -35,6 +35,7 @@ const auth: Handle = async ({ event, resolve }) => {
 						select: {
 							id: true,
 							ownerId: true,
+							inviteToken: true,
 							users: {
 								select: {
 									id: true,

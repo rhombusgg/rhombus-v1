@@ -4,6 +4,8 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import { teamNameFormSchema } from './schema.js';
+import { PUBLIC_LOCATION_URL } from '$env/static/public';
+import { generateInviteToken } from '$lib/team.js';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -20,6 +22,7 @@ export const load = async ({ locals }) => {
 					id: true,
 					name: true,
 					ownerId: true,
+					inviteToken: true,
 					users: {
 						select: {
 							id: true,
@@ -39,6 +42,7 @@ export const load = async ({ locals }) => {
 	const team: {
 		name: string;
 		ownerId: string;
+		inviteLink: string;
 		users: {
 			discord: {
 				username: string;
@@ -52,6 +56,7 @@ export const load = async ({ locals }) => {
 	} = {
 		name: user.team!.name,
 		ownerId: user.team!.ownerId,
+		inviteLink: `${PUBLIC_LOCATION_URL}/signin?invite=${user.team!.inviteToken}`,
 		users: user.team!.users.map((user) => ({
 			discord: user.discord,
 			email: user.discord ? undefined : user.emails[0].email,
@@ -138,5 +143,25 @@ export const actions = {
 		return {
 			form
 		};
+	},
+	refreshInviteLink: async ({ locals }) => {
+		if (!locals.session) {
+			throw redirect(302, '/signin');
+		}
+
+		if (locals.session.isTeamOwner) {
+			const inviteToken = generateInviteToken();
+			await prisma.team.update({
+				where: {
+					id: locals.session.team.id
+				},
+				data: {
+					inviteToken
+				}
+			});
+			return;
+		}
+
+		return error(401);
 	}
 };

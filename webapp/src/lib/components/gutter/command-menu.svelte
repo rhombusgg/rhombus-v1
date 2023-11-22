@@ -7,10 +7,22 @@
 	import * as Command from '$lib/components/ui/command';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import Logo from '$lib/components/icons/logo.svelte';
-	import { LineChart, LogIn, LogOut, Mail, Swords, User, UserPlus, Users } from 'lucide-svelte';
+	import {
+		CaseSensitive,
+		LineChart,
+		LogIn,
+		LogOut,
+		Mail,
+		Swords,
+		User,
+		UserPlus,
+		Users
+	} from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { signInDiscord, signOut } from '$lib/clientAuth';
 	import { avatarFallback } from '$lib/utils';
+	import { PUBLIC_LOCATION_URL } from '$env/static/public';
+	import { enhance } from '$app/forms';
 
 	let open = false;
 
@@ -127,30 +139,22 @@
 		</Command.Group>
 		{#if $page.data.session}
 			<Command.Group heading="Team">
-				<Command.Item value="invite" onSelect={() => runCommand(() => console.log('invite'))}>
+				<Command.Item
+					value="Copy invite link"
+					onSelect={() =>
+						runCommand(() => {
+							const inviteLink = `${PUBLIC_LOCATION_URL}/signin?invite=${$page.data.session?.team.inviteToken}`;
+							navigator.clipboard.writeText(inviteLink);
+						})}
+				>
 					<UserPlus class="mr-2 h-4 w-4" />
 					Copy Invite Link
 				</Command.Item>
 				{#if $page.data.session.isTeamOwner}
-					{#each $page.data.session.team.users as user}
-						{#if user.id !== $page.data.session.id}
-							<Command.Item
-								value={`Kick ${user.discord?.username ?? user.emails[0].email}`}
-								onSelect={() => runCommand(() => console.log('invite'))}
-							>
-								<Avatar.Root class="mr-2 h-6 w-6">
-									{#if user.discord}
-										<Avatar.Image
-											src={user.discord.image}
-											alt={`@${user.discord.globalUsername}`}
-										/>
-									{/if}
-									<Avatar.Fallback>{avatarFallback(user)}</Avatar.Fallback>
-								</Avatar.Root>
-								Kick {user.discord?.username ?? user.emails[0].email}
-							</Command.Item>
-						{/if}
-					{/each}
+					<Command.Item value="Set team name" onSelect={() => runCommand(() => goto('/team'))}>
+						<CaseSensitive class="mr-2 h-4 w-4" />
+						Set team name
+					</Command.Item>
 				{/if}
 			</Command.Group>
 		{/if}

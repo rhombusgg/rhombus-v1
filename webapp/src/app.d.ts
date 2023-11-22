@@ -29,6 +29,7 @@ declare global {
 		team: {
 			id: string;
 			ownerId: string;
+			inviteToken: string;
 			users: {
 				id: string;
 				discord: {
