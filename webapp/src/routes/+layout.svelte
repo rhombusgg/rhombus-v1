@@ -9,7 +9,7 @@
 
 <div class="relative flex min-h-screen flex-col" id="page">
 	<SiteHeader />
-	<div class="flex-1">
+	<div class="flex flex-1">
 		<slot />
 	</div>
 	<SiteFooter />

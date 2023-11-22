@@ -19,23 +19,35 @@
 		>
 			Scoreboard
 		</a>
-		<a
-			href="/challenges"
-			class={cn(
-				'hover:text-foreground/80 transition-colors',
-				$page.url.pathname === '/challenges' ? 'text-foreground' : 'text-foreground/60'
-			)}
-		>
-			Challenges
-		</a>
-		<a
-			href="/team"
-			class={cn(
-				'hover:text-foreground/80 transition-colors',
-				$page.url.pathname === '/team' ? 'text-foreground' : 'text-foreground/60'
-			)}
-		>
-			Team
-		</a>
+		{#if $page.data.session}
+			<a
+				href="/challenges"
+				class={cn(
+					'hover:text-foreground/80 transition-colors',
+					$page.url.pathname === '/challenges' ? 'text-foreground' : 'text-foreground/60'
+				)}
+			>
+				Challenges
+			</a>
+			<a
+				href="/team"
+				class={cn(
+					'hover:text-foreground/80 transition-colors',
+					$page.url.pathname === '/team' ? 'text-foreground' : 'text-foreground/60'
+				)}
+			>
+				Team
+			</a>
+		{:else}
+			<a
+				href="/signin"
+				class={cn(
+					'hover:text-foreground/80 transition-colors',
+					$page.url.pathname === '/signin' ? 'text-foreground' : 'text-foreground/60'
+				)}
+			>
+				Sign In
+			</a>
+		{/if}
 	</nav>
 </div>

@@ -51,14 +51,25 @@
 	<Command.List>
 		<Command.Empty>No results found.</Command.Empty>
 		<Command.Group heading="Pages">
-			<Command.Item value="challenges" onSelect={() => runCommand(() => goto('/challenges'))}>
-				<Swords class="mr-2 h-4 w-4" />
-				Challenges
-			</Command.Item>
-			<Command.Item value="team" onSelect={() => runCommand(() => goto('/team'))}>
-				<Users class="mr-2 h-4 w-4" />
-				Team
-			</Command.Item>
+			{#if $page.data.session}
+				<Command.Item value="challenges" onSelect={() => runCommand(() => goto('/challenges'))}>
+					<Swords class="mr-2 h-4 w-4" />
+					Challenges
+				</Command.Item>
+				<Command.Item value="team" onSelect={() => runCommand(() => goto('/team'))}>
+					<Users class="mr-2 h-4 w-4" />
+					Team
+				</Command.Item>
+				<Command.Item value="account" onSelect={() => runCommand(() => goto('/account'))}>
+					<User class="mr-2 h-4 w-4" />
+					Account
+				</Command.Item>
+			{:else}
+				<Command.Item value="signin" onSelect={() => runCommand(() => goto('/signin'))}>
+					<LogIn class="mr-2 h-4 w-4" />
+					Sign in
+				</Command.Item>
+			{/if}
 			<Command.Item value="scoreboard" onSelect={() => runCommand(() => goto('/scoreboard'))}>
 				<LineChart class="mr-2 h-4 w-4" />
 				Scoreboard
@@ -66,14 +77,6 @@
 			<Command.Item value="home" onSelect={() => runCommand(() => goto('/'))}>
 				<Logo class="mr-2 h-4 w-4" />
 				Home
-			</Command.Item>
-			<Command.Item value="account" onSelect={() => runCommand(() => goto('/account'))}>
-				<User class="mr-2 h-4 w-4" />
-				Account
-			</Command.Item>
-			<Command.Item value="signin" onSelect={() => runCommand(() => goto('/signin'))}>
-				<LogIn class="mr-2 h-4 w-4" />
-				Sign in
 			</Command.Item>
 		</Command.Group>
 		<Command.Separator />
@@ -107,11 +110,13 @@
 				</Command.Item>
 			{/if}
 		</Command.Group>
-		<Command.Group heading="Team">
-			<Command.Item value="invite" onSelect={() => runCommand(() => console.log('invite'))}>
-				<UserPlus class="mr-2 h-4 w-4" />
-				Copy Invite Link
-			</Command.Item>
-		</Command.Group>
+		{#if $page.data.session}
+			<Command.Group heading="Team">
+				<Command.Item value="invite" onSelect={() => runCommand(() => console.log('invite'))}>
+					<UserPlus class="mr-2 h-4 w-4" />
+					Copy Invite Link
+				</Command.Item>
+			</Command.Group>
+		{/if}
 	</Command.List>
 </Command.Dialog>
