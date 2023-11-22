@@ -57,8 +57,31 @@ export async function GET({ url, cookies }) {
 					}
 				}
 			},
-			select: { sessions: { select: { id: true } } }
+			select: { id: true, sessions: { select: { id: true } } }
 		});
+
+		const inviteToken = cookies.get('inviteToken');
+		if (inviteToken) {
+			cookies.delete('inviteToken', { path: '/' });
+			const invitedTeam = await prisma.team.findUnique({
+				where: {
+					inviteToken
+				},
+				select: {
+					id: true
+				}
+			});
+			if (invitedTeam) {
+				await prisma.user.update({
+					where: {
+						id: user.id
+					},
+					data: {
+						teamId: invitedTeam.id
+					}
+				});
+			}
+		}
 
 		await setJwt({ sessionId: user.sessions[0].id, expires }, cookies);
 	}

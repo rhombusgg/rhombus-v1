@@ -2,7 +2,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
-	import { LogOut, User } from 'lucide-svelte';
+	import { LogOut, User, Users } from 'lucide-svelte';
 	import { signOut } from '$lib/clientAuth';
 	import { page } from '$app/stores';
 	import clsx from 'clsx';
@@ -53,6 +53,7 @@
 			</DropdownMenu.Label>
 			<DropdownMenu.Separator />
 			<DropdownMenu.Item href="/account"><User class="mr-2 h-4 w-4" /> Account</DropdownMenu.Item>
+			<DropdownMenu.Item href="/team"><Users class="mr-2 h-4 w-4" /> Team</DropdownMenu.Item>
 			<DropdownMenu.Item on:click={() => signOut()}
 				><LogOut class="mr-2 h-4 w-4" /> Sign out</DropdownMenu.Item
 			>

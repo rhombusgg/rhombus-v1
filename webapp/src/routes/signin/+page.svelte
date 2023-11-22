@@ -12,6 +12,11 @@
 </script>
 
 <div class="flex flex-grow flex-col items-center justify-center gap-y-6">
+	{#if data.teamName}
+		<h1 class="text-2xl font-semibold tracking-tight">
+			You've been invited to join {data.teamName}!
+		</h1>
+	{/if}
 	<div class="flex max-w-md flex-col gap-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Sign In</h1>
 		<p class="text-muted-foreground text-sm">

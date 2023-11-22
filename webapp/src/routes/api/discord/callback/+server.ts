@@ -2,8 +2,9 @@ import { DISCORD_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_DISCORD_CLIENT_ID, PUBLIC_LOCATION_URL } from '$env/static/public';
 import { z } from 'zod';
 import { error, redirect } from '@sveltejs/kit';
-import prisma from '$lib/db.js';
-import { setJwt, getJwt } from '$lib/serverAuth.js';
+import prisma from '$lib/db';
+import { setJwt, getJwt } from '$lib/serverAuth';
+import { generateInviteToken } from '$lib/team';
 
 export async function GET({ url, cookies }) {
 	if (url.searchParams.get('error')) {
@@ -178,8 +179,51 @@ export async function GET({ url, cookies }) {
 					}
 				}
 			},
-			select: { sessions: { select: { id: true } } }
+			select: { id: true, sessions: { select: { id: true } } }
 		});
+
+		const team = await prisma.team.create({
+			data: {
+				name: profile.username,
+				inviteToken: generateInviteToken(),
+				discordRoleId: '',
+				ownerId: user.id
+			},
+			select: {
+				id: true
+			}
+		});
+
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				teamId: team.id,
+				ownerTeamId: team.id
+			}
+		});
+
+		const inviteToken = cookies.get('inviteToken');
+		if (inviteToken) {
+			cookies.delete('inviteToken');
+			const invitedTeam = await prisma.team.findUnique({
+				where: {
+					inviteToken
+				},
+				select: {
+					id: true
+				}
+			});
+			if (invitedTeam) {
+				await prisma.user.update({
+					where: {
+						id: user.id
+					},
+					data: {
+						teamId: invitedTeam.id
+					}
+				});
+			}
+		}
 
 		await setJwt({ sessionId: user.sessions[0].id, expires }, cookies);
 	}

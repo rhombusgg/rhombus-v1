@@ -1,5 +1,4 @@
-import type { PageServerLoad, Actions } from './$types';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { formSchema } from './schema';
 import { renderSignInEmail } from './email';
@@ -9,8 +8,41 @@ import { z } from 'zod';
 import { PUBLIC_LOCATION_URL } from '$env/static/public';
 import prisma from '$lib/db';
 
-export const load: PageServerLoad = () => {
+export const load = async ({ url, cookies, locals }) => {
+	const inviteToken = url.searchParams.get('invite');
+	if (inviteToken) {
+		const team = await prisma.team.findUnique({
+			where: {
+				inviteToken
+			},
+			select: {
+				id: true,
+				name: true
+			}
+		});
+		if (team) {
+			if (locals.session) {
+				await prisma.user.update({
+					where: {
+						id: locals.session.id
+					},
+					data: {
+						teamId: team.id
+					}
+				});
+				throw redirect(302, '/team');
+			}
+
+			cookies.set('inviteToken', inviteToken);
+			return {
+				teamName: team.name,
+				form: superValidate(formSchema)
+			};
+		}
+	}
+
 	return {
+		team: undefined,
 		form: superValidate(formSchema)
 	};
 };
@@ -24,7 +56,7 @@ const transporter = nodemailer.createTransport({
 	}
 });
 
-export const actions: Actions = {
+export const actions = {
 	default: async (event) => {
 		const form = await superValidate(event, formSchema);
 		if (!form.valid) {

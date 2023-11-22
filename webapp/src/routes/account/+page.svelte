@@ -8,10 +8,6 @@
 	import { DiscordLogo } from 'radix-icons-svelte';
 </script>
 
-<!-- {JSON.stringify($page.data.session)} -->
-
-<!-- <Button on:click={() => signInDiscord()}>Link Discord</Button> -->
-
 {#if $page.data.session}
 	<div class="container">
 		<div class="mb-4 mt-4 space-y-0.5">
