@@ -3,7 +3,7 @@ import { PUBLIC_DISCORD_CLIENT_ID, PUBLIC_LOCATION_URL } from '$env/static/publi
 import { z } from 'zod';
 import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db.js';
-import { setJwt } from '$lib/serverAuth.js';
+import { setJwt, getJwt } from '$lib/serverAuth.js';
 
 export async function GET({ url, cookies }) {
 	if (url.searchParams.get('error')) {
@@ -80,6 +80,62 @@ export async function GET({ url, cookies }) {
 		select: { userId: true }
 	});
 
+	const jwt = await getJwt(cookies);
+	if (jwt) {
+		const session = await prisma.session.findUnique({
+			where: {
+				id: jwt.sessionId
+			},
+			select: { userId: true }
+		});
+
+		if (session) {
+			if (existing) {
+				if (existing.userId !== session.userId) {
+					throw error(403, 'Discord account already linked to another user');
+				}
+			} else {
+				const discord = await prisma.discord.create({
+					data: {
+						id: profile.id,
+						username: profile.username,
+						globalUsername: profile.global_name,
+						email: profile.email,
+						image,
+						userId: session.userId
+					}
+				});
+				console.log('connecting');
+
+				await prisma.user.update({
+					where: {
+						id: session.userId
+					},
+					data: {
+						discord: {
+							connect: {
+								id: discord.id
+							}
+						},
+						emails: {
+							connectOrCreate: {
+								create: {
+									email: profile.email,
+									verified: new Date()
+								},
+								where: {
+									email: profile.email
+								}
+							}
+						}
+					}
+				});
+			}
+
+			throw redirect(302, `/account`);
+		}
+	}
+
 	const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 
 	if (existing) {
@@ -128,5 +184,5 @@ export async function GET({ url, cookies }) {
 		await setJwt({ sessionId: user.sessions[0].id, expires }, cookies);
 	}
 
-	throw redirect(302, `/`);
+	throw redirect(302, `/account`);
 }

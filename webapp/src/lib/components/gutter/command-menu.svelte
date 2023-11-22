@@ -100,6 +100,15 @@
 					<LogOut class="mr-2 h-4 w-4" />
 					Sign Out
 				</Command.Item>
+				{#if !$page.data.session.discord}
+					<Command.Item
+						value="Sign in with discord"
+						onSelect={() => runCommand(() => signInDiscord())}
+					>
+						<LogIn class="mr-2 h-4 w-4" />
+						Link Discord
+					</Command.Item>
+				{/if}
 			{:else}
 				<Command.Item
 					value="Sign in with discord"

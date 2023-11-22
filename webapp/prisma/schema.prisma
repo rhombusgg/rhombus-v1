@@ -18,8 +18,8 @@ model Email {
     id       String    @id @default(cuid())
     email    String    @unique
     verified DateTime?
-    User     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId   String?
+    User     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId   String
 }
 
 model Discord {
@@ -40,12 +40,10 @@ model User {
     ips      IP[]
 }
 
-model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
-
-    @@unique([identifier, token])
+model EmailVerificationToken {
+    token   String   @id @unique @default(cuid())
+    email   String
+    expires DateTime
 }
 
 model IP {

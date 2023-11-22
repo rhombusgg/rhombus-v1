@@ -7,6 +7,7 @@ import nodemailer from 'nodemailer';
 import { SMTP_FROM, SMTP_HOST, SMTP_PASSWORD, SMTP_PORT, SMTP_USER } from '$env/static/private';
 import { z } from 'zod';
 import { PUBLIC_LOCATION_URL } from '$env/static/public';
+import prisma from '$lib/db';
 
 export const load: PageServerLoad = () => {
 	return {
@@ -32,8 +33,18 @@ export const actions: Actions = {
 			});
 		}
 
+		const verificationToken = await prisma.emailVerificationToken.create({
+			data: {
+				email: form.data.email,
+				expires: new Date(Date.now() + 1000 * 60 * 10)
+			},
+			select: {
+				token: true
+			}
+		});
+
 		const email = await renderSignInEmail({
-			authLink: `${PUBLIC_LOCATION_URL}/afhsdf`,
+			authLink: `${PUBLIC_LOCATION_URL}/api/email/callback?token=${verificationToken.token}`,
 			ip: event.getClientAddress()
 		});
 
