@@ -119,7 +119,7 @@
 						value="Sign in with discord"
 						onSelect={() => runCommand(() => signInDiscord())}
 					>
-						<LogIn class="mr-2 h-4 w-4" />
+						<DiscordLogo class="mr-2 h-4 w-4" />
 						Link Discord
 					</Command.Item>
 				{/if}

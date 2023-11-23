@@ -82,10 +82,29 @@
 			</form>
 		</Dialog.Content>
 	</Dialog.Root>
+	<Dialog.Root
+		open={$page.url.searchParams.get('ticket') === challenge.humanId}
+		onOpenChange={() => {
+			$page.url.searchParams.delete('ticket');
+			goto($page.url);
+		}}
+	>
+		<Dialog.Content>
+			<div class="font-bold">
+				<span class="text-green-500">{challenge.category} / </span>
+				<span>{challenge.difficulty} / </span>
+				<span>{challenge.name}</span>
+			</div>
+			<div>
+				{challenge.description}
+			</div>
+			<div>Ticket</div>
+		</Dialog.Content>
+	</Dialog.Root>
 {/each}
 
 <div
-	class="mt-4 grid grid-flow-col gap-4 overflow-x-scroll px-4"
+	class="mt-4 grid w-full gap-4 overflow-x-scroll px-4 md:grid-flow-col"
 	use:dndzone={{
 		items: challenges,
 		flipDurationMs,
@@ -97,7 +116,10 @@
 	on:finalize={handleDndFinalizeColumns}
 >
 	{#each challenges as category (category.id)}
-		<div class="flex w-[500px] flex-col rounded-md" animate:flip={{ duration: flipDurationMs }}>
+		<div
+			class="flex w-full flex-col rounded-md md:w-[500px]"
+			animate:flip={{ duration: flipDurationMs }}
+		>
 			<div
 				class="flex justify-between rounded-md bg-green-500 p-4 font-bold"
 				tabindex={dragDisabled ? 0 : -1}
@@ -147,7 +169,9 @@
 										<p>Last checked 1s ago and is <span class="text-green-500">up</span></p>
 									</Tooltip.Content>
 								</Tooltip.Root>
-								<Ticket class="-rotate-45" />
+								<a href={`?ticket=${challenge.humanId}`}>
+									<Ticket class="-rotate-45" />
+								</a>
 								<Avatar.Root class="h-8 w-8 border-4">
 									<Avatar.Image
 										src={challenge.author.image}
