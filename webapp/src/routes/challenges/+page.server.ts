@@ -1,5 +1,6 @@
 import prisma from '$lib/db';
 import { redirect } from '@sveltejs/kit';
+import { z } from 'zod';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -12,6 +13,7 @@ export const load = async ({ locals }) => {
 			humanId: true,
 			name: true,
 			description: true,
+			issueTemplate: true,
 			difficulty: true,
 			points: true,
 			category: true,
@@ -33,6 +35,7 @@ export const load = async ({ locals }) => {
 		humanId: string;
 		name: string;
 		description: string;
+		issueTemplate: string | undefined;
 		difficulty: string;
 		points: number | null;
 		category: string;
@@ -45,6 +48,7 @@ export const load = async ({ locals }) => {
 		humanId: challenge.humanId,
 		name: challenge.name,
 		description: challenge.description,
+		issueTemplate: challenge.issueTemplate as string | undefined,
 		difficulty: challenge.difficulty,
 		points: challenge.points,
 		category: challenge.category,
@@ -57,4 +61,18 @@ export const load = async ({ locals }) => {
 	return {
 		challenges
 	};
+};
+
+export const actions = {
+	ticket: async ({ request, locals }) => {
+		if (!locals.session) {
+			throw redirect(302, '/signin');
+		}
+
+		const data = z
+			.object({ challengeId: z.string(), content: z.string() })
+			.parse(Object.fromEntries((await request.formData()).entries()));
+
+		console.log(data);
+	}
 };

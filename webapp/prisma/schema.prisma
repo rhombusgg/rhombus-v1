@@ -59,15 +59,16 @@ model Team {
 }
 
 model Challenge {
-    id          String @id @default(cuid())
-    humanId     String @unique
-    name        String
-    description String
-    category    String
-    difficulty  String
-    points      Int?
-    author      User   @relation(fields: [userId], references: [id])
-    userId      String
+    id            String  @id @default(cuid())
+    humanId       String  @unique
+    name          String
+    description   String
+    category      String
+    difficulty    String
+    issueTemplate String?
+    points        Int?
+    author        User    @relation(fields: [userId], references: [id])
+    userId        String
 }
 
 model EmailVerificationToken {

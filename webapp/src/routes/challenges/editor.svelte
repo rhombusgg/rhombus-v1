@@ -1,0 +1,64 @@
+<script lang="ts">
+	import { onDestroy, onMount } from 'svelte';
+	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
+	import { mode } from 'mode-watcher';
+
+	let editor: Monaco.editor.IStandaloneCodeEditor;
+	let monaco: typeof Monaco;
+	let editorContainer: HTMLElement;
+	export let content: string | undefined;
+
+	onMount(async () => {
+		if (!content) content = '# Describe the issue with the challenge\n\n';
+
+		monaco = (await import('./monaco')).default;
+
+		const editor = monaco.editor.create(editorContainer);
+		const model = monaco.editor.createModel(content, 'markdown');
+		monaco.editor.defineTheme('customDark', {
+			base: 'vs-dark',
+			inherit: true,
+			rules: [],
+			colors: {
+				'editor.background': '#020617' // from tailwindcss's slate-950, the dark theme's background color
+			}
+		});
+
+		if ($mode === 'dark') {
+			monaco.editor.setTheme('customDark');
+		} else {
+			monaco.editor.setTheme('vs');
+		}
+		editor.setModel(model);
+		editor.updateOptions({
+			minimap: { enabled: false },
+			lineNumbers: 'off',
+			wordWrap: 'on',
+			scrollBeyondLastLine: false,
+			scrollbar: {
+				verticalScrollbarSize: 0
+			},
+			folding: false,
+			lineDecorationsWidth: 0
+		});
+		model.onDidChangeContent(() => {
+			content = model.getValue();
+		});
+	});
+
+	mode.subscribe((m) => {
+		if (m === 'dark') {
+			monaco?.editor.setTheme('customDark');
+		} else {
+			monaco?.editor.setTheme('vs');
+		}
+	});
+
+	onDestroy(() => {
+		monaco?.editor.getModels().forEach((model) => model.dispose());
+		editor?.dispose();
+	});
+</script>
+
+<div class="h-[400px] w-[350px]" bind:this={editorContainer} />
+<input type="hidden" name="content" bind:value={content} />

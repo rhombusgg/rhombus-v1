@@ -8,6 +8,9 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import Editor from './editor.svelte';
+	import { Button } from '$lib/components/ui/form';
+	import { enhance } from '$app/forms';
 
 	export let data;
 
@@ -58,6 +61,8 @@
 			dragDisabled = true;
 		}
 	}
+
+	let content: string = '### default';
 </script>
 
 {#each data.challenges as challenge}
@@ -84,12 +89,13 @@
 	</Dialog.Root>
 	<Dialog.Root
 		open={$page.url.searchParams.get('ticket') === challenge.humanId}
+		closeOnEscape={false}
 		onOpenChange={() => {
 			$page.url.searchParams.delete('ticket');
 			goto($page.url);
 		}}
 	>
-		<Dialog.Content>
+		<Dialog.Content class="max-w-fit">
 			<div class="font-bold">
 				<span class="text-green-500">{challenge.category} / </span>
 				<span>{challenge.difficulty} / </span>
@@ -98,13 +104,17 @@
 			<div>
 				{challenge.description}
 			</div>
-			<div>Ticket</div>
+			<form use:enhance method="POST" action="?/ticket" on:submit={() => goto('/challenges')}>
+				<Editor content={challenge.issueTemplate} />
+				<input type="hidden" name="challengeId" value={challenge.id} />
+				<Button>Submit</Button>
+			</form>
 		</Dialog.Content>
 	</Dialog.Root>
 {/each}
 
 <div
-	class="mt-4 grid w-full gap-4 overflow-x-scroll px-4 md:grid-flow-col"
+	class="mt-4 flex w-full flex-col gap-4 overflow-x-auto px-4 lg:flex-row"
 	use:dndzone={{
 		items: challenges,
 		flipDurationMs,
@@ -117,7 +127,7 @@
 >
 	{#each challenges as category (category.id)}
 		<div
-			class="flex w-full flex-col rounded-md md:w-[500px]"
+			class="flex w-full flex-col rounded-md lg:w-[500px] lg:min-w-[500px]"
 			animate:flip={{ duration: flipDurationMs }}
 		>
 			<div

@@ -269,57 +269,21 @@ importers:
       '@react-email/render':
         specifier: ^0.0.9
         version: 0.0.9
-      '@types/nodemailer':
-        specifier: ^6.4.14
-        version: 6.4.14
-      '@types/react':
-        specifier: ^18
-        version: 18.2.25
-      bits-ui:
-        specifier: ^0.9.8
-        version: 0.9.8(svelte@4.2.5)
-      clsx:
-        specifier: ^2.0.0
-        version: 2.0.0
-      cmdk-sv:
-        specifier: ^0.0.9
-        version: 0.0.9(svelte@4.2.5)
-      formsnap:
-        specifier: ^0.4.1
-        version: 0.4.1(svelte@4.2.5)(sveltekit-superforms@1.10.2)(zod@3.22.2)
       jose:
         specifier: ^5.1.1
         version: 5.1.1
-      lucide-svelte:
-        specifier: ^0.292.0
-        version: 0.292.0(svelte@4.2.5)
-      mode-watcher:
-        specifier: ^0.1.1
-        version: 0.1.1(svelte@4.2.5)
       nodemailer:
         specifier: ^6.9.5
         version: 6.9.5
-      radix-icons-svelte:
-        specifier: ^1.2.1
-        version: 1.2.1
       react:
         specifier: ^18.2.0
         version: 18.2.0
       react-email:
         specifier: ^1.9.5
         version: 1.9.5
-      svelte-french-toast:
-        specifier: ^1.2.0
-        version: 1.2.0(svelte@4.2.5)
       sveltekit-superforms:
         specifier: ^1.10.2
         version: 1.10.2(@sveltejs/kit@1.27.6)(svelte@4.2.5)(zod@3.22.2)
-      tailwind-merge:
-        specifier: ^1.14.0
-        version: 1.14.0
-      tailwind-variants:
-        specifier: ^0.1.18
-        version: 0.1.18(tailwindcss@3.3.3)
       zod:
         specifier: ^3.22.2
         version: 3.22.2
@@ -330,6 +294,15 @@ importers:
       '@sveltejs/kit':
         specifier: ^1.27.4
         version: 1.27.6(svelte@4.2.5)(vite@4.5.0)
+      '@tailwindcss/typography':
+        specifier: ^0.5.10
+        version: 0.5.10(tailwindcss@3.3.3)
+      '@types/nodemailer':
+        specifier: ^6.4.14
+        version: 6.4.14
+      '@types/react':
+        specifier: ^18
+        version: 18.2.25
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.0.0
         version: 6.7.5(@typescript-eslint/parser@6.7.5)(eslint@8.48.0)(typescript@5.2.2)
@@ -339,6 +312,15 @@ importers:
       autoprefixer:
         specifier: ^10
         version: 10.4.16(postcss@8.4.31)
+      bits-ui:
+        specifier: ^0.9.8
+        version: 0.9.8(svelte@4.2.5)
+      clsx:
+        specifier: ^2.0.0
+        version: 2.0.0
+      cmdk-sv:
+        specifier: ^0.0.9
+        version: 0.0.9(svelte@4.2.5)
       eslint:
         specifier: ^8.28.0
         version: 8.48.0
@@ -348,6 +330,18 @@ importers:
       eslint-plugin-svelte:
         specifier: ^2.30.0
         version: 2.35.0(eslint@8.48.0)(svelte@4.2.5)
+      formsnap:
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@4.2.5)(sveltekit-superforms@1.10.2)(zod@3.22.2)
+      lucide-svelte:
+        specifier: ^0.292.0
+        version: 0.292.0(svelte@4.2.5)
+      mode-watcher:
+        specifier: ^0.1.1
+        version: 0.1.1(svelte@4.2.5)
+      monaco-editor:
+        specifier: ^0.44.0
+        version: 0.44.0
       postcss:
         specifier: ^8
         version: 8.4.31
@@ -363,6 +357,9 @@ importers:
       prisma:
         specifier: ^5.4.1
         version: 5.4.1
+      radix-icons-svelte:
+        specifier: ^1.2.1
+        version: 1.2.1
       svelte:
         specifier: ^4.0.5
         version: 4.2.5
@@ -372,6 +369,15 @@ importers:
       svelte-dnd-action:
         specifier: ^0.9.32
         version: 0.9.32(svelte@4.2.5)
+      svelte-french-toast:
+        specifier: ^1.2.0
+        version: 1.2.0(svelte@4.2.5)
+      tailwind-merge:
+        specifier: ^1.14.0
+        version: 1.14.0
+      tailwind-variants:
+        specifier: ^0.1.18
+        version: 0.1.18(tailwindcss@3.3.3)
       tailwindcss:
         specifier: ^3
         version: 3.3.3
@@ -1342,14 +1348,12 @@ packages:
     resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
     dependencies:
       '@floating-ui/utils': 0.1.6
-    dev: false
 
   /@floating-ui/dom@1.5.3:
     resolution: {integrity: sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==}
     dependencies:
       '@floating-ui/core': 1.5.0
       '@floating-ui/utils': 0.1.6
-    dev: false
 
   /@floating-ui/react-dom@2.0.2(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-5qhlDvjaLmAst/rKb3VdlCinwTF4EYMiVxuuc/HVUjs46W0zgtbMmAZ1UTsDrRTxRmUEzl92mOtWbeeXL26lSQ==}
@@ -1364,7 +1368,6 @@ packages:
 
   /@floating-ui/utils@0.1.6:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
-    dev: false
 
   /@headlessui/react@1.7.17(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-4am+tzvkqDSSgiwrsEpGWqgGo9dz8qU5M3znCkC4PgkpY4HcCZzEDEvozltGGGHIKl9jbXbZPSH5TWn4sWJdow==}
@@ -1422,7 +1425,7 @@ packages:
     resolution: {integrity: sha512-nw0Q+oRkizBWMioseI8+2TeUPEyopJVz5YxoYVzR0W1v+2YytiYah7s/ot35F149q/xAg4F1gT/6eTd+tsUpFQ==}
     dependencies:
       '@swc/helpers': 0.5.2
-    dev: false
+    dev: true
 
   /@isaacs/cliui@8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -1526,7 +1529,7 @@ packages:
       focus-trap: 7.5.4
       nanoid: 4.0.2
       svelte: 4.2.5
-    dev: false
+    dev: true
 
   /@napi-rs/simple-git-android-arm-eabi@0.1.9:
     resolution: {integrity: sha512-9D4JnfePMpgL4pg9aMUX7/TIWEUQ+Tgx8n3Pf8TNCMGjUbImJyYsDSLJzbcv9wH7srgn4GRjSizXFJHAPjzEug==}
@@ -3127,7 +3130,6 @@ packages:
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
     dependencies:
       tslib: 2.6.2
-    dev: false
 
   /@t3-oss/env-core@0.7.0(typescript@5.2.2)(zod@3.22.2):
     resolution: {integrity: sha512-cgunN82CqgQOOyuMOK/bGtujX5/ooXQTwGMJVWI6mCowq6WE5EgRLOqF/DRcrElI0gSFGA9i9GrxzCnk73HZLQ==}
@@ -3155,6 +3157,18 @@ packages:
       typescript: 5.2.2
       zod: 3.22.2
     dev: false
+
+  /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.3.3
+    dev: true
 
   /@tanstack/query-core@4.35.7:
     resolution: {integrity: sha512-PgDJtX75ubFS0WCYFM7DqEoJ4QbxU3S5OH3gJSI40xr7UVVax3/J4CM3XUMOTs+EOT5YGEfssi3tfRVGte4DEw==}
@@ -3333,7 +3347,7 @@ packages:
     resolution: {integrity: sha512-fUWthHO9k9DSdPCSPRqcu6TWhYyxTBg382vlNIttSe9M7XfsT06y0f24KHXtbnijPGGRIcVvdKHTNikOI6qiHA==}
     dependencies:
       '@types/node': 20.8.3
-    dev: false
+    dev: true
 
   /@types/normalize-package-data@2.4.4:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -3839,7 +3853,7 @@ packages:
       '@melt-ui/svelte': 0.61.2(svelte@4.2.5)
       nanoid: 5.0.3
       svelte: 4.2.5
-    dev: false
+    dev: true
 
   /bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
@@ -4046,7 +4060,6 @@ packages:
   /clsx@2.0.0:
     resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
     engines: {node: '>=6'}
-    dev: false
 
   /cmdk-sv@0.0.9(svelte@4.2.5):
     resolution: {integrity: sha512-WnOKl+hW8zqicJAZ+YwUomHYTLuwxlMUhA23CV8w48YKEcaMNd8IpuoeaoWBe0NO0CGemg4QRbHHk3ArXlIo6w==}
@@ -4056,7 +4069,7 @@ packages:
       bits-ui: 0.9.8(svelte@4.2.5)
       nanoid: 5.0.3
       svelte: 4.2.5
-    dev: false
+    dev: true
 
   /cmdk@0.2.0(@types/react@18.2.25)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-JQpKvEOb86SnvMZbYaFKYhvzFntWBeSZdyii0rZPhKJj9uwJBxu4DaVYDrRN7r3mPop56oPhRw+JYWTKs66TYw==}
@@ -5490,7 +5503,7 @@ packages:
     resolution: {integrity: sha512-N7kHdlgsO/v+iD/dMoJKtsSqs5Dz/dXZVebRgJw23LDk+jMi/974zyiOYDziY2JPp8xivq9BmUGwIJMiuSBi7w==}
     dependencies:
       tabbable: 6.2.0
-    dev: false
+    dev: true
 
   /focus-visible@5.2.0:
     resolution: {integrity: sha512-Rwix9pBtC1Nuy5wysTmKy+UjbDJpIfg8eHjw0rjZ1mX4GNLz1Bmd16uDpI3Gk1i70Fgcs8Csg2lPm8HULFg9DQ==}
@@ -5520,7 +5533,7 @@ packages:
       svelte: 4.2.5
       sveltekit-superforms: 1.10.2(@sveltejs/kit@1.27.6)(svelte@4.2.5)(zod@3.22.2)
       zod: 3.22.2
-    dev: false
+    dev: true
 
   /fraction.js@4.3.6:
     resolution: {integrity: sha512-n2aZ9tNfYDwaHhvFTkhFErqOMIb8uyzSQ+vGJBjZyanAKZVbGUQ1sngfk9FdkBw7G26O7AgNjLcecLffD1c7eg==}
@@ -6729,9 +6742,17 @@ packages:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
     dev: false
 
+  /lodash.castarray@4.4.0:
+    resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
+    dev: true
+
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
     dev: false
+
+  /lodash.isplainobject@4.0.6:
+    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
+    dev: true
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -6800,7 +6821,7 @@ packages:
       svelte: '>=3 <5'
     dependencies:
       svelte: 4.2.5
-    dev: false
+    dev: true
 
   /magic-bytes.js@1.5.0:
     resolution: {integrity: sha512-wJkXvutRbNWcc37tt5j1HyOK1nosspdh3dj6LUYYAvF6JYNqs53IfRvK9oEpcwiDA1NdoIi64yAMfdivPeVAyw==}
@@ -7864,7 +7885,11 @@ packages:
       svelte: ^4.0.0
     dependencies:
       svelte: 4.2.5
-    dev: false
+    dev: true
+
+  /monaco-editor@0.44.0:
+    resolution: {integrity: sha512-5SmjNStN6bSuSE5WPT2ZV+iYn1/yI9sd4Igtk23ChvqB7kDk9lZbB9F5frsuvpB+2njdIeGGFf2G4gbE6rCC9Q==}
+    dev: true
 
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -7893,13 +7918,13 @@ packages:
     resolution: {integrity: sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==}
     engines: {node: ^14 || ^16 || >=18}
     hasBin: true
-    dev: false
+    dev: true
 
   /nanoid@5.0.3:
     resolution: {integrity: sha512-I7X2b22cxA4LIHXPSqbBCEQSL+1wv8TuoefejsX4HFWyC6jc5JG7CEaxOltiKjc1M+YCS2YkrZZcj4+dytw9GA==}
     engines: {node: ^18 || >=20}
     hasBin: true
-    dev: false
+    dev: true
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -8611,6 +8636,14 @@ packages:
       postcss: 8.4.31
     dev: true
 
+  /postcss-selector-parser@6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+    dev: true
+
   /postcss-selector-parser@6.0.13:
     resolution: {integrity: sha512-EaV1Gl4mUEV4ddhDnv/xtj7sxwrwxdetHdWUGnT4VJQf+4d05v6lHYZr8N573k5Z0BViss7BDhfWtKS3+sfAqQ==}
     engines: {node: '>=4'}
@@ -8859,7 +8892,7 @@ packages:
 
   /radix-icons-svelte@1.2.1:
     resolution: {integrity: sha512-svmiMd0ocpdTm9cvAz0klcZpnh639lVctj6psQiawd4pYalVzOG4cX+JizAgRckyTAsRVdzObP7D2EBrSfdghA==}
-    dev: false
+    dev: true
 
   /react-dom@18.2.0(react@18.2.0):
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
@@ -9958,7 +9991,7 @@ packages:
     dependencies:
       svelte: 4.2.5
       svelte-writable-derived: 3.1.0(svelte@4.2.5)
-    dev: false
+    dev: true
 
   /svelte-hmr@0.15.3(svelte@4.2.5):
     resolution: {integrity: sha512-41snaPswvSf8TJUhlkoJBekRrABDXDMdpNpT2tfHIv4JuhgvHqLMhEPGtaQn0BmbNSTkuz2Ed20DF2eHw0SmBQ==}
@@ -10022,7 +10055,7 @@ packages:
       svelte: ^3.2.1 || ^4.0.0-next.1
     dependencies:
       svelte: 4.2.5
-    dev: false
+    dev: true
 
   /svelte@4.2.5:
     resolution: {integrity: sha512-P9YPKsGkNdw4OJbtpd1uzimQHPj7Ai2sPcOHmmD6VgkFhFDmcYevQi7vE4cQ1g8/Vs64aL2TwMoCNFAzv7TPaQ==}
@@ -10052,15 +10085,13 @@ packages:
       '@sveltejs/kit': 1.27.6(svelte@4.2.5)(vite@4.5.0)
       svelte: 4.2.5
       zod: 3.22.2
-    dev: false
 
   /tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
-    dev: false
+    dev: true
 
   /tailwind-merge@1.14.0:
     resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
-    dev: false
 
   /tailwind-variants@0.1.18(tailwindcss@3.3.3):
     resolution: {integrity: sha512-yoydMYm3FbZRw7wak+E2sqwYv2Uo3YWRqVZR03DGqDGm0ytzDrEnWO/Q/GMHdhaz8adOvycKw/bwCgQFCfmfhg==}
@@ -10070,7 +10101,7 @@ packages:
     dependencies:
       tailwind-merge: 1.14.0
       tailwindcss: 3.3.3
-    dev: false
+    dev: true
 
   /tailwindcss-animate@1.0.7(tailwindcss@3.3.3):
     resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
@@ -10968,7 +10999,6 @@ packages:
 
   /zod@3.22.2:
     resolution: {integrity: sha512-wvWkphh5WQsJbVk1tbx1l1Ly4yg+XecD+Mq280uBGt9wa5BKSWf4Mhp6GmrkPixhMxmabYY7RbzlwVP32pbGCg==}
-    dev: false
 
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
