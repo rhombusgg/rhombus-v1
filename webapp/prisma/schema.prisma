@@ -33,15 +33,17 @@ model Discord {
 }
 
 model User {
-    id          String    @id @default(cuid())
+    id          String      @id @default(cuid())
     discord     Discord?
     emails      Email[]
     sessions    Session[]
     ips         IP[]
-    team        Team?     @relation(fields: [teamId], references: [id], name: "member")
+    team        Team?       @relation(fields: [teamId], references: [id], name: "member")
     teamId      String?
-    ownerTeam   Team?     @relation(name: "owner")
+    ownerTeam   Team?       @relation(name: "owner")
     ownerTeamId String?
+    Challenge   Challenge[]
+    isAdmin     Boolean     @default(false)
 }
 
 model Team {
@@ -54,6 +56,18 @@ model Team {
     ownerId String @unique
 
     inviteToken String @unique
+}
+
+model Challenge {
+    id          String @id @default(cuid())
+    humanId     String @unique
+    name        String
+    description String
+    category    String
+    difficulty  String
+    points      Int?
+    author      User   @relation(fields: [userId], references: [id])
+    userId      String
 }
 
 model EmailVerificationToken {

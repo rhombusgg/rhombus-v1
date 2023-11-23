@@ -1,73 +1,31 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
-	import { GripVertical } from 'lucide-svelte';
+	import { GripVertical, Maximize, Maximize2, Ticket } from 'lucide-svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import * as Avatar from '$lib/components/ui/avatar';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import Input from '$lib/components/ui/input/input.svelte';
 
-	interface Column {
-		id: number;
-		name: string;
-		items: Item[];
-	}
+	export let data;
 
-	interface Item {
-		id: number;
-		name: string;
-	}
-
-	let board = [
-		{
-			id: 1,
-			name: 'web',
-			items: [
-				{ id: 41, name: 'item41' },
-				{ id: 42, name: 'item42' },
-				{ id: 43, name: 'item43' },
-				{ id: 44, name: 'item44' },
-				{ id: 45, name: 'item45' },
-				{ id: 46, name: 'item46' },
-				{ id: 47, name: 'item47' },
-				{ id: 48, name: 'item48' },
-				{ id: 49, name: 'item49' },
-				{ id: 50, name: 'item49' },
-				{ id: 51, name: 'item49' },
-				{ id: 52, name: 'item49' },
-				{ id: 53, name: 'item49' },
-				{ id: 54, name: 'item49' },
-				{ id: 55, name: 'item49' },
-				{ id: 56, name: 'item49' },
-				{ id: 57, name: 'item49' },
-				{ id: 58, name: 'item49' },
-				{ id: 59, name: 'item49' },
-				{ id: 60, name: 'item49' }
-			]
-		},
-		{
-			id: 2,
-			name: 'pwn',
-			items: []
-		},
-		{
-			id: 3,
-			name: 'crypto',
-			items: []
-		},
-		{
-			id: 4,
-			name: 'misc',
-			items: []
-		},
-		{
-			id: 5,
-			name: 'forensics',
-			items: []
-		}
-	];
+	let challenges = data.challenges
+		.map((challenge) => challenge.category)
+		.filter((v, i, a) => a.indexOf(v) === i)
+		.map((category) => ({
+			id: category,
+			challenges: data.challenges.filter((challenge) => challenge.category === category)
+		}));
+	type C = (typeof challenges)[number];
+	type I = C['challenges'][number];
 
 	let dragDisabled = true;
 
 	const flipDurationMs = 200;
-	function handleDndConsiderColumns(e: CustomEvent<DndEvent<Column>>) {
-		board = e.detail.items;
+	function handleDndConsiderColumns(e: CustomEvent<DndEvent<C>>) {
+		challenges = e.detail.items;
 		if (
 			e.detail.info.source === SOURCES.KEYBOARD &&
 			e.detail.info.trigger === TRIGGERS.DRAG_STOPPED
@@ -75,16 +33,16 @@
 			dragDisabled = true;
 		}
 	}
-	function handleDndFinalizeColumns(e: CustomEvent<DndEvent<Column>>) {
-		board = e.detail.items;
+	function handleDndFinalizeColumns(e: CustomEvent<DndEvent<C>>) {
+		challenges = e.detail.items;
 		if (e.detail.info.source === SOURCES.POINTER) {
 			dragDisabled = true;
 		}
 	}
-	function handleDndConsiderCards(columnId: number, e: CustomEvent<DndEvent<Item>>) {
-		const colIdx = board.findIndex((c) => c.id === columnId);
-		board[colIdx].items = e.detail.items;
-		board = [...board];
+	function handleDndConsiderCards(columnId: string, e: CustomEvent<DndEvent<I>>) {
+		const colIdx = challenges.findIndex((c) => c.id === columnId);
+		challenges[colIdx].challenges = e.detail.items;
+		challenges = [...challenges];
 		if (
 			e.detail.info.source === SOURCES.KEYBOARD &&
 			e.detail.info.trigger === TRIGGERS.DRAG_STOPPED
@@ -92,20 +50,44 @@
 			dragDisabled = true;
 		}
 	}
-	function handleDndFinalizeCards(columnId: number, e: CustomEvent<DndEvent<Item>>) {
-		const colIdx = board.findIndex((c) => c.id === columnId);
-		board[colIdx].items = e.detail.items;
-		board = [...board];
+	function handleDndFinalizeCards(columnId: string, e: CustomEvent<DndEvent<I>>) {
+		const colIdx = challenges.findIndex((c) => c.id === columnId);
+		challenges[colIdx].challenges = e.detail.items;
+		challenges = [...challenges];
 		if (e.detail.info.source === SOURCES.POINTER) {
 			dragDisabled = true;
 		}
 	}
 </script>
 
+{#each data.challenges as challenge}
+	<Dialog.Root
+		open={$page.url.searchParams.get('challenge') === challenge.humanId}
+		onOpenChange={() => {
+			$page.url.searchParams.delete('challenge');
+			goto($page.url);
+		}}
+	>
+		<Dialog.Content>
+			<div class="font-bold">
+				<span class="text-green-500">{challenge.category} / </span>
+				<span>{challenge.difficulty} / </span>
+				<span>{challenge.name}</span>
+			</div>
+			<div>
+				{challenge.description}
+			</div>
+			<form>
+				<Input placeholder="flag..." />
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
+{/each}
+
 <div
 	class="mt-4 grid grid-flow-col gap-4 overflow-x-scroll px-4"
 	use:dndzone={{
-		items: board,
+		items: challenges,
 		flipDurationMs,
 		dragDisabled,
 		type: 'columns',
@@ -114,7 +96,7 @@
 	on:consider={handleDndConsiderColumns}
 	on:finalize={handleDndFinalizeColumns}
 >
-	{#each board as column (column.id)}
+	{#each challenges as category (category.id)}
 		<div class="flex w-[500px] flex-col rounded-md" animate:flip={{ duration: flipDurationMs }}>
 			<div
 				class="flex justify-between rounded-md bg-green-500 p-4 font-bold"
@@ -132,39 +114,76 @@
 					if ((e.key === 'Enter' || e.key === ' ') && dragDisabled) dragDisabled = false;
 				}}
 			>
-				<div>{column.name}</div>
+				<div>{category.id}</div>
 			</div>
 			<div
 				class="flex flex-grow flex-col gap-2 p-2"
-				use:dndzone={{ items: column.items, flipDurationMs, dragDisabled, dropTargetStyle: {} }}
-				on:consider={(e) => handleDndConsiderCards(column.id, e)}
-				on:finalize={(e) => handleDndFinalizeCards(column.id, e)}
+				use:dndzone={{
+					items: category.challenges,
+					flipDurationMs,
+					dragDisabled,
+					dropTargetStyle: {}
+				}}
+				on:consider={(e) => handleDndConsiderCards(category.id, e)}
+				on:finalize={(e) => handleDndFinalizeCards(category.id, e)}
 			>
-				{#each column.items as item (item.id)}
+				{#each category.challenges as challenge (challenge.id)}
 					<div
 						class="bg-card border-l-4 border-green-500 p-4"
 						animate:flip={{ duration: flipDurationMs }}
 					>
-						<div class="flex justify-between">
-							<div class="font-bold">{item.name}</div>
-							<div
-								tabindex={dragDisabled ? 0 : -1}
-								class="h-5 w-5"
-								role="button"
-								aria-label="drag-handle"
-								style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
-								on:mousedown|preventDefault={() => {
-									dragDisabled = false;
-								}}
-								on:touchstart|preventDefault={() => {
-									dragDisabled = false;
-								}}
-								on:keydown={(e) => {
-									if ((e.key === 'Enter' || e.key === ' ') && dragDisabled) dragDisabled = false;
-								}}
-							>
-								<GripVertical />
+						<div class="mb-2 flex justify-between">
+							<div class="font-bold">
+								<span class="text-green-500">{challenge.category} / </span>
+								<span>{challenge.difficulty} / </span>
+								<span>{challenge.name}</span>
 							</div>
+							<div class="flex items-center gap-4">
+								<Tooltip.Root>
+									<Tooltip.Trigger>
+										<div class="h-3 w-3 rounded-full bg-green-500" />
+									</Tooltip.Trigger>
+									<Tooltip.Content>
+										<p>Last checked 1s ago and is <span class="text-green-500">up</span></p>
+									</Tooltip.Content>
+								</Tooltip.Root>
+								<Ticket class="-rotate-45" />
+								<Avatar.Root class="h-8 w-8 border-4">
+									<Avatar.Image
+										src={challenge.author.image}
+										alt={`@${challenge.author.globalUsername}`}
+									/>
+									<Avatar.Fallback
+										>{challenge.author.globalUsername
+											.substring(0, 2)
+											.toUpperCase()}</Avatar.Fallback
+									>
+								</Avatar.Root>
+								<div
+									tabindex={dragDisabled ? 0 : -1}
+									role="button"
+									aria-label="drag-handle"
+									style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
+									on:mousedown|preventDefault={() => {
+										dragDisabled = false;
+									}}
+									on:touchstart|preventDefault={() => {
+										dragDisabled = false;
+									}}
+									on:keydown={(e) => {
+										if ((e.key === 'Enter' || e.key === ' ') && dragDisabled) dragDisabled = false;
+									}}
+								>
+									<GripVertical />
+								</div>
+							</div>
+						</div>
+						<div class="relative">
+							{challenge.description}
+
+							<a href={`?challenge=${challenge.humanId}`} class="absolute bottom-0 right-0 h-6 w-6">
+								<Maximize2 />
+							</a>
 						</div>
 					</div>
 				{/each}

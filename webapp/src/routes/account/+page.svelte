@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { signInDiscord, signInDiscordUrl } from '$lib/clientAuth';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { signInDiscordUrl } from '$lib/clientAuth';
+	import { buttonVariants } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import clsx from 'clsx';
 	import { Check } from 'lucide-svelte';
@@ -80,10 +80,17 @@
 			</Card.Root>
 			<Card.Root>
 				<Card.Header>
+					<Card.Title>Support Tickets</Card.Title>
+					<Card.Description>Review submitted support tickets</Card.Description>
+				</Card.Header>
+				<Card.Content>A</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Header>
 					<Card.Title>API Tokens</Card.Title>
 					<Card.Description>Manage API tokens for the provided REST API</Card.Description>
 				</Card.Header>
-				<Card.Content>B</Card.Content>
+				<Card.Content>A</Card.Content>
 			</Card.Root>
 		</div>
 	</div>
