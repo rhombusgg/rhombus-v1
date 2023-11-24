@@ -6,7 +6,7 @@
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	export let content: string | undefined;
+	export let content: string | null | undefined;
 
 	onMount(async () => {
 		if (!content) content = '# Describe the issue with the challenge\n\n';

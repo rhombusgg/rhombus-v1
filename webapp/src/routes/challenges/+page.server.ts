@@ -30,36 +30,60 @@ export const load = async ({ locals }) => {
 		}
 	});
 
-	const challenges: {
-		id: string;
-		humanId: string;
-		name: string;
-		description: string;
-		issueTemplate: string | undefined;
-		difficulty: string;
-		points: number | null;
-		category: string;
-		author: {
-			image: string;
-			globalUsername: string;
-		};
-	}[] = dbChallenges.map((challenge) => ({
-		id: challenge.id,
-		humanId: challenge.humanId,
-		name: challenge.name,
-		description: challenge.description,
-		issueTemplate: challenge.issueTemplate as string | undefined,
-		difficulty: challenge.difficulty,
-		points: challenge.points,
-		category: challenge.category,
-		author: {
-			image: challenge.author.discord!.image,
-			globalUsername: challenge.author.discord!.globalUsername
-		}
+	const categories = dbChallenges
+		.map((challenge) => challenge.category)
+		.filter((v, i, a) => a.indexOf(v) === i);
+
+	let columns = await prisma.userColumns.findMany({
+		where: { userId: locals.session.id },
+		select: {
+			challenges: { select: { challengeId: true }, orderBy: { order: 'asc' } },
+			name: true,
+			id: true
+		},
+		orderBy: { order: 'asc' }
+	});
+
+	if (!columns || columns.length === 0) {
+		const user = await prisma.user.update({
+			where: { id: locals.session.id },
+			data: {
+				columns: {
+					create: categories.map((category, i) => ({
+						name: category,
+						order: i,
+						challenges: {
+							createMany: {
+								data: dbChallenges
+									.filter((challenge) => challenge.category === category)
+									.map((challenge, j) => ({
+										challengeId: challenge.id,
+										order: j,
+										userId: locals.session!.id
+									}))
+							}
+						}
+					}))
+				}
+			},
+			select: {
+				columns: { select: { challenges: { select: { challengeId: true } }, name: true, id: true } }
+			}
+		});
+
+		columns = user.columns;
+	}
+
+	const userColumns = columns.map((column) => ({
+		id: column.id,
+		name: column.name,
+		challenges: column.challenges.map((challenge) => ({
+			...dbChallenges.find((chall) => chall.id === challenge.challengeId)!
+		}))
 	}));
 
 	return {
-		challenges
+		userColumns
 	};
 };
 

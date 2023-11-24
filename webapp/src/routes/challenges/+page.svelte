@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
-	import { GripVertical, Maximize, Maximize2, Ticket } from 'lucide-svelte';
+	import { GripVertical, Maximize2, Ticket } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Editor from './editor.svelte';
 	import { Button } from '$lib/components/ui/form';
@@ -14,21 +14,18 @@
 
 	export let data;
 
-	let challenges = data.challenges
-		.map((challenge) => challenge.category)
-		.filter((v, i, a) => a.indexOf(v) === i)
-		.map((category) => ({
-			id: category,
-			challenges: data.challenges.filter((challenge) => challenge.category === category)
-		}));
-	type C = (typeof challenges)[number];
-	type I = C['challenges'][number];
+	$: userColumns = data.userColumns;
+	$: oldUserColumns = data.userColumns;
+	$: challenges = data.userColumns.flatMap((column) => column.challenges);
+
+	type Column = (typeof userColumns)[number];
+	type Item = Column['challenges'][number];
 
 	let dragDisabled = true;
 
 	const flipDurationMs = 200;
-	function handleDndConsiderColumns(e: CustomEvent<DndEvent<C>>) {
-		challenges = e.detail.items;
+	function handleDndConsiderColumns(e: CustomEvent<DndEvent<Column>>) {
+		userColumns = e.detail.items;
 		if (
 			e.detail.info.source === SOURCES.KEYBOARD &&
 			e.detail.info.trigger === TRIGGERS.DRAG_STOPPED
@@ -36,36 +33,72 @@
 			dragDisabled = true;
 		}
 	}
-	function handleDndFinalizeColumns(e: CustomEvent<DndEvent<C>>) {
-		challenges = e.detail.items;
-		if (e.detail.info.source === SOURCES.POINTER) {
-			dragDisabled = true;
+
+	function handleDndFinalizeColumns(e: CustomEvent<DndEvent<Column>>) {
+		userColumns = e.detail.items;
+
+		const swappedItemIndex = userColumns.findIndex((item, i) => item.id !== oldUserColumns[i].id);
+		if (swappedItemIndex !== -1) {
+			oldUserColumns = [...userColumns];
+			const columns = oldUserColumns.map((column) => ({
+				id: column.id,
+				name: column.name,
+				items: column.challenges.map((challenge) => ({ challengeId: challenge.id }))
+			}));
+			fetch('/challenges/board', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(columns)
+			});
 		}
-	}
-	function handleDndConsiderCards(columnId: string, e: CustomEvent<DndEvent<I>>) {
-		const colIdx = challenges.findIndex((c) => c.id === columnId);
-		challenges[colIdx].challenges = e.detail.items;
-		challenges = [...challenges];
-		if (
-			e.detail.info.source === SOURCES.KEYBOARD &&
-			e.detail.info.trigger === TRIGGERS.DRAG_STOPPED
-		) {
-			dragDisabled = true;
-		}
-	}
-	function handleDndFinalizeCards(columnId: string, e: CustomEvent<DndEvent<I>>) {
-		const colIdx = challenges.findIndex((c) => c.id === columnId);
-		challenges[colIdx].challenges = e.detail.items;
-		challenges = [...challenges];
+
 		if (e.detail.info.source === SOURCES.POINTER) {
 			dragDisabled = true;
 		}
 	}
 
-	let content: string = '### default';
+	function handleDndConsiderCards(columnId: string, e: CustomEvent<DndEvent<Item>>) {
+		const colIdx = userColumns.findIndex((c) => c.id === columnId);
+		userColumns[colIdx].challenges = e.detail.items;
+		userColumns = [...userColumns];
+		if (
+			e.detail.info.source === SOURCES.KEYBOARD &&
+			e.detail.info.trigger === TRIGGERS.DRAG_STOPPED
+		) {
+			dragDisabled = true;
+		}
+	}
+
+	function handleDndFinalizeCards(columnId: string, e: CustomEvent<DndEvent<Item>>) {
+		const colIdx = userColumns.findIndex((c) => c.id === columnId);
+		userColumns[colIdx].challenges = e.detail.items;
+		userColumns = [...userColumns];
+		if (e.detail.info.source === SOURCES.POINTER) {
+			dragDisabled = true;
+		}
+
+		oldUserColumns = [...userColumns];
+		const columns = oldUserColumns.map((column) => ({
+			id: column.id,
+			name: column.name,
+			items: column.challenges.map((challenge) => ({ challengeId: challenge.id }))
+		}));
+
+		fetch('/challenges/board', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(columns)
+		});
+	}
 </script>
 
-{#each data.challenges as challenge}
+<svelte:document on:focus={() => invalidateAll()} />
+
+{#each challenges as challenge}
 	<Dialog.Root
 		open={$page.url.searchParams.get('challenge') === challenge.humanId}
 		onOpenChange={() => {
@@ -116,7 +149,7 @@
 <div
 	class="mt-4 flex w-full flex-col gap-4 overflow-x-auto px-4 lg:flex-row"
 	use:dndzone={{
-		items: challenges,
+		items: userColumns,
 		flipDurationMs,
 		dragDisabled,
 		type: 'columns',
@@ -125,7 +158,7 @@
 	on:consider={handleDndConsiderColumns}
 	on:finalize={handleDndFinalizeColumns}
 >
-	{#each challenges as category (category.id)}
+	{#each userColumns as column (column.id)}
 		<div
 			class="flex w-full flex-col rounded-md lg:w-[500px] lg:min-w-[500px]"
 			animate:flip={{ duration: flipDurationMs }}
@@ -146,20 +179,20 @@
 					if ((e.key === 'Enter' || e.key === ' ') && dragDisabled) dragDisabled = false;
 				}}
 			>
-				<div>{category.id}</div>
+				<div>{column.name}</div>
 			</div>
 			<div
 				class="flex flex-grow flex-col gap-2 p-2"
 				use:dndzone={{
-					items: category.challenges,
+					items: column.challenges,
 					flipDurationMs,
 					dragDisabled,
 					dropTargetStyle: {}
 				}}
-				on:consider={(e) => handleDndConsiderCards(category.id, e)}
-				on:finalize={(e) => handleDndFinalizeCards(category.id, e)}
+				on:consider={(e) => handleDndConsiderCards(column.id, e)}
+				on:finalize={(e) => handleDndFinalizeCards(column.id, e)}
 			>
-				{#each category.challenges as challenge (challenge.id)}
+				{#each column.challenges as challenge (challenge.id)}
 					<div
 						class="bg-card border-l-4 border-green-500 p-4"
 						animate:flip={{ duration: flipDurationMs }}
@@ -184,11 +217,11 @@
 								</a>
 								<Avatar.Root class="h-8 w-8 border-4">
 									<Avatar.Image
-										src={challenge.author.image}
-										alt={`@${challenge.author.globalUsername}`}
+										src={challenge.author.discord?.image}
+										alt={`@${challenge.author.discord?.globalUsername}`}
 									/>
 									<Avatar.Fallback
-										>{challenge.author.globalUsername
+										>{challenge.author.discord?.globalUsername
 											.substring(0, 2)
 											.toUpperCase()}</Avatar.Fallback
 									>
