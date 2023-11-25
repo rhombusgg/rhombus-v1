@@ -93,7 +93,7 @@ export const load = async ({ locals }) => {
 						return {
 							where: { challengeId: challenge.challengeId },
 							data: {
-								columnId: board.find((c) => c.name === category)!.id
+								columnId: updatedColumns.find((c) => c.name === category)!.id
 							}
 						};
 					})
