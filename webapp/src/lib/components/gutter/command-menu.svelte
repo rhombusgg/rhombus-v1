@@ -5,7 +5,6 @@
 	import { resetMode, setMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
-	import * as Avatar from '$lib/components/ui/avatar';
 	import Logo from '$lib/components/icons/logo.svelte';
 	import {
 		CaseSensitive,
@@ -20,9 +19,7 @@
 	} from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { signInDiscord, signOut } from '$lib/clientAuth';
-	import { avatarFallback } from '$lib/utils';
-	import { PUBLIC_LOCATION_URL } from '$env/static/public';
-	import { enhance } from '$app/forms';
+	import { env } from '$env/dynamic/public';
 
 	let open = false;
 
@@ -143,7 +140,7 @@
 					value="Copy invite link"
 					onSelect={() =>
 						runCommand(() => {
-							const inviteLink = `${PUBLIC_LOCATION_URL}/signin?invite=${$page.data.session?.team.inviteToken}`;
+							const inviteLink = `${env.PUBLIC_LOCATION_URL}/signin?invite=${$page.data.session?.team.inviteToken}`;
 							navigator.clipboard.writeText(inviteLink);
 						})}
 				>

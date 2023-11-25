@@ -4,7 +4,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import { teamNameFormSchema } from './schema.js';
-import { PUBLIC_LOCATION_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { generateInviteToken } from '$lib/team.js';
 
 export const load = async ({ locals }) => {
@@ -56,7 +56,7 @@ export const load = async ({ locals }) => {
 	} = {
 		name: user.team!.name,
 		ownerId: user.team!.ownerId,
-		inviteLink: `${PUBLIC_LOCATION_URL}/signin?invite=${user.team!.inviteToken}`,
+		inviteLink: `${env.PUBLIC_LOCATION_URL}/signin?invite=${user.team!.inviteToken}`,
 		users: user.team!.users.map((user) => ({
 			discord: user.discord,
 			email: user.discord ? undefined : user.emails[0].email,

@@ -1,11 +1,11 @@
-import { JWT_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { Cookies } from '@sveltejs/kit';
 import * as jose from 'jose';
 import { z } from 'zod';
 
 const SESSION_TOKEN_COOKIE = 'session-token';
 
-const jwtSecret = new TextEncoder().encode(JWT_SECRET);
+const jwtSecret = new TextEncoder().encode(env.JWT_SECRET);
 
 const jwtSchema = z.object({
 	sessionId: z.string(),

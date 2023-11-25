@@ -1,5 +1,5 @@
-import { DISCORD_CLIENT_SECRET } from '$env/static/private';
-import { PUBLIC_DISCORD_CLIENT_ID, PUBLIC_LOCATION_URL } from '$env/static/public';
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { z } from 'zod';
 import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
@@ -23,10 +23,10 @@ export async function GET({ url, cookies }) {
 		},
 		method: 'POST',
 		body: new URLSearchParams({
-			client_id: PUBLIC_DISCORD_CLIENT_ID,
-			client_secret: DISCORD_CLIENT_SECRET,
+			client_id: publicEnv.PUBLIC_DISCORD_CLIENT_ID!,
+			client_secret: privateEnv.DISCORD_CLIENT_SECRET!,
 			grant_type: 'authorization_code',
-			redirect_uri: `${PUBLIC_LOCATION_URL}/api/discord/callback`,
+			redirect_uri: `${publicEnv.PUBLIC_LOCATION_URL}/api/discord/callback`,
 			code
 		})
 	});

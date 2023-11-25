@@ -3,9 +3,9 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { formSchema } from './schema';
 import { renderSignInEmail } from './email';
 import nodemailer from 'nodemailer';
-import { SMTP_FROM, SMTP_HOST, SMTP_PASSWORD, SMTP_PORT, SMTP_USER } from '$env/static/private';
+import { env as privateEnv } from '$env/dynamic/private';
 import { z } from 'zod';
-import { PUBLIC_LOCATION_URL } from '$env/static/public';
+import { env as publicEnv } from '$env/dynamic/public';
 import prisma from '$lib/db';
 
 export const load = async ({ url, cookies, locals }) => {
@@ -47,15 +47,6 @@ export const load = async ({ url, cookies, locals }) => {
 	};
 };
 
-const transporter = nodemailer.createTransport({
-	host: SMTP_HOST,
-	port: z.coerce.number().parse(SMTP_PORT),
-	auth: {
-		user: SMTP_USER,
-		pass: SMTP_PASSWORD
-	}
-});
-
 export const actions = {
 	default: async (event) => {
 		const form = await superValidate(event, formSchema);
@@ -76,12 +67,21 @@ export const actions = {
 		});
 
 		const email = await renderSignInEmail({
-			authLink: `${PUBLIC_LOCATION_URL}/api/email/callback?token=${verificationToken.token}`,
+			authLink: `${publicEnv.PUBLIC_LOCATION_URL}/api/email/callback?token=${verificationToken.token}`,
 			ip: event.getClientAddress()
 		});
 
+		const transporter = nodemailer.createTransport({
+			host: privateEnv.SMTP_HOST,
+			port: z.coerce.number().parse(privateEnv.SMTP_PORT),
+			auth: {
+				user: privateEnv.SMTP_USER,
+				pass: privateEnv.SMTP_PASSWORD
+			}
+		});
+
 		await transporter.sendMail({
-			from: SMTP_FROM,
+			from: privateEnv.SMTP_FROM,
 			to: form.data.email,
 			subject: 'Rhombus CTF Sign In',
 			html: email.html,
