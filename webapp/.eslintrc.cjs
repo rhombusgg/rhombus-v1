@@ -6,6 +6,9 @@ module.exports = {
 		'plugin:svelte/recommended',
 		'prettier'
 	],
+	globals: {
+		DndEvent: true
+	},
 	parser: '@typescript-eslint/parser',
 	plugins: ['@typescript-eslint'],
 	parserOptions: {
@@ -24,6 +27,12 @@ module.exports = {
 			parser: 'svelte-eslint-parser',
 			parserOptions: {
 				parser: '@typescript-eslint/parser'
+			},
+			rules: {
+				'@typescript-eslint/no-unused-vars': [
+					'warn',
+					{ varsIgnorePattern: '^\\$\\$(Props|Events|Slots)$' }
+				]
 			}
 		}
 	]
