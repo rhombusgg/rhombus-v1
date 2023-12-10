@@ -44,12 +44,34 @@ client.on(Events.GuildCreate, async (guild) => {
 	}
 });
 
+client.on(Events.GuildMemberAdd, async (member) => {
+	const user = await prisma.discord.findUnique({
+		where: { id: member.id },
+		select: { user: { select: { team: { select: { discordRoleId: true } } } } }
+	});
+	if (!user?.user.team) return;
+
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) return;
+
+	if (discordBot.verifiedRoleId) await member.roles.add(discordBot.verifiedRoleId);
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	const teamRole = await guild.roles.fetch(user.user.team.discordRoleId);
+	if (!teamRole) return;
+	await member.roles.add(teamRole);
+});
+
 client.login(env.DISCORD_TOKEN);
 
 export async function isUserInGuild(userId: string, guildId: string) {
 	const guild = await client.guilds.fetch(guildId);
-	const member = await guild.members.fetch(userId);
-	return member ? true : false;
+	try {
+		const member = await guild.members.fetch(userId);
+		return member ? true : false;
+	} catch {
+		return false;
+	}
 }
 
 export async function getGuilds() {
@@ -64,8 +86,85 @@ export async function getTextChannels() {
 	const guild = await client.guilds.fetch(discordBot.guildId);
 	const channels = await guild.channels.fetch();
 	return channels
-		.filter((channel) => channel?.isTextBased() && channel.manageable)
+		.filter(
+			(channel) => channel && channel.isTextBased() && channel.client.user && channel.manageable
+		)
 		.map((channel) => channel as NonThreadGuildBasedChannel);
+}
+
+export async function getRoles() {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) return undefined;
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	const roles = await guild.roles.fetch();
+	return roles.filter((role) => role && role.client.user && role.editable);
+}
+
+export async function createRole(name: string) {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) throw new Error('No discord bot found');
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	const role = await guild.roles.create({
+		name: name,
+		color: 'Blurple',
+		reason: `rhombus-managed team`
+	});
+	return role;
+}
+
+export async function renameRole(roleId: string, name: string) {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) throw new Error('No discord bot found');
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	const role = await guild.roles.fetch(roleId);
+	if (!role) return;
+	await role.edit({ name });
+}
+
+export async function changeUsersRole(userId: string, oldRoleId: string, newRoleId: string) {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) throw new Error('No discord bot found');
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	const member = await guild.members.fetch(userId);
+	const oldRole = await guild.roles.fetch(oldRoleId);
+	const newRole = await guild.roles.fetch(newRoleId);
+	if (!oldRole || !newRole) return;
+	await member.roles.remove(oldRole);
+	await member.roles.add(newRole);
+}
+
+export async function joinUserToRole(userId: string, roleId: string) {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) throw new Error('No discord bot found');
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	try {
+		const member = await guild.members.fetch(userId);
+		const role = await guild.roles.fetch(roleId);
+		if (!role) return;
+		await member.roles.add(role);
+	} catch {
+		// user not in guild
+	}
+}
+
+export async function verifyUser(userId: string) {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) throw new Error('No discord bot found');
+	if (!discordBot.verifiedRoleId) throw new Error('No verified role found');
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	try {
+		const member = await guild.members.fetch(userId);
+		if (!member) return;
+		await member.roles.add(discordBot.verifiedRoleId);
+	} catch {
+		// user not in guild
+	}
 }
 
 export async function createSupportThread({

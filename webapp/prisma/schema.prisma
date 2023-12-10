@@ -46,6 +46,7 @@ model User {
     ownerTeamId        String?
     authoredChallenges Challenge[]
     isAdmin            Boolean         @default(false)
+    Ticket             Ticket[]
 }
 
 model UserColumns {
@@ -108,4 +109,13 @@ model DiscordBot {
     guildId          String
     ticketNumber     Int     @default(1)
     supportChannelId String?
+    verifiedRoleId   String?
+}
+
+model Ticket {
+    id      String @id @default(cuid())
+    number  Int
+    user    User   @relation(fields: [userId], references: [id])
+    userId  String
+    content String
 }

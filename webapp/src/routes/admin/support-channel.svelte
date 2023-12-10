@@ -9,13 +9,14 @@
 	export let channels: { label: string; value: string }[] = [];
 	export let channelId: string | undefined = undefined;
 
+	const makeValue = (channel: (typeof channels)[0] | undefined) =>
+		channel && `${channel.label}-${channel.value}`;
+
 	let open = false;
-	$: value = channelId;
-	$: selectedValue = channels.find((f) => f.value === value)?.label ?? 'Select a channel...';
-	// We want to refocus the trigger button when the user selects
-	// an item from the list so users can continue navigating the
-	// rest of the form with the keyboard.
-	function closeAndFocusTrigger(triggerId: string) {
+	$: value = makeValue(channels.find((f) => f.value === channelId));
+	$: selectedValue = channels.find((f) => makeValue(f) === value)?.label ?? 'Select a channel...';
+
+	function closeAndFocusTrigger(triggerId: string, channel: (typeof channels)[0]) {
 		open = false;
 		tick().then(() => {
 			document.getElementById(triggerId)?.focus();
@@ -25,7 +26,7 @@
 					'Content-Type': 'application/x-www-form-urlencoded'
 				},
 				body: new URLSearchParams({
-					channelId: `${value}`
+					channelId: `${channel.value}`
 				})
 			});
 		});
@@ -47,15 +48,15 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-[200px] p-0">
 		<Command.Root>
-			<Command.Input placeholder="Search channel..." />
-			<Command.Empty>No channel found.</Command.Empty>
+			<Command.Input placeholder="Search channels..." />
+			<Command.Empty>No channels found.</Command.Empty>
 			<Command.Group>
 				{#each channels as channel}
 					<Command.Item
-						value={channel.value}
+						value={makeValue(channel)}
 						onSelect={(currentValue) => {
 							value = currentValue;
-							closeAndFocusTrigger(ids.trigger);
+							closeAndFocusTrigger(ids.trigger, channel);
 						}}
 					>
 						<Check class={cn('mr-2 h-4 w-4', value !== channel.value && 'text-transparent')} />

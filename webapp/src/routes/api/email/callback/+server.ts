@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db.js';
 import { setJwt } from '$lib/serverAuth.js';
 import { generateInviteToken } from '$lib/team.js';
+import { createRole } from '$lib/bot.js';
 
 export async function GET({ url, cookies }) {
 	const token = url.searchParams.get('token');
@@ -65,11 +66,13 @@ export async function GET({ url, cookies }) {
 			select: { id: true, sessions: { select: { id: true } } }
 		});
 
+		const teamName = emailVerificationToken.email.split('@')[0];
+		const role = await createRole(teamName);
 		const team = await prisma.team.create({
 			data: {
-				name: emailVerificationToken.email.split('@')[0],
+				name: teamName,
 				inviteToken: generateInviteToken(),
-				discordRoleId: '',
+				discordRoleId: role.id,
 				ownerId: user.id
 			},
 			select: {

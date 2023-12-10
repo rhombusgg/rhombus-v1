@@ -6,19 +6,29 @@
 	import { cn } from '$lib/utils';
 	import { tick } from 'svelte';
 
-	export let guilds: { label: string; value: string }[] = [];
-	export let guildId: string | undefined = undefined;
+	export let roles: { label: string; value: string }[] = [];
+	export let roleId: string | undefined = undefined;
+
+	const makeValue = (channel: (typeof roles)[0] | undefined) =>
+		channel && `${channel.label}-${channel.value}`;
 
 	let open = false;
-	$: value = guildId;
-	$: selectedValue = guilds.find((f) => f.value === value)?.label ?? 'Select a guild...';
-	// We want to refocus the trigger button when the user selects
-	// an item from the list so users can continue navigating the
-	// rest of the form with the keyboard.
-	function closeAndFocusTrigger(triggerId: string) {
+	$: value = makeValue(roles.find((f) => f.value === roleId));
+	$: selectedValue = roles.find((f) => makeValue(f) === value)?.label ?? 'Select a role...';
+
+	function closeAndFocusTrigger(triggerId: string, role: (typeof roles)[0]) {
 		open = false;
 		tick().then(() => {
 			document.getElementById(triggerId)?.focus();
+			fetch('/admin?/verifiedRoleId', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				body: new URLSearchParams({
+					verifiedRoleId: `${role.value}`
+				})
+			});
 		});
 	}
 </script>
@@ -38,19 +48,19 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-[200px] p-0">
 		<Command.Root>
-			<Command.Input placeholder="Search guilds..." />
-			<Command.Empty>No guilds found.</Command.Empty>
+			<Command.Input placeholder="Search roles..." />
+			<Command.Empty>No roles found.</Command.Empty>
 			<Command.Group>
-				{#each guilds as guild}
+				{#each roles as role}
 					<Command.Item
-						value={guild.value}
+						value={makeValue(role)}
 						onSelect={(currentValue) => {
 							value = currentValue;
-							closeAndFocusTrigger(ids.trigger);
+							closeAndFocusTrigger(ids.trigger, role);
 						}}
 					>
-						<Check class={cn('mr-2 h-4 w-4', value !== guild.value && 'text-transparent')} />
-						{guild.label}
+						<Check class={cn('mr-2 h-4 w-4', value !== role.value && 'text-transparent')} />
+						{role.label}
 					</Command.Item>
 				{/each}
 			</Command.Group>

@@ -1,4 +1,4 @@
-import { getGuilds, getTextChannels } from '$lib/bot.js';
+import { getGuilds, getRoles, getTextChannels } from '$lib/bot.js';
 import prisma from '$lib/db.js';
 import { error, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -6,6 +6,19 @@ import { z } from 'zod';
 export const load = async ({ locals }) => {
 	if (!locals.session) {
 		throw redirect(302, '/signin');
+	}
+
+	const user = await prisma.user.findUnique({
+		where: {
+			id: locals.session.id
+		},
+		select: {
+			isAdmin: true
+		}
+	});
+
+	if (!user?.isAdmin) {
+		throw redirect(302, '/account');
 	}
 
 	const discordBot = await prisma.discordBot.findFirst();
@@ -16,6 +29,7 @@ export const load = async ({ locals }) => {
 			label: `#${channel.name}`,
 			value: channel.id
 		})),
+		roles: (await getRoles())?.map((role) => ({ label: `@${role.name}`, value: role.id })),
 		botSettings: discordBot
 	};
 };
@@ -39,6 +53,26 @@ export const actions = {
 				supportChannelId: data.channelId
 			}
 		});
+	},
+
+	verifiedRoleId: async ({ locals, request }) => {
+		await isAdmin(locals);
+
+		const data = z
+			.object({ verifiedRoleId: z.string() })
+			.parse(Object.fromEntries((await request.formData()).entries()));
+
+		const discordBot = await prisma.discordBot.findFirst();
+		if (!discordBot) throw error(500, 'No bot found');
+
+		await prisma.discordBot.update({
+			where: {
+				id: discordBot.id
+			},
+			data: {
+				verifiedRoleId: data.verifiedRoleId
+			}
+		});
 	}
 };
 
@@ -55,6 +89,7 @@ const isAdmin = async (locals: App.Locals) => {
 			isAdmin: true
 		}
 	});
+
 	if (!user?.isAdmin) {
 		throw error(403, 'Not an admin');
 	}

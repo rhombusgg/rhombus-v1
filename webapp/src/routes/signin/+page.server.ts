@@ -7,6 +7,7 @@ import { env as privateEnv } from '$env/dynamic/private';
 import { z } from 'zod';
 import { env as publicEnv } from '$env/dynamic/public';
 import prisma from '$lib/db';
+import { changeUsersRole } from '$lib/bot';
 
 export const load = async ({ url, cookies, locals }) => {
 	const inviteToken = url.searchParams.get('invite');
@@ -17,11 +18,26 @@ export const load = async ({ url, cookies, locals }) => {
 			},
 			select: {
 				id: true,
-				name: true
+				name: true,
+				discordRoleId: true
 			}
 		});
 		if (team) {
 			if (locals.session) {
+				const oldTeam = await prisma.user.findFirst({
+					where: {
+						id: locals.session.id
+					},
+					select: { team: { select: { discordRoleId: true } } }
+				});
+				if (oldTeam) {
+					await changeUsersRole(
+						locals.session.discord!.id,
+						oldTeam.team!.discordRoleId,
+						team.discordRoleId
+					);
+				}
+
 				await prisma.user.update({
 					where: {
 						id: locals.session.id
@@ -30,6 +46,7 @@ export const load = async ({ url, cookies, locals }) => {
 						teamId: team.id
 					}
 				});
+
 				throw redirect(302, '/team');
 			}
 

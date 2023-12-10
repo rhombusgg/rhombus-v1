@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { teamNameFormSchema } from './schema.js';
 import { env } from '$env/dynamic/public';
 import { generateInviteToken } from '$lib/team.js';
+import { changeUsersRole, renameRole } from '$lib/bot.js';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -82,8 +83,20 @@ export const actions = {
 
 		const user = await prisma.user.findUnique({
 			where: { id: data.userId },
-			select: { ownerTeamId: true, teamId: true }
+			select: {
+				ownerTeamId: true,
+				ownerTeam: { select: { discordRoleId: true } },
+				teamId: true,
+				team: { select: { discordRoleId: true } }
+			}
 		});
+
+		if (locals.session.discord)
+			await changeUsersRole(
+				locals.session.discord.id,
+				user!.team!.discordRoleId,
+				user!.ownerTeam!.discordRoleId
+			);
 
 		if (locals.session?.id === data.userId) {
 			await prisma.user.update({
@@ -116,26 +129,29 @@ export const actions = {
 		}
 
 		if (event.locals.session?.isTeamOwner) {
-			const team = await prisma.team.findFirst({
+			const existingTeam = await prisma.team.findFirst({
 				where: {
 					name: form.data.name
-				}
+				},
+				select: { id: true, discordRoleId: true }
 			});
-			if (team) {
-				if (team.id === event.locals.session.team.id) {
+			if (existingTeam) {
+				if (existingTeam.id === event.locals.session.team.id) {
 					return { form };
 				}
 				return message(form, 'A team with that name already exists.', { status: 400 });
 			}
 
-			await prisma.team.update({
+			const team = await prisma.team.update({
 				where: {
 					id: event.locals.session.team.id
 				},
 				data: {
 					name: form.data.name
-				}
+				},
+				select: { discordRoleId: true }
 			});
+			await renameRole(team.discordRoleId, form.data.name);
 		} else {
 			return error(401);
 		}

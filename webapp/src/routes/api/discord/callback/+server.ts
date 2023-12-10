@@ -5,6 +5,7 @@ import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
 import { setJwt, getJwt } from '$lib/serverAuth';
 import { generateInviteToken } from '$lib/team';
+import { createRole, joinUserToRole, verifyUser } from '$lib/bot.js';
 
 export async function GET({ url, cookies }) {
 	if (url.searchParams.get('error')) {
@@ -182,17 +183,22 @@ export async function GET({ url, cookies }) {
 			select: { id: true, sessions: { select: { id: true } } }
 		});
 
+		const teamName = profile.username;
+		const role = await createRole(teamName);
 		const team = await prisma.team.create({
 			data: {
-				name: profile.username,
+				name: teamName,
 				inviteToken: generateInviteToken(),
-				discordRoleId: '',
+				discordRoleId: role.id,
 				ownerId: user.id
 			},
 			select: {
 				id: true
 			}
 		});
+
+		await joinUserToRole(profile.id, role.id);
+		await verifyUser(profile.id);
 
 		await prisma.user.update({
 			where: { id: user.id },
