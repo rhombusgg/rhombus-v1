@@ -269,6 +269,9 @@ importers:
       '@react-email/render':
         specifier: ^0.0.9
         version: 0.0.9
+      discord.js:
+        specifier: ^14.13.0
+        version: 14.13.0
       jose:
         specifier: ^5.1.1
         version: 5.1.1

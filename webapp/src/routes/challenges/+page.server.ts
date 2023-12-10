@@ -1,3 +1,4 @@
+import { createSupportThread } from '$lib/bot.js';
 import prisma from '$lib/db';
 import { redirect } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -151,6 +152,10 @@ export const actions = {
 			.object({ challengeId: z.string(), content: z.string() })
 			.parse(Object.fromEntries((await request.formData()).entries()));
 
-		console.log(data);
+		await createSupportThread({
+			discordId: locals.session.discord?.id,
+			challengeId: data.challengeId,
+			content: data.content
+		});
 	}
 };

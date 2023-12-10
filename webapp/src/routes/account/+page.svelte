@@ -6,6 +6,8 @@
 	import clsx from 'clsx';
 	import { Check } from 'lucide-svelte';
 	import { DiscordLogo } from 'radix-icons-svelte';
+
+	export let data;
 </script>
 
 {#if $page.data.session}
@@ -49,9 +51,16 @@
 
 						<h3 class="mt-8 flex items-center text-xl font-semibold tracking-tight">
 							<div
-								class="back bg-border absolute ml-[-50px] inline-flex h-9 w-9 items-center justify-center rounded-full border-4"
+								class={clsx(
+									'back absolute ml-[-50px] inline-flex h-9 w-9 items-center justify-center rounded-full border-4',
+									data.inGuild ? 'bg-green-500' : 'bg-border'
+								)}
 							>
-								<DiscordLogo class="h-4 w-4" />
+								{#if data.inGuild}
+									<Check class="h-4 w-4" />
+								{:else}
+									<DiscordLogo class="h-4 w-4" />
+								{/if}
 							</div>
 							Join Server
 						</h3>
@@ -59,7 +68,9 @@
 							Join the official Discord server to get important announcements and chat with other
 							competitors.
 						</p>
-						<a class={clsx(buttonVariants(), 'mt-2')} href={'https://discord.com'}>Join Server</a>
+						{#if !data.inGuild}
+							<a class={clsx(buttonVariants(), 'mt-2')} href={'https://discord.com'}>Join Server</a>
+						{/if}
 					</div>
 				</Card.Content>
 			</Card.Root>

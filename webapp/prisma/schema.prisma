@@ -102,3 +102,10 @@ model IP {
     address String @id @unique
     users   User[]
 }
+
+model DiscordBot {
+    id               String  @id @default(cuid())
+    guildId          String
+    ticketNumber     Int     @default(1)
+    supportChannelId String?
+}
