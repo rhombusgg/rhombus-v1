@@ -10,6 +10,11 @@
 	export let data;
 </script>
 
+<svelte:head>
+	<title>Account</title>
+	<meta name="description" content="Manage your individual account settings." />
+</svelte:head>
+
 {#if $page.data.session}
 	<div class="container">
 		<div class="mb-4 mt-4 space-y-0.5">

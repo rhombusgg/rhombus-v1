@@ -1,11 +1,19 @@
 <script lang="ts">
-	import GuildSelect from './guild-select.svelte';
-	import SupportChannel from './support-channel.svelte';
-	import VerifiedRole from './verified-role.svelte';
-
-	export let data;
+	import { Separator } from '$lib/components/ui/separator';
 </script>
 
-<GuildSelect guilds={data.guilds} guildId={data.botSettings?.guildId} />
-<SupportChannel channels={data.textChannels} channelId={data.botSettings?.supportChannelId} />
-<VerifiedRole roles={data.roles} roleId={data.botSettings?.verifiedRoleId} />
+<svelte:head>
+	<title>Admin - General</title>
+	<meta name="description" content="Manage the CTF." />
+</svelte:head>
+
+<div class="flex flex-col gap-4">
+	<div>
+		<h3 class="text-lg font-medium">General Settings</h3>
+		<p class="text-muted-foreground text-sm">Manage the CTF.</p>
+	</div>
+	<Separator />
+	<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-2">Export to CTFTime</div>
+	</div>
+</div>

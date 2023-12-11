@@ -17,6 +17,11 @@
 	$: isOwner.set(data.team.ownerId === data.session?.id);
 </script>
 
+<svelte:head>
+	<title>Team {data.team.name}</title>
+	<meta name="description" content="Manage your team." />
+</svelte:head>
+
 {#if $page.data.session}
 	<div class="container">
 		<div class="mb-4 mt-4 space-y-0.5">

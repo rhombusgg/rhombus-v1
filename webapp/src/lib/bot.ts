@@ -4,7 +4,9 @@ import {
 	GatewayIntentBits,
 	type TextChannel,
 	type NonThreadGuildBasedChannel,
-	ChannelType
+	ChannelType,
+	ComponentType,
+	ButtonStyle
 } from 'discord.js';
 import { env } from '$env/dynamic/private';
 import prisma from '$lib/db';
@@ -87,7 +89,11 @@ export async function getTextChannels() {
 	const channels = await guild.channels.fetch();
 	return channels
 		.filter(
-			(channel) => channel && channel.isTextBased() && channel.client.user && channel.manageable
+			(channel) =>
+				channel &&
+				channel.type == ChannelType.GuildText &&
+				channel.client.user &&
+				channel.manageable
 		)
 		.map((channel) => channel as NonThreadGuildBasedChannel);
 }
@@ -98,7 +104,17 @@ export async function getRoles() {
 
 	const guild = await client.guilds.fetch(discordBot.guildId);
 	const roles = await guild.roles.fetch();
-	return roles.filter((role) => role && role.client.user && role.editable);
+	return roles.filter(
+		(role) => guild.roles.everyone.id !== role.id && role && role.client.user && role.editable
+	);
+}
+
+export async function getRhombusRoleIds() {
+	const teams = await prisma.team.findMany({
+		select: { discordRoleId: true }
+	});
+
+	return teams.flatMap((team) => team.discordRoleId);
 }
 
 export async function createRole(name: string) {
@@ -165,6 +181,36 @@ export async function verifyUser(userId: string) {
 	} catch {
 		// user not in guild
 	}
+}
+
+export async function sendPanel(supportChannelId: string) {
+	const discordBot = await prisma.discordBot.findFirst();
+	if (!discordBot) return undefined;
+
+	const guild = await client.guilds.fetch(discordBot.guildId);
+	const supportChannel = (await guild.channels.fetch(supportChannelId)) as TextChannel;
+	await supportChannel.send({
+		embeds: [
+			{
+				color: 0x0099ff,
+				title: 'Support',
+				description: 'Your support tickets will appear here.'
+			}
+		],
+		components: [
+			{
+				type: ComponentType.ActionRow,
+				components: [
+					{
+						label: 'Create Ticket',
+						customId: 'create-ticket',
+						type: ComponentType.Button,
+						style: ButtonStyle.Primary
+					}
+				]
+			}
+		]
+	});
 }
 
 export async function createSupportThread({

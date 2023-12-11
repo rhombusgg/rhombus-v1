@@ -1,9 +1,9 @@
-import { getGuilds, getRoles, getTextChannels } from '$lib/bot.js';
+import { getGuilds, getRhombusRoleIds, getRoles, getTextChannels, sendPanel } from '$lib/bot.js';
 import prisma from '$lib/db.js';
 import { error, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 
-export const load = async ({ locals }) => {
+export const load = async ({ locals, depends }) => {
 	if (!locals.session) {
 		throw redirect(302, '/signin');
 	}
@@ -21,7 +21,11 @@ export const load = async ({ locals }) => {
 		throw redirect(302, '/account');
 	}
 
+	depends('app:admin:discord');
+
 	const discordBot = await prisma.discordBot.findFirst();
+
+	const rhombusRoleIds = await getRhombusRoleIds();
 
 	return {
 		guilds: (await getGuilds()).map((guild) => ({ label: guild.name, value: guild.id })),
@@ -29,7 +33,9 @@ export const load = async ({ locals }) => {
 			label: `#${channel.name}`,
 			value: channel.id
 		})),
-		roles: (await getRoles())?.map((role) => ({ label: `@${role.name}`, value: role.id })),
+		roles: (await getRoles())
+			?.filter((channel) => !rhombusRoleIds.includes(channel.id))
+			.map((role) => ({ label: `@${role.name}`, value: role.id })),
 		botSettings: discordBot
 	};
 };
@@ -53,6 +59,16 @@ export const actions = {
 				supportChannelId: data.channelId
 			}
 		});
+	},
+
+	sendPanel: async ({ locals }) => {
+		await isAdmin(locals);
+
+		const discordBot = await prisma.discordBot.findFirst();
+		if (!discordBot) throw error(500, 'No bot found');
+		if (!discordBot.supportChannelId) throw error(500, 'No support channel set');
+
+		await sendPanel(discordBot.supportChannelId);
 	},
 
 	verifiedRoleId: async ({ locals, request }) => {

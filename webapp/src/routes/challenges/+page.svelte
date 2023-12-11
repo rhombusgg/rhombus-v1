@@ -96,6 +96,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Challenges</title>
+	<meta name="description" content="Challenges" />
+</svelte:head>
+
 <svelte:document on:focus={() => invalidateAll()} />
 
 {#each challenges as challenge}
