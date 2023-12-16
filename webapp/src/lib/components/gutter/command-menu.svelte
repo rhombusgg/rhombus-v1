@@ -12,7 +12,9 @@
 		LogIn,
 		LogOut,
 		Mail,
+		Maximize2,
 		Swords,
+		Ticket,
 		User,
 		UserPlus,
 		Users
@@ -153,6 +155,24 @@
 						Set team name
 					</Command.Item>
 				{/if}
+			</Command.Group>
+			<Command.Group heading="Challenges">
+				{#each $page.data.challenges as challenge}
+					<Command.Item
+						value={`${challenge.name} ${challenge.humanId} ${challenge.description} ${challenge.author} ${challenge.category} ticket`}
+						onSelect={() => runCommand(() => goto(`/challenges?ticket=${challenge.humanId}`))}
+					>
+						<Ticket class="mr-2 h-4 w-4 -rotate-45" />
+						Create ticket for {challenge.name}
+					</Command.Item>
+					<Command.Item
+						value={`${challenge.name} ${challenge.humanId} ${challenge.description} ${challenge.author} ${challenge.category} focus`}
+						onSelect={() => runCommand(() => goto(`/challenges?challenge=${challenge.humanId}`))}
+					>
+						<Maximize2 class="mr-2 h-4 w-4" />
+						Focus challenge {challenge.name}
+					</Command.Item>
+				{/each}
 			</Command.Group>
 		{/if}
 	</Command.List>

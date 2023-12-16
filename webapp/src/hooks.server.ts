@@ -18,6 +18,7 @@ const auth: Handle = async ({ event, resolve }) => {
 				select: {
 					id: true,
 					teamId: true,
+					isAdmin: true,
 					discord: {
 						select: {
 							id: true,
@@ -67,7 +68,8 @@ const auth: Handle = async ({ event, resolve }) => {
 		emails: session.user.emails.map((email) => email.email),
 		avatarFallback: avatarFallback(session.user),
 		isTeamOwner: session.user.team!.ownerId === session.user.id,
-		team: session.user.team!
+		team: session.user.team!,
+		isAdmin: session.user.isAdmin
 	};
 
 	if (session.user.discord) {

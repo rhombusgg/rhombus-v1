@@ -47,6 +47,17 @@
 			>
 				Account
 			</a>
+			{#if $page.data.session.isAdmin}
+				<a
+					href="/admin"
+					class={cn(
+						'hover:text-foreground/80 transition-colors',
+						$page.url.pathname === '/admin' ? 'text-foreground' : 'text-foreground/60'
+					)}
+				>
+					Admin
+				</a>
+			{/if}
 		{:else}
 			<a
 				href="/signin"

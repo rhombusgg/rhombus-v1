@@ -12,7 +12,25 @@ declare global {
 
 		interface PageData {
 			session: Session | undefined;
+			challenges: Challenge[];
 		}
+	}
+
+	interface Challenge {
+		id: string;
+		humanId: string;
+		name: string;
+		description: string;
+		category: string;
+		difficulty: string;
+		issueTemplate: string | null;
+		points: number | null;
+		author: {
+			discord: {
+				globalUsername: string;
+				image: string;
+			} | null;
+		};
 	}
 
 	interface Session {
@@ -26,6 +44,7 @@ declare global {
 		emails: string[];
 		avatarFallback: string;
 		isTeamOwner: boolean;
+		isAdmin: boolean;
 		team: {
 			id: string;
 			ownerId: string;
