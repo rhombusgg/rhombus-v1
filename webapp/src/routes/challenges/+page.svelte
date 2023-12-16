@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
-	import { GripVertical, Maximize2, Ticket } from 'lucide-svelte';
+	import { Check, GripVertical, Maximize2, Ticket } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -10,9 +10,30 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Editor from './editor.svelte';
 	import { Button } from '$lib/components/ui/form';
-	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms/client';
+	import toast from 'svelte-french-toast';
+	import clsx from 'clsx';
+	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
 	export let data;
+
+	const ticketForm = superForm(data.ticketForm, {
+		async onUpdated() {
+			toast.success('Ticket submitted!');
+			await goto(`/challenges`);
+		}
+	});
+
+	const { enhance: flagFormEnhance, errors: flagFormErrors } = superForm(data.flagForm, {
+		async onUpdated({ form }) {
+			if (form.valid) {
+				toast.success('Challenge solved!');
+				await goto(`/challenges`);
+			} else if (form.errors.flag) {
+				// toast.error(form.errors.flag.join(' '));
+			}
+		}
+	});
 
 	$: userColumns = data.userColumns;
 	$: oldUserColumns = data.userColumns;
@@ -120,8 +141,21 @@
 			<div>
 				{challenge.description}
 			</div>
-			<form>
-				<Input placeholder="flag..." />
+			<form use:flagFormEnhance method="POST" action="?/flag">
+				<input type="hidden" name="challengeId" value={challenge.id} />
+				<div class="flex">
+					<Input
+						placeholder="flag..."
+						name="flag"
+						class={clsx($flagFormErrors.flag && 'border-red-500')}
+					/>
+					<Button class="ml-2">Submit</Button>
+				</div>
+				{#if $flagFormErrors.flag}
+					<div class="text-red-500">
+						{$flagFormErrors.flag}
+					</div>
+				{/if}
 			</form>
 		</Dialog.Content>
 	</Dialog.Root>
@@ -142,7 +176,7 @@
 			<div>
 				{challenge.description}
 			</div>
-			<form use:enhance method="POST" action="?/ticket" on:submit={() => goto('/challenges')}>
+			<form use:ticketForm.enhance method="POST" action="?/ticket">
 				<Editor content={challenge.issueTemplate} />
 				<input type="hidden" name="challengeId" value={challenge.id} />
 				<Button>Submit</Button>
@@ -169,7 +203,7 @@
 			animate:flip={{ duration: flipDurationMs }}
 		>
 			<div
-				class="flex justify-between rounded-md bg-green-500 p-4 font-bold"
+				class="flex justify-between rounded-md bg-blue-500 p-4 font-bold"
 				tabindex={dragDisabled ? 0 : -1}
 				role="button"
 				aria-label="drag-handle"
@@ -199,14 +233,26 @@
 			>
 				{#each column.challenges as challenge (challenge.id)}
 					<div
-						class="bg-card border-l-4 border-green-500 p-4"
+						class="bg-card border-l-4 border-blue-500 p-4"
 						animate:flip={{ duration: flipDurationMs }}
 					>
 						<div class="mb-2 flex justify-between">
-							<div class="font-bold">
-								<span class="text-green-500">{challenge.category} / </span>
-								<span>{challenge.difficulty} / </span>
-								<span>{challenge.name}</span>
+							<div class="flex items-center gap-4">
+								<div class="font-bold">
+									<span class="text-blue-500">{challenge.category} / </span>
+									<span>{challenge.difficulty} / </span>
+									<span>{challenge.name}</span>
+								</div>
+								{#if challenge.solved}
+									<Tooltip.Root>
+										<Tooltip.Trigger>
+											<Check />
+										</Tooltip.Trigger>
+										<Tooltip.Content>
+											<p>Challenge is solved!</p>
+										</Tooltip.Content>
+									</Tooltip.Root>
+								{/if}
 							</div>
 							<div class="flex items-center gap-4">
 								<Tooltip.Root>
@@ -222,13 +268,11 @@
 								</a>
 								<Avatar.Root class="h-8 w-8 border-4">
 									<Avatar.Image
-										src={challenge.author.discord?.image}
-										alt={`@${challenge.author.discord?.globalUsername}`}
+										src={challenge.author.image}
+										alt={`@${challenge.author.username}`}
 									/>
 									<Avatar.Fallback
-										>{challenge.author.discord?.globalUsername
-											.substring(0, 2)
-											.toUpperCase()}</Avatar.Fallback
+										>{challenge.author.username.substring(0, 2).toUpperCase()}</Avatar.Fallback
 									>
 								</Avatar.Root>
 								<div

@@ -171,7 +171,8 @@ export async function joinUserToRole(userId: string, roleId: string) {
 export async function verifyUser(userId: string) {
 	const discordBot = await prisma.discordBot.findFirst();
 	if (!discordBot) throw new Error('No discord bot found');
-	if (!discordBot.verifiedRoleId) throw new Error('No verified role found');
+	if (!discordBot.verifiedRoleId) return undefined;
+	// if (!discordBot.verifiedRoleId) throw new Error('No verified role found');
 
 	const guild = await client.guilds.fetch(discordBot.guildId);
 	try {
@@ -250,10 +251,9 @@ export async function createSupportThread({
 		type: ChannelType.PrivateThread
 	});
 
+	await thread.send(content);
 	await thread.members.add(discordId!);
 	await thread.members.add(challenge.author.discord!.id);
-
-	await thread.send(content);
 
 	return thread;
 }

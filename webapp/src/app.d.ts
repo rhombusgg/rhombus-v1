@@ -24,13 +24,12 @@ declare global {
 		category: string;
 		difficulty: string;
 		issueTemplate: string | null;
-		points: number | null;
+		points: number;
 		author: {
-			discord: {
-				globalUsername: string;
-				image: string;
-			} | null;
+			username: string;
+			image: string;
 		};
+		solved: boolean;
 	}
 
 	interface Session {

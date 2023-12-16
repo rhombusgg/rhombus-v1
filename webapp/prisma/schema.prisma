@@ -46,7 +46,17 @@ model User {
     ownerTeamId        String?
     authoredChallenges Challenge[]
     isAdmin            Boolean         @default(false)
-    Ticket             Ticket[]
+    tickets            Ticket[]
+    solves             Solve[]
+}
+
+model Solve {
+    id          String    @id @default(cuid())
+    challengeId String
+    challenge   Challenge @relation(fields: [challengeId], references: [id])
+    userId      String?
+    user        User?     @relation(fields: [userId], references: [id])
+    time        DateTime  @default(now())
 }
 
 model UserColumns {
@@ -87,10 +97,12 @@ model Challenge {
     description   String
     category      String
     difficulty    String
+    flag          String
     issueTemplate String?
     points        Int?
     author        User    @relation(fields: [authorId], references: [id])
-    authorId      String  @map("userId")
+    authorId      String
+    solves        Solve[]
 }
 
 model EmailVerificationToken {

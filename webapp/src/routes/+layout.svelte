@@ -8,7 +8,7 @@
 
 <ModeWatcher />
 
-<Toaster position="bottom-right" />
+<Toaster />
 
 <div class="relative flex min-h-screen flex-col" id="page">
 	<SiteHeader />

@@ -34,7 +34,7 @@
 						<h3 class="flex items-center text-xl font-semibold tracking-tight">
 							<div
 								class={clsx(
-									'back absolute ml-[-50px] inline-flex h-9 w-9 items-center justify-center rounded-full border-4',
+									'absolute ml-[-50px] inline-flex h-9 w-9 items-center justify-center rounded-full border-4',
 									$page.data.session.discord ? 'bg-green-500' : 'bg-border'
 								)}
 							>
@@ -57,7 +57,7 @@
 						<h3 class="mt-8 flex items-center text-xl font-semibold tracking-tight">
 							<div
 								class={clsx(
-									'back absolute ml-[-50px] inline-flex h-9 w-9 items-center justify-center rounded-full border-4',
+									'absolute ml-[-50px] inline-flex h-9 w-9 items-center justify-center rounded-full border-4',
 									data.inGuild ? 'bg-green-500' : 'bg-border'
 								)}
 							>
