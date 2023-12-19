@@ -53,14 +53,14 @@ export const load = async ({ url, cookies, locals }) => {
 			cookies.set('inviteToken', inviteToken);
 			return {
 				teamName: team.name,
-				form: superValidate(formSchema)
+				form: await superValidate(formSchema)
 			};
 		}
 	}
 
 	return {
 		team: undefined,
-		form: superValidate(formSchema)
+		form: await superValidate(formSchema)
 	};
 };
 

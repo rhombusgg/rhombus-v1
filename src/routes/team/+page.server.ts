@@ -41,6 +41,7 @@ export const load = async ({ locals }) => {
 	}
 
 	const team: {
+		id: string;
 		name: string;
 		ownerId: string;
 		inviteLink: string;
@@ -55,6 +56,7 @@ export const load = async ({ locals }) => {
 			id: string;
 		}[];
 	} = {
+		id: user.team!.id,
 		name: user.team!.name,
 		ownerId: user.team!.ownerId,
 		inviteLink: `${env.PUBLIC_LOCATION_URL}/signin?invite=${user.team!.inviteToken}`,
@@ -67,7 +69,7 @@ export const load = async ({ locals }) => {
 	};
 	return {
 		team,
-		teamNameForm: superValidate(teamNameFormSchema)
+		teamNameForm: await superValidate(teamNameFormSchema)
 	};
 };
 

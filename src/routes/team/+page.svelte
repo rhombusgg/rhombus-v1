@@ -27,7 +27,7 @@
 		<div class="mb-4 mt-4 space-y-0.5">
 			<h2 class="text-2xl font-bold tracking-tight">Team {data.team.name}</h2>
 			<p class="text-muted-foreground">
-				View your <a href="/" class="font-medium underline underline-offset-4"
+				View your <a href={`/team/${data.team.id}`} class="font-medium underline underline-offset-4"
 					>public team profile</a
 				>
 			</p>
