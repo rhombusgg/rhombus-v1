@@ -6,11 +6,9 @@
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	export let content: string | null | undefined;
+	let content = '';
 
 	onMount(async () => {
-		if (!content) content = '# Describe the issue with the challenge\n\n';
-
 		monaco = (await import('./monaco')).default;
 
 		const editor = monaco.editor.create(editorContainer);
@@ -32,14 +30,12 @@
 		editor.setModel(model);
 		editor.updateOptions({
 			minimap: { enabled: false },
-			lineNumbers: 'off',
 			wordWrap: 'on',
 			scrollBeyondLastLine: false,
 			scrollbar: {
 				verticalScrollbarSize: 0
 			},
-			folding: false,
-			lineDecorationsWidth: 0
+			folding: false
 		});
 		model.onDidChangeContent(() => {
 			content = model.getValue();
@@ -60,5 +56,5 @@
 	});
 </script>
 
-<div class="h-[400px] w-[350px]" bind:this={editorContainer} />
-<input type="hidden" name="content" bind:value={content} />
+<div class="h-[150px]" bind:this={editorContainer} />
+<input type="hidden" name="description" bind:value={content} />

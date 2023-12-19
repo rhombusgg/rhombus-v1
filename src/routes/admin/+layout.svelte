@@ -30,7 +30,7 @@
 		<aside class="flex flex-col lg:w-1/5">
 			<SidebarNav items={sidebarNavItems} />
 		</aside>
-		<div class="flex-1 lg:max-w-2xl">
+		<div class="flex-1 lg:max-w-3xl">
 			<slot />
 		</div>
 	</div>

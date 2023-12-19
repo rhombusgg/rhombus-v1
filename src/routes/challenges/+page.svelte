@@ -147,6 +147,7 @@
 						placeholder="flag..."
 						name="flag"
 						class={clsx($flagFormErrors.flag && 'border-red-500')}
+						autocomplete="off"
 					/>
 					<Button class="ml-2">Submit</Button>
 				</div>

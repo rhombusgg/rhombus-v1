@@ -29,6 +29,7 @@
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.30.0",
 		"formsnap": "^0.4.1",
+		"github-slugger": "^2.0.0",
 		"lucide-svelte": "^0.292.0",
 		"mode-watcher": "^0.1.1",
 		"monaco-editor": "^0.44.0",
