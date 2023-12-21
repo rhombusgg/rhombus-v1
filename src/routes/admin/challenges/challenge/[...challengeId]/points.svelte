@@ -3,8 +3,10 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Input } from '$lib/components/ui/input';
 
-	let checked = true;
-	let value = 50;
+	export let initial: number | null | undefined;
+
+	let checked = !initial;
+	let value = initial || 50;
 </script>
 
 <div class="flex flex-col gap-2">

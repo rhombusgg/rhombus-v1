@@ -4,12 +4,15 @@
 	import { mode } from 'mode-watcher';
 	import * as Select from '$lib/components/ui/select';
 	import { Label } from '$lib/components/ui/label';
+	import clsx from 'clsx';
+
+	export let initial: string | null | undefined;
 
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let model: Monaco.editor.ITextModel;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	let selected: 'http' | 'tcp' | 'none' = 'http';
+	let selected: 'http' | 'tcp' | 'none' = initial === null ? 'none' : 'http';
 
 	const httpTemplate =
 		`
@@ -40,7 +43,7 @@ export async function health(): Promise<boolean> {
 }
 `.trim() + '\n';
 
-	let content = httpTemplate;
+	let content = initial === null ? '' : initial || httpTemplate;
 
 	onMount(async () => {
 		monaco = (await import('./monaco')).default;
@@ -147,9 +150,16 @@ namespace Rhombus {
 </script>
 
 <div class="flex items-center gap-x-2">
-	<Select.Root onSelectedChange={selectChange} selected={{ value: 'http', label: 'HTTP' }}>
+	<Select.Root
+		onSelectedChange={selectChange}
+		selected={selected === 'http'
+			? { value: 'http', label: 'HTTP' }
+			: selected === 'none'
+				? { value: 'none', label: 'No healthcheck' }
+				: undefined}
+	>
 		<Select.Trigger class="w-[180px]" id="healthcheck">
-			<Select.Value />
+			<Select.Value placeholder="Select a template..." />
 		</Select.Trigger>
 		<Select.Content>
 			<Select.Item class="cursor-pointer" value="http">HTTP</Select.Item>
@@ -165,5 +175,10 @@ namespace Rhombus {
 		Healthcheck Template
 	</Label>
 </div>
-<div class="h-[300px]" bind:this={editorContainer} hidden={selected === 'none'} />
+<div class="relative">
+	<div
+		class={clsx('h-[300px]', selected === 'none' && 'absolute -z-10 w-full opacity-0')}
+		bind:this={editorContainer}
+	/>
+</div>
 <input type="hidden" name="healthcheck" bind:value={content} />

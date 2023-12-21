@@ -15,7 +15,9 @@
 	const { form, enhance, errors } = superForm(data.challengeForm, {
 		async onUpdated({ form }) {
 			if (form.valid) {
-				toast.success('Created challenge');
+				if (data.existingChallenge) toast.success('Updated challenge');
+				else toast.success('Created challenge');
+
 				await goto(`/admin/challenges`);
 			}
 		}
@@ -32,23 +34,30 @@
 </script>
 
 <svelte:head>
-	<title>Admin - New Challenge</title>
+	<title>Admin - {data.existingChallenge ? 'Edit' : 'New'} Challenge</title>
 	<meta name="description" content="Manage the CTF challenges" />
 </svelte:head>
 
 <div class="flex flex-col gap-4">
 	<div>
-		<h3 class="text-lg font-medium">New Challenge</h3>
-		<p class="text-sm text-muted-foreground">Create a new challenge</p>
+		<h3 class="text-lg font-medium">{data.existingChallenge ? 'Edit' : 'New'} Challenge</h3>
+		<p class="text-sm text-muted-foreground">
+			{data.existingChallenge
+				? `Edit challenge ${data.existingChallenge.name}`
+				: 'Create a new challenge'}
+		</p>
 	</div>
 	<Separator />
 	<form class="flex flex-col gap-4" method="POST" action="?/createChallenge" use:enhance>
+		{#if data.existingChallenge}
+			<input type="hidden" name="existingChallengeId" value={data.existingChallenge.id} />
+		{/if}
 		<div class="setting">
 			<div>
 				<h4 class="heading">Name</h4>
 				<p class="subheading">The name of the challenge</p>
 			</div>
-			<Name />
+			<Name initial={data.existingChallenge?.name} />
 			{#if $errors.name}
 				<span class="invalid">{$errors.name}</span>
 			{/if}
@@ -64,7 +73,7 @@
 					it exists
 				</p>
 			</div>
-			<MarkdownEditor name="description" />
+			<MarkdownEditor name="description" initial={data.existingChallenge?.description} />
 			{#if $errors.description}
 				<span class="invalid">{$errors.description}</span>
 			{/if}
@@ -80,7 +89,7 @@
 				<h4 class="heading">Health Check</h4>
 				<p class="subheading">Write a simple healthcheck in Typescript</p>
 			</div>
-			<Healthcheck />
+			<Healthcheck initial={data.existingChallenge?.healthCheckTypescript} />
 			{#if $errors.healthcheck}
 				<span class="invalid">{$errors.healthcheck}</span>
 			{/if}
@@ -94,7 +103,8 @@
 			</div>
 			<MarkdownEditor
 				name="issueTemplate"
-				content={`# Describe the issue with the challenge\n\n`}
+				initial={data.existingChallenge?.issueTemplate}
+				none={`# Describe the issue with the challenge\n\n`}
 			/>
 			{#if $errors.issueTemplate}
 				<span class="invalid">{$errors.issueTemplate}</span>
@@ -107,6 +117,7 @@
 			</div>
 			<Selector
 				options={difficultyOptions}
+				initial={data.existingChallenge?.difficulty}
 				ui={{
 					prompt: 'Select a difficulty level ...',
 					placeholder: 'Search difficulty levels...',
@@ -133,7 +144,7 @@
 				<h4 class="heading">Points</h4>
 				<p class="subheading">The number of points the challenge is worth</p>
 			</div>
-			<Points />
+			<Points initial={data.existingChallenge?.points} />
 			{#if $errors.points}
 				<span class="invalid">{$errors.points}</span>
 			{/if}
@@ -145,6 +156,7 @@
 			</div>
 			<Selector
 				options={categoryOptions}
+				initial={data.existingChallenge?.category}
 				ui={{
 					prompt: 'Select a category ...',
 					placeholder: 'Search categories...',
@@ -171,12 +183,18 @@
 				<h4 class="heading">Flag</h4>
 				<p class="subheading">The flag for the challenge</p>
 			</div>
-			<Input type="text" name="flag" autocomplete="off" />
+			<Input type="text" name="flag" autocomplete="off" value={data.existingChallenge?.flag} />
 			{#if $errors.flag}
 				<span class="invalid">{$errors.flag}</span>
 			{/if}
 		</div>
-		<Button type="submit">Create Challenge</Button>
+		<Button type="submit">
+			{#if data.existingChallenge}
+				Update Challenge
+			{:else}
+				Create Challenge
+			{/if}
+		</Button>
 	</form>
 </div>
 

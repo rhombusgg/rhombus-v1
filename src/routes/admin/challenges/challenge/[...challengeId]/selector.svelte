@@ -11,7 +11,8 @@
 
 	export let options: { label: string; value: string }[] = [];
 	type Option = (typeof options)[0];
-	export let value: string | null | undefined = undefined;
+	export let initial: string | undefined;
+	let value = initial;
 	export let ui: {
 		prompt: string;
 		placeholder: string;
@@ -29,6 +30,8 @@
 		}
 	};
 	export let onChange: ((option: Option) => void) | ((option: Option) => Promise<void>) = () => {};
+
+	if (initial) onChange({ label: initial, value: initial });
 
 	let showCreateDialog = false;
 	let open = false;

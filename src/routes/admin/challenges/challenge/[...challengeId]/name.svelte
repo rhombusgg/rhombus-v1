@@ -2,7 +2,9 @@
 	import { Input } from '$lib/components/ui/input';
 	import { slug as slugger } from 'github-slugger';
 
-	let name: string;
+	export let initial: string | undefined;
+	let name: string = initial || '';
+
 	$: slug = slugger(name);
 </script>
 

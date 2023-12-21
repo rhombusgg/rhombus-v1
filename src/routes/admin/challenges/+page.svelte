@@ -14,7 +14,7 @@
 	</div>
 	<Separator />
 	<div class="flex flex-col gap-4">
-		<a href="challenges/new">New challenge</a>
+		<a href="challenges/challenge">New challenge</a>
 	</div>
 </div>
 

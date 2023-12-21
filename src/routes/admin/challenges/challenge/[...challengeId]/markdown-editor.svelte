@@ -6,7 +6,9 @@
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	export let content = '';
+	export let initial: string | undefined;
+	export let none = '';
+	let content = initial || none;
 	export let name: string;
 
 	onMount(async () => {
