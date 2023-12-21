@@ -12,7 +12,7 @@
 	import toast from 'svelte-french-toast';
 
 	export let data;
-	const { form, enhance, errors } = superForm(data.challengeForm, {
+	const { enhance, errors } = superForm(data.challengeForm, {
 		async onUpdated({ form }) {
 			if (form.valid) {
 				if (data.existingChallenge) toast.success('Updated challenge');

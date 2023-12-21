@@ -12,7 +12,8 @@
 	let model: Monaco.editor.ITextModel;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	let selected: 'http' | 'tcp' | 'none' = initial === null ? 'none' : 'http';
+	type Value = 'http' | 'tcp' | 'none';
+	let selected: Value = initial === null ? 'none' : 'http';
 
 	const httpTemplate =
 		`
@@ -136,8 +137,8 @@ namespace Rhombus {
 		editor?.dispose();
 	});
 
-	function selectChange(value: any) {
-		selected = value.value;
+	function selectChange(option: unknown) {
+		selected = (option as { value: Value; label: string }).value;
 		if (selected === 'http') {
 			content = httpTemplate;
 		} else if (selected === 'tcp') {

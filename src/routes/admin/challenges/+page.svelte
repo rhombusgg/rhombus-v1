@@ -17,17 +17,3 @@
 		<a href="challenges/challenge">New challenge</a>
 	</div>
 </div>
-
-<style>
-	.heading {
-		@apply text-sm font-semibold;
-	}
-
-	.subheading {
-		@apply text-sm text-muted-foreground;
-	}
-
-	.setting {
-		@apply flex flex-col gap-2;
-	}
-</style>
