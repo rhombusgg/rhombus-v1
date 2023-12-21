@@ -14,7 +14,7 @@ export const load = async ({ params }) => {
 							challenge: {
 								select: {
 									name: true,
-									humanId: true
+									slug: true
 								}
 							}
 						}

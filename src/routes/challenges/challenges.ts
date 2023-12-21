@@ -4,7 +4,7 @@ export async function getUserColumns(userId: string) {
 	const dbChallenges = await prisma.challenge.findMany({
 		select: {
 			id: true,
-			humanId: true,
+			slug: true,
 			name: true,
 			description: true,
 			issueTemplate: true,
@@ -134,7 +134,7 @@ export async function getUserColumns(userId: string) {
 			const challenge = dbChallenges.find((chall) => chall.id === c.challengeId)!;
 			return {
 				id: challenge.id,
-				humanId: challenge.humanId,
+				slug: challenge.slug,
 				name: challenge.name,
 				description: challenge.description,
 				category: challenge.category,

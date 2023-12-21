@@ -4,7 +4,7 @@ export const load = async (event) => {
 	const challenges = await prisma.challenge.findMany({
 		select: {
 			id: true,
-			humanId: true,
+			slug: true,
 			name: true,
 			description: true,
 			issueTemplate: true,

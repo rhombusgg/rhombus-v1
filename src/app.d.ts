@@ -18,7 +18,7 @@ declare global {
 
 	interface Challenge {
 		id: string;
-		humanId: string;
+		slug: string;
 		name: string;
 		description: string;
 		category: string;

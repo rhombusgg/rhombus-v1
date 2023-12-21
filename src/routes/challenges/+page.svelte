@@ -125,7 +125,7 @@
 
 {#each challenges as challenge}
 	<Dialog.Root
-		open={$page.url.searchParams.get('challenge') === challenge.humanId}
+		open={$page.url.searchParams.get('challenge') === challenge.slug}
 		onOpenChange={() => {
 			$page.url.searchParams.delete('challenge');
 			goto($page.url);
@@ -160,7 +160,7 @@
 		</Dialog.Content>
 	</Dialog.Root>
 	<Dialog.Root
-		open={$page.url.searchParams.get('ticket') === challenge.humanId}
+		open={$page.url.searchParams.get('ticket') === challenge.slug}
 		closeOnEscape={false}
 		onOpenChange={() => {
 			$page.url.searchParams.delete('ticket');
@@ -263,7 +263,7 @@
 										<p>Last checked 1s ago and is <span class="text-green-500">up</span></p>
 									</Tooltip.Content>
 								</Tooltip.Root>
-								<a href={`?ticket=${challenge.humanId}`}>
+								<a href={`?ticket=${challenge.slug}`}>
 									<Ticket class="-rotate-45" />
 								</a>
 								<Avatar.Root class="h-8 w-8 border-4">
@@ -297,7 +297,7 @@
 						<div class="relative">
 							{challenge.description}
 
-							<a href={`?challenge=${challenge.humanId}`} class="absolute bottom-0 right-0 h-6 w-6">
+							<a href={`?challenge=${challenge.slug}`} class="absolute bottom-0 right-0 h-6 w-6">
 								<Maximize2 />
 							</a>
 						</div>

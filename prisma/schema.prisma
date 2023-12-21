@@ -92,14 +92,14 @@ model Team {
 
 model Challenge {
     id                    String  @id @default(cuid())
-    slug                  String  @unique @map("humanId")
+    slug                  String  @unique
     name                  String
     description           String
     category              String
     difficulty            String
     flag                  String
-    healthCheckTypescript String?
-    healthCheckJavascript String?
+    healthCheckTypescript String? @db.Text
+    healthCheckJavascript String? @db.Text
     issueTemplate         String
     points                Int?
     author                User    @relation(fields: [authorId], references: [id])

@@ -8,9 +8,24 @@
 	import MarkdownEditor from './markdown-editor.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { superForm } from 'sveltekit-superforms/client';
+	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
 	export let data;
-	const { form, enhance, errors } = superForm(data.challengeForm);
+	const { form, enhance, errors } = superForm(data.challengeForm, {
+		async onUpdated({ form }) {
+			if (form.valid) {
+				toast.success('Created challenge');
+				await goto(`/admin/challenges`);
+			}
+		}
+	});
+
+	$: categoryOptions = data.categories.map((category) => ({ label: category, value: category }));
+	$: difficultyOptions = data.difficulties.map((difficulty) => ({
+		label: difficulty,
+		value: difficulty
+	}));
 
 	let category: string | undefined = undefined;
 	let difficulty: string | undefined = undefined;
@@ -91,7 +106,7 @@
 				<p class="subheading">How hard you expect the challenge to be</p>
 			</div>
 			<Selector
-				options={[{ label: 'A', value: 'a' }]}
+				options={difficultyOptions}
 				ui={{
 					prompt: 'Select a difficulty level ...',
 					placeholder: 'Search difficulty levels...',
@@ -129,7 +144,7 @@
 				<p class="subheading">The category of the challenge</p>
 			</div>
 			<Selector
-				options={[{ label: 'A', value: 'a' }]}
+				options={categoryOptions}
 				ui={{
 					prompt: 'Select a category ...',
 					placeholder: 'Search categories...',

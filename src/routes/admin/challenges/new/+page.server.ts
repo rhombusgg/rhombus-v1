@@ -21,10 +21,27 @@ export const load = async ({ locals }) => {
 		throw redirect(302, '/account');
 	}
 
+	const challenges = await prisma.challenge.findMany({
+		select: {
+			difficulty: true,
+			category: true
+		}
+	});
+
+	const categories = challenges
+		.map((challenge) => challenge.category)
+		.filter((value, index, array) => array.indexOf(value) === index);
+
+	const difficulties = challenges
+		.map((challenge) => challenge.difficulty)
+		.filter((value, index, array) => array.indexOf(value) === index);
+
 	const challengeForm = await superValidate(challengeSchema);
 
 	return {
-		challengeForm
+		challengeForm,
+		categories,
+		difficulties
 	};
 };
 
@@ -37,7 +54,7 @@ const challengeSchema = z.object({
 	difficulty: z.string().min(1, 'You must select a difficulty level'),
 	points: z.number().positive().optional(),
 	category: z.string().min(1, 'You must select a category'),
-	flag: z.string().min(1)
+	flag: z.string().min(1, 'You must set a flag')
 });
 
 export const actions = {
@@ -45,12 +62,6 @@ export const actions = {
 		await isAdmin(locals);
 
 		const form = await superValidate(request, challengeSchema);
-		console.log(form.data);
-		console.log(form.errors);
-
-		if (!form.valid) {
-			return fail(400, { form });
-		}
 
 		const existingChallenge = await prisma.challenge.findFirst({
 			where: {
@@ -60,6 +71,10 @@ export const actions = {
 
 		if (existingChallenge) {
 			return setError(form, 'slug', 'Challnge with slug already exists');
+		}
+
+		if (!form.valid) {
+			return fail(400, { form });
 		}
 
 		await prisma.challenge.create({
