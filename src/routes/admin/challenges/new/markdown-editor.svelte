@@ -6,7 +6,8 @@
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	let content = '';
+	export let content = '';
+	export let name: string;
 
 	onMount(async () => {
 		monaco = (await import('./monaco')).default;
@@ -57,4 +58,4 @@
 </script>
 
 <div class="h-[150px]" bind:this={editorContainer} />
-<input type="hidden" name="description" bind:value={content} />
+<input type="hidden" {name} bind:value={content} />
