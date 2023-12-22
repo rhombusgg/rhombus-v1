@@ -95,10 +95,10 @@ export const actions = {
 			issueTemplate: form.data.issueTemplate,
 			healthCheckTypescript: form.data.healthcheck || null,
 			category: form.data.category,
+			points: form.data.points || null,
 			difficulty: form.data.difficulty,
 			flag: form.data.flag
 		};
-		console.log(data);
 
 		await prisma.challenge.upsert({
 			where: {

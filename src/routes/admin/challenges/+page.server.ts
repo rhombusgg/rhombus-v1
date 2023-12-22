@@ -21,7 +21,7 @@ export const load = async ({ locals, depends }) => {
 
 	depends('app:admin:challenges');
 
-	const challenges = await prisma.challenge.findMany({});
+	const challenges = await prisma.challenge.findMany();
 
 	return {
 		challenges
