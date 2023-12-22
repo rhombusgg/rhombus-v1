@@ -43,6 +43,7 @@
 		"svelte-check": "^3.6.0",
 		"svelte-dnd-action": "^0.9.35",
 		"svelte-french-toast": "^1.2.0",
+		"svelte-headless-table": "^0.17.7",
 		"tailwind-merge": "^1.14.0",
 		"tailwind-variants": "^0.1.18",
 		"tailwindcss": "^3",

@@ -94,7 +94,7 @@ model Challenge {
     id                    String  @id @default(cuid())
     slug                  String  @unique
     name                  String
-    description           String
+    description           String  @db.Text
     category              String
     difficulty            String
     flag                  String

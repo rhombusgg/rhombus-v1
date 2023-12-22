@@ -159,14 +159,14 @@
 			<Command.Group heading="Challenges">
 				{#each $page.data.challenges as challenge}
 					<Command.Item
-						value={`${challenge.name} ${challenge.slug} ${challenge.description} ${challenge.author} ${challenge.category} ticket`}
+						value={`${challenge.name} ${challenge.category} ticket`}
 						onSelect={() => runCommand(() => goto(`/challenges?ticket=${challenge.slug}`))}
 					>
 						<Ticket class="mr-2 h-4 w-4 -rotate-45" />
 						Create ticket for {challenge.name}
 					</Command.Item>
 					<Command.Item
-						value={`${challenge.name} ${challenge.slug} ${challenge.description} ${challenge.author} ${challenge.category} focus`}
+						value={`${challenge.name} ${challenge.category} focus`}
 						onSelect={() => runCommand(() => goto(`/challenges?challenge=${challenge.slug}`))}
 					>
 						<Maximize2 class="mr-2 h-4 w-4" />
