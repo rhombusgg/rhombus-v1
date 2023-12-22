@@ -9,7 +9,7 @@
 			<p class="text-center text-sm leading-loose text-muted-foreground md:text-left">
 				The source code is available on{' '}
 				<a
-					href="https://github.com/mbund/rhombus"
+					href="https://github.com/rhombusgg/rhombus"
 					target="_blank"
 					class="font-medium underline underline-offset-4">GitHub</a
 				>.
