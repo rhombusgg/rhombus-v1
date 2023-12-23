@@ -4,7 +4,7 @@
 	const sidebarNavItems = [
 		{
 			title: 'General',
-			href: '/admin'
+			href: '/admin/general'
 		},
 		{
 			title: 'Discord',

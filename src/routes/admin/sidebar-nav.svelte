@@ -13,7 +13,7 @@
 			href={item.href}
 			variant="ghost"
 			class={cn(
-				$page.url.pathname === item.href
+				$page.url.pathname.startsWith(item.href)
 					? 'bg-muted hover:bg-muted'
 					: 'hover:bg-transparent hover:underline',
 				'justify-start'

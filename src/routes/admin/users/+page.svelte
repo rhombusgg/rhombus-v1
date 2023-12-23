@@ -6,14 +6,14 @@
 </script>
 
 <svelte:head>
-	<title>Admin - Challenges</title>
-	<meta name="description" content="Manage the CTF challenges" />
+	<title>Admin - Users</title>
+	<meta name="description" content="Inspect signed up users" />
 </svelte:head>
 
 <div class="flex flex-col gap-4">
 	<div>
-		<h3 class="text-lg font-medium">Challenges</h3>
-		<p class="text-sm text-muted-foreground">Manage the CTF challenges</p>
+		<h3 class="text-lg font-medium">Users</h3>
+		<p class="text-sm text-muted-foreground">Inspect signed up users</p>
 	</div>
 	<Separator />
 

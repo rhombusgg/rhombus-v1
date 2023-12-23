@@ -1,8 +1,7 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { MoreHorizontal, Pencil, ShieldAlert, Trash2, Waypoints } from 'lucide-svelte';
-	import DropdownMenuSeparator from '$lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte';
+	import { MoreHorizontal, ShieldAlert, Trash2 } from 'lucide-svelte';
 	export let id: string;
 </script>
 
@@ -14,8 +13,6 @@
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Item><Waypoints class="mr-2 h-4 w-4" /> View IPs</DropdownMenu.Item>
-		<DropdownMenuSeparator />
 		<DropdownMenu.Item href={`challenges/challenge/${id}`}
 			><ShieldAlert class="mr-2 h-4 w-4" /> Make Admin</DropdownMenu.Item
 		>

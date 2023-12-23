@@ -8,18 +8,24 @@
 	import { ArrowUpDown } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
 	import DiscordAvatar from './discord-avatar.svelte';
+	import Email from './email.svelte';
+	import Team from './team.svelte';
 
 	export let users: {
 		id: string;
 		isAdmin: boolean;
-		email: string;
-		teamName: string;
+		email: { email: string; userId: string };
+		team: { name: string; id: string };
 		teamId: string;
-		discord: {
-			username: string;
-			globalUsername: string;
-			image: string;
-		} | null;
+		discord:
+			| {
+					username: string;
+					globalUsername: string;
+					image: string;
+					userId: string;
+			  }
+			| undefined;
+		ips: string[];
 	}[];
 
 	const table = createTable(readable(users), {
@@ -38,21 +44,29 @@
 		}),
 		table.column({
 			accessor: 'email',
-			header: 'Email'
+			header: 'Email',
+			cell: ({ value }) => createRender(Email, value)
 		}),
 		table.column({
-			accessor: 'teamName',
-			header: 'Team'
+			accessor: 'team',
+			header: 'Team',
+			cell: ({ value }) => createRender(Team, value)
+		}),
+		table.column({
+			accessor: 'ips',
+			header: 'IPs',
+			cell: ({ value: ips }) =>
+				ips.filter((ip, index) => index <= 1).join(', ') + (ips.length > 2 ? ', ...' : '')
 		}),
 		table.column({
 			accessor: 'isAdmin',
 			header: 'Admin',
-			cell: ({ value }) => (value ? 'Yes' : 'No')
+			cell: ({ value: isAdmin }) => (isAdmin ? 'Yes' : 'No')
 		}),
 		table.column({
 			accessor: ({ id }) => id,
 			header: '',
-			cell: ({ value }) => createRender(TableActions, { id: value }),
+			cell: ({ value: id }) => createRender(TableActions, { id }),
 			plugins: {
 				sort: {
 					disable: true

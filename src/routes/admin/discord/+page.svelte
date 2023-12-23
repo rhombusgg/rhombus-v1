@@ -11,14 +11,14 @@
 
 <svelte:head>
 	<title>Admin - Discord Integration</title>
-	<meta name="description" content="Manage your discord bot." />
+	<meta name="description" content="Configure the integrated discord bot" />
 </svelte:head>
 
 <div class="flex flex-col gap-4">
 	<div class="flex justify-between">
 		<div>
 			<h3 class="text-lg font-medium">Discord Integration</h3>
-			<p class="text-sm text-muted-foreground">Manage your discord bot.</p>
+			<p class="text-sm text-muted-foreground">Configure the integrated discord bot</p>
 		</div>
 		<div>
 			<Button
@@ -84,8 +84,8 @@
 							}
 						});
 						await invalidate('app:admin:discord');
-						toast.success('Sent support pannel');
-					}}>Send Pannel</Button
+						toast.success('Sent support panel');
+					}}>Send Panel</Button
 				>
 			</div>
 		</div>

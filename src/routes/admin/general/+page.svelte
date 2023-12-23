@@ -4,13 +4,13 @@
 
 <svelte:head>
 	<title>Admin - General</title>
-	<meta name="description" content="Manage the CTF." />
+	<meta name="description" content="Manage the CTF" />
 </svelte:head>
 
 <div class="flex flex-col gap-4">
 	<div>
 		<h3 class="text-lg font-medium">General Settings</h3>
-		<p class="text-sm text-muted-foreground">Manage the CTF.</p>
+		<p class="text-sm text-muted-foreground">Manage the CTF</p>
 	</div>
 	<Separator />
 	<div class="flex flex-col gap-4">

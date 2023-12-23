@@ -14,7 +14,7 @@
 			href="/scoreboard"
 			class={cn(
 				'transition-colors hover:text-foreground/80',
-				$page.url.pathname === '/scoreboard' ? 'text-foreground' : 'text-foreground/60'
+				$page.url.pathname.startsWith('/scoreboard') ? 'text-foreground' : 'text-foreground/60'
 			)}
 		>
 			Scoreboard
@@ -24,7 +24,7 @@
 				href="/challenges"
 				class={cn(
 					'transition-colors hover:text-foreground/80',
-					$page.url.pathname === '/challenges' ? 'text-foreground' : 'text-foreground/60'
+					$page.url.pathname.startsWith('/challenges') ? 'text-foreground' : 'text-foreground/60'
 				)}
 			>
 				Challenges
@@ -33,7 +33,7 @@
 				href="/team"
 				class={cn(
 					'transition-colors hover:text-foreground/80',
-					$page.url.pathname === '/team' ? 'text-foreground' : 'text-foreground/60'
+					$page.url.pathname.startsWith('/team') ? 'text-foreground' : 'text-foreground/60'
 				)}
 			>
 				Team
@@ -42,7 +42,7 @@
 				href="/account"
 				class={cn(
 					'transition-colors hover:text-foreground/80',
-					$page.url.pathname === '/account' ? 'text-foreground' : 'text-foreground/60'
+					$page.url.pathname.startsWith('/account') ? 'text-foreground' : 'text-foreground/60'
 				)}
 			>
 				Account
@@ -52,7 +52,7 @@
 					href="/admin"
 					class={cn(
 						'transition-colors hover:text-foreground/80',
-						$page.url.pathname === '/admin' ? 'text-foreground' : 'text-foreground/60'
+						$page.url.pathname.startsWith('/admin') ? 'text-foreground' : 'text-foreground/60'
 					)}
 				>
 					Admin
@@ -63,7 +63,7 @@
 				href="/signin"
 				class={cn(
 					'transition-colors hover:text-foreground/80',
-					$page.url.pathname === '/signin' ? 'text-foreground' : 'text-foreground/60'
+					$page.url.pathname.startsWith('/signin') ? 'text-foreground' : 'text-foreground/60'
 				)}
 			>
 				Sign In

@@ -4,19 +4,20 @@
 	export let username: string;
 	export let globalUsername: string;
 	export let image: string;
+	export let userId: string;
 </script>
 
-<div class="flex items-center gap-4">
+<a href={`/user/${userId}`} class="flex items-center gap-4">
 	<Avatar.Root class="h-8 w-8">
 		<Avatar.Image src={image} alt={`@${globalUsername}`} />
 		<Avatar.Fallback>{username.substring(0, 2).toUpperCase()}</Avatar.Fallback>
 	</Avatar.Root>
 	<div>
-		<p>
+		<p class="font-medium underline underline-offset-4">
 			{username}
 		</p>
 		<p class="text-sm text-muted-foreground">
 			@{globalUsername}
 		</p>
 	</div>
-</div>
+</a>

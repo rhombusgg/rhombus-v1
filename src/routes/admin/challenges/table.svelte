@@ -7,11 +7,15 @@
 	import { Button } from '$lib/components/ui/button';
 	import { ArrowUpDown } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
+	import Name from './name.svelte';
 
 	export let challenges: {
 		id: string;
 		slug: string;
-		name: string;
+		name: {
+			name: string;
+			id: string;
+		};
 		description: string;
 		category: string;
 		difficulty: string;
@@ -34,12 +38,14 @@
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'name',
-			header: 'Name'
+			header: 'Name',
+			cell: ({ value }) => createRender(Name, value)
 		}),
 		table.column({
 			accessor: 'description',
 			header: 'Description',
-			cell: ({ value }) => (value.length > 50 ? value.slice(0, 50) + '...' : value)
+			cell: ({ value: description }) =>
+				description.length > 50 ? description.slice(0, 50) + '...' : description
 		}),
 		table.column({
 			accessor: 'category',

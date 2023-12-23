@@ -24,6 +24,19 @@ export const load = async ({ locals, depends }) => {
 	const challenges = await prisma.challenge.findMany();
 
 	return {
-		challenges
+		challenges: challenges.map((challenge) => ({
+			id: challenge.id,
+			slug: challenge.slug,
+			name: { name: challenge.name, slug: challenge.slug },
+			description: challenge.description,
+			category: challenge.category,
+			difficulty: challenge.difficulty,
+			flag: challenge.flag,
+			healthCheckTypescript: challenge.healthCheckTypescript,
+			healthCheckJavascript: challenge.healthCheckJavascript,
+			issueTemplate: challenge.issueTemplate,
+			points: challenge.points,
+			authorId: challenge.authorId
+		}))
 	};
 };

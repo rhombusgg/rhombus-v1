@@ -17,9 +17,10 @@
 	</div>
 	<Separator />
 
-	<Table challenges={data.challenges} />
-
 	<div class="flex flex-col gap-4">
 		<a href="challenges/challenge">New challenge</a>
 	</div>
+	Flag Format
+
+	<Table challenges={data.challenges} />
 </div>

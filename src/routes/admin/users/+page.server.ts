@@ -22,6 +22,7 @@ export const load = async ({ locals }) => {
 	const users = await prisma.user.findMany({
 		select: {
 			id: true,
+			isAdmin: true,
 			discord: {
 				select: {
 					image: true,
@@ -35,11 +36,15 @@ export const load = async ({ locals }) => {
 					email: true
 				}
 			},
-			isAdmin: true,
 			team: {
 				select: {
 					name: true,
 					id: true
+				}
+			},
+			ips: {
+				select: {
+					address: true
 				}
 			}
 		}
@@ -49,10 +54,11 @@ export const load = async ({ locals }) => {
 		users: users.map((user) => ({
 			id: user.id,
 			isAdmin: user.isAdmin,
-			email: user.emails[0]?.email,
-			teamName: user.team!.name,
+			email: { email: user.emails[0]?.email, userId: user.id },
+			team: user.team!,
 			teamId: user.team!.id,
-			discord: user.discord
+			discord: user.discord ? { ...user.discord, userId: user.id } : undefined,
+			ips: user.ips.map((ip) => ip.address)
 		}))
 	};
 };
