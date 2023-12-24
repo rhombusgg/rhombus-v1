@@ -50,18 +50,32 @@
 		table.column({
 			accessor: 'team',
 			header: 'Team',
-			cell: ({ value }) => createRender(Team, value)
+			cell: ({ value }) => createRender(Team, value),
+			plugins: {
+				sort: {
+					compareFn(left, right) {
+						return left.name < right.name ? -1 : left.name > right.name ? 1 : 0;
+					}
+				}
+			}
 		}),
 		table.column({
 			accessor: 'ips',
 			header: 'IPs',
 			cell: ({ value: ips }) =>
-				ips.filter((ip, index) => index <= 1).join(', ') + (ips.length > 2 ? ', ...' : '')
+				ips.filter((_, index) => index <= 1).join(', ') + (ips.length > 2 ? ', ...' : '')
 		}),
 		table.column({
 			accessor: 'isAdmin',
 			header: 'Admin',
-			cell: ({ value: isAdmin }) => (isAdmin ? 'Yes' : 'No')
+			cell: ({ value: isAdmin }) => (isAdmin ? 'Yes' : 'No'),
+			plugins: {
+				sort: {
+					compareFn(left) {
+						return left ? 1 : -1;
+					}
+				}
+			}
 		}),
 		table.column({
 			accessor: ({ id }) => id,
@@ -98,7 +112,7 @@
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
-										{#if ['isAdmin'].includes(cell.id)}
+										{#if ['team', 'isAdmin'].includes(cell.id)}
 											<Button variant="ghost" on:click={props.sort.toggle}>
 												<Render of={cell.render()} />
 												<ArrowUpDown class={'ml-2 h-4 w-4'} />

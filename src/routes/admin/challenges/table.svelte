@@ -14,7 +14,7 @@
 		slug: string;
 		name: {
 			name: string;
-			id: string;
+			slug: string;
 		};
 		description: string;
 		category: string;
