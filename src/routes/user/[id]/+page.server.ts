@@ -31,7 +31,8 @@ export const load = async ({ locals, params }) => {
 					challenge: {
 						select: {
 							name: true,
-							slug: true
+							slug: true,
+							points: true
 						}
 					}
 				}
@@ -55,6 +56,7 @@ export const load = async ({ locals, params }) => {
 				},
 		fallback: avatarFallback(user),
 		team: user.team!,
+		solves: user.solves,
 		admin: locals.session?.isAdmin
 			? {
 					ips: user.ips.map((ip) => ip.address)

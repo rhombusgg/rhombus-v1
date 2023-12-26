@@ -5,7 +5,6 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { ClipboardCopy, Crown, LogOut, RefreshCcw } from 'lucide-svelte';
 	import { page } from '$app/stores';
-	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 	import { teamNameFormSchema } from './schema.js';
 	import toast from 'svelte-french-toast';
@@ -13,8 +12,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	export let data;
 
-	const isOwner = writable();
-	$: isOwner.set(data.team.ownerId === data.session?.id);
+	$: isOwner = data.team.ownerId === data.session?.id;
 </script>
 
 <svelte:head>
@@ -98,13 +96,13 @@
 										<Avatar.Fallback>{user.avatarFallback}</Avatar.Fallback>
 									</Avatar.Root>
 									<div>
-										<p>
+										<a class="font-medium underline underline-offset-4" href={`/user/${user.id}`}>
 											{#if user.discord}
 												{user.discord.username}
 											{:else}
 												{user.email}
 											{/if}
-										</p>
+										</a>
 										<p class="text-sm text-muted-foreground">
 											{#if user.discord}
 												@{user.discord.globalUsername}
@@ -125,7 +123,7 @@
 										</Tooltip.Root>
 									{/if}
 								</div>
-								{#if $isOwner !== (user.id === data.session?.id)}
+								{#if isOwner !== (user.id === data.session?.id)}
 									<Tooltip.Root>
 										<Tooltip.Trigger>
 											<form
@@ -141,7 +139,7 @@
 											</form>
 										</Tooltip.Trigger>
 										<Tooltip.Content>
-											{#if $isOwner}
+											{#if isOwner}
 												<p>Remove from team</p>
 											{:else}
 												<p>Leave team</p>
@@ -168,7 +166,7 @@
 				</Card.Header>
 				<Card.Content>A</Card.Content>
 			</Card.Root>
-			{#if $isOwner}
+			{#if isOwner}
 				<Card.Root>
 					<Card.Header>
 						<Card.Title>Webhook</Card.Title>
@@ -177,7 +175,7 @@
 					<Card.Content>A</Card.Content>
 				</Card.Root>
 			{/if}
-			{#if $isOwner}
+			{#if isOwner}
 				<Card.Root>
 					<Card.Header>
 						<Card.Title>Settings</Card.Title>

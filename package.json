@@ -25,6 +25,7 @@
 		"bits-ui": "^0.9.8",
 		"clsx": "^2.0.0",
 		"cmdk-sv": "^0.0.9",
+		"dayjs": "^1.11.10",
 		"echarts": "^5.4.3",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^9.0.0",

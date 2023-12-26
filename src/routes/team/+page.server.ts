@@ -40,22 +40,7 @@ export const load = async ({ locals }) => {
 		throw redirect(302, '/signin');
 	}
 
-	const team: {
-		id: string;
-		name: string;
-		ownerId: string;
-		inviteLink: string;
-		users: {
-			discord: {
-				username: string;
-				globalUsername: string;
-				image: string;
-			} | null;
-			email: string | undefined;
-			avatarFallback: string;
-			id: string;
-		}[];
-	} = {
+	const team = {
 		id: user.team!.id,
 		name: user.team!.name,
 		ownerId: user.team!.ownerId,
@@ -67,6 +52,7 @@ export const load = async ({ locals }) => {
 			id: user.id
 		}))
 	};
+
 	return {
 		team,
 		teamNameForm: await superValidate(teamNameFormSchema)
