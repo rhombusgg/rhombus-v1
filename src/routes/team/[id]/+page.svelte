@@ -30,7 +30,7 @@
 				<Card.Title>Members</Card.Title>
 				<Card.Description>Players on the team</Card.Description>
 			</Card.Header>
-			<Card.Content>
+			<Card.Content class="flex flex-col gap-6">
 				{#each data.users as user}
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-4">
@@ -69,7 +69,7 @@
 				<Card.Title>Solves</Card.Title>
 				<Card.Description>Challenges the team has solved</Card.Description>
 			</Card.Header>
-			<Card.Content>
+			<Card.Content class="flex flex-col gap-2">
 				{#each data.solves as solve}
 					<div class="flex items-center justify-between">
 						<div>

@@ -1,15 +1,20 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
 	import * as Card from '$lib/components/ui/card';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Form from '$lib/components/ui/form';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { ClipboardCopy, Crown, LogOut, RefreshCcw } from 'lucide-svelte';
-	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
-	import { teamNameFormSchema } from './schema.js';
-	import toast from 'svelte-french-toast';
 	import { Input } from '$lib/components/ui/input';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { ClipboardCopy, Crown, LogOut, RefreshCcw } from 'lucide-svelte';
+	import dayjs from 'dayjs';
+	import calendar from 'dayjs/plugin/calendar';
+	import toast from 'svelte-french-toast';
+	import { teamNameFormSchema } from './schema';
+
+	dayjs.extend(calendar);
+
 	export let data;
 
 	$: isOwner = data.team.ownerId === data.session?.id;
@@ -30,11 +35,11 @@
 				>
 			</p>
 		</div>
-		<div class="grid h-fit gap-6 md:grid-cols-2 lg:grid-cols-3">
+		<div class="grid h-fit gap-6 lg:grid-cols-2">
 			<Card.Root>
 				<Card.Header>
 					<Card.Title>Members</Card.Title>
-					<Card.Description>Your team members</Card.Description>
+					<Card.Description>Players on your team</Card.Description>
 				</Card.Header>
 				<Card.Content>
 					<div class="flex flex-col gap-6">
@@ -149,15 +154,62 @@
 								{/if}
 							</div>
 						{/each}
-					</div></Card.Content
-				>
+					</div>
+				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header>
 					<Card.Title>Solves</Card.Title>
 					<Card.Description>Challenges your team has solved</Card.Description>
 				</Card.Header>
-				<Card.Content>A</Card.Content>
+				<Card.Content class="flex flex-col gap-2">
+					{#each data.solves as solve}
+						<div class="flex items-center justify-between">
+							<div>
+								<a
+									class="font-medium underline underline-offset-4"
+									href={`/challenges?challenge=${solve.challenge.slug}`}>{solve.challenge.name}</a
+								>
+								<span class="text-sm text-muted-foreground">
+									/ {solve.challenge.points} points / {dayjs(solve.time).calendar(dayjs())}</span
+								>
+							</div>
+							<div class="flex items-center gap-4">
+								<div class="text-right">
+									<a
+										class="font-medium underline underline-offset-4"
+										href={`/user/${solve.user.id}`}
+									>
+										{#if solve.user.discord}
+											{solve.user.discord.username}
+										{:else}
+											{solve.user.email}
+										{/if}
+									</a>
+									<p class="text-sm text-muted-foreground">
+										{#if solve.user.discord}
+											@{solve.user.discord.globalUsername}
+										{:else}
+											{solve.user.email}
+										{/if}
+										{#if solve.user.id === data.session?.id}
+											(You)
+										{/if}
+									</p>
+								</div>
+								<Avatar.Root class="h-10 w-10 border-4">
+									{#if solve.user.discord}
+										<Avatar.Image
+											src={solve.user.discord.image}
+											alt={`@${solve.user.discord.globalUsername}`}
+										/>
+									{/if}
+									<Avatar.Fallback>{solve.user.avatarFallback}</Avatar.Fallback>
+								</Avatar.Root>
+							</div>
+						</div>
+					{/each}
+				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header>

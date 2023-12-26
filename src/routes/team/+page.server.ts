@@ -28,7 +28,19 @@ export const load = async ({ locals }) => {
 						select: {
 							id: true,
 							discord: { select: { username: true, globalUsername: true, image: true } },
-							emails: { select: { email: true }, take: 1 }
+							emails: { select: { email: true }, take: 1 },
+							solves: {
+								select: {
+									time: true,
+									challenge: {
+										select: {
+											name: true,
+											slug: true,
+											points: true
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -40,21 +52,30 @@ export const load = async ({ locals }) => {
 		throw redirect(302, '/signin');
 	}
 
-	const team = {
-		id: user.team!.id,
-		name: user.team!.name,
-		ownerId: user.team!.ownerId,
-		inviteLink: `${env.PUBLIC_LOCATION_URL}/signin?invite=${user.team!.inviteToken}`,
-		users: user.team!.users.map((user) => ({
-			discord: user.discord,
-			email: user.discord ? undefined : user.emails[0].email,
-			avatarFallback: avatarFallback(user),
-			id: user.id
-		}))
-	};
-
 	return {
-		team,
+		team: {
+			id: user.team!.id,
+			name: user.team!.name,
+			ownerId: user.team!.ownerId,
+			inviteLink: `${env.PUBLIC_LOCATION_URL}/signin?invite=${user.team!.inviteToken}`,
+			users: user.team!.users.map((user) => ({
+				discord: user.discord,
+				email: user.discord ? undefined : user.emails[0].email,
+				avatarFallback: avatarFallback(user),
+				id: user.id
+			}))
+		},
+		solves: user.team!.users.flatMap((user) =>
+			user.solves.map((solve) => ({
+				...solve,
+				user: {
+					discord: user.discord,
+					email: user.discord ? undefined : user.emails[0].email,
+					avatarFallback: avatarFallback(user),
+					id: user.id
+				}
+			}))
+		),
 		teamNameForm: await superValidate(teamNameFormSchema)
 	};
 };
