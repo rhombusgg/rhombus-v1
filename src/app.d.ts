@@ -27,9 +27,22 @@ declare global {
 		points: number;
 		author: {
 			username: string;
+			globalUsername: string;
 			image: string;
 		};
-		solved: boolean;
+		solve: {
+			time: Date;
+			user: {
+				discord: {
+					username: string;
+					globalUsername: string;
+					image: string;
+				} | null;
+				email: string | undefined;
+				avatarFallback: string;
+				id: string;
+			};
+		} | null;
 	}
 
 	interface Session {

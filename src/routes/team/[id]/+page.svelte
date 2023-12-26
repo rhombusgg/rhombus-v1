@@ -34,7 +34,7 @@
 				{#each data.users as user}
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-4">
-							<Avatar.Root class="h-8 w-8">
+							<Avatar.Root class="h-10 w-10 border-4">
 								{#if user.discord}
 									<Avatar.Image src={user.discord.image} alt={`@${user.discord.globalUsername}`} />
 								{/if}
@@ -101,7 +101,7 @@
 									{/if}
 								</p>
 							</div>
-							<Avatar.Root class="h-8 w-8">
+							<Avatar.Root class="h-10 w-10 border-4">
 								{#if solve.user.discord}
 									<Avatar.Image
 										src={solve.user.discord.image}

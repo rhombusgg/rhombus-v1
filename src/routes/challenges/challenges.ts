@@ -1,4 +1,5 @@
 import prisma from '$lib/db';
+import { avatarFallback } from '$lib/utils';
 
 export async function getUserColumns(userId: string) {
 	const dbChallenges = await prisma.challenge.findMany({
@@ -16,7 +17,8 @@ export async function getUserColumns(userId: string) {
 					discord: {
 						select: {
 							image: true,
-							globalUsername: true
+							globalUsername: true,
+							username: true
 						}
 					}
 				}
@@ -24,6 +26,27 @@ export async function getUserColumns(userId: string) {
 			solves: {
 				where: {
 					userId
+				},
+				select: {
+					time: true,
+					user: {
+						select: {
+							id: true,
+							discord: {
+								select: {
+									image: true,
+									globalUsername: true,
+									username: true
+								}
+							},
+							emails: {
+								take: 1,
+								select: {
+									email: true
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -142,10 +165,19 @@ export async function getUserColumns(userId: string) {
 				issueTemplate: challenge.issueTemplate,
 				points: challenge.points || 0,
 				author: {
-					username: challenge.author.discord!.globalUsername,
+					username: challenge.author.discord!.username,
+					globalUsername: challenge.author.discord!.globalUsername,
 					image: challenge.author.discord!.image
 				},
-				solved: challenge.solves.length > 0
+				solve: challenge.solves.map((solve) => ({
+					time: solve.time,
+					user: {
+						discord: solve.user!.discord,
+						email: solve.user!.discord ? undefined : solve.user!.emails[0].email,
+						avatarFallback: avatarFallback(solve.user!),
+						id: solve.user!.id
+					}
+				}))[0]
 			} satisfies Challenge;
 		})
 	}));
