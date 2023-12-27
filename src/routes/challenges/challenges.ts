@@ -16,6 +16,7 @@ export async function getUserColumns(userId: string) {
 				select: {
 					discord: {
 						select: {
+							id: true,
 							image: true,
 							globalUsername: true,
 							username: true
@@ -34,6 +35,7 @@ export async function getUserColumns(userId: string) {
 							id: true,
 							discord: {
 								select: {
+									id: true,
 									image: true,
 									globalUsername: true,
 									username: true
@@ -164,10 +166,11 @@ export async function getUserColumns(userId: string) {
 				difficulty: challenge.difficulty,
 				issueTemplate: challenge.issueTemplate,
 				points: challenge.points || 0,
-				author: {
+				authorDiscord: {
 					username: challenge.author.discord!.username,
 					globalUsername: challenge.author.discord!.globalUsername,
-					image: challenge.author.discord!.image
+					image: challenge.author.discord!.image,
+					id: challenge.author.discord!.id
 				},
 				solve: challenge.solves.map((solve) => ({
 					time: solve.time,

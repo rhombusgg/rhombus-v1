@@ -292,7 +292,12 @@
 														</a>
 														<p class="text-sm text-muted-foreground">
 															{#if challenge.solve.user.discord}
-																@{challenge.solve.user.discord.globalUsername}
+																<a
+																	href={`https://discord.com/users/${challenge.solve.user.discord.id}`}
+																	target="_blank"
+																	class="underline underline-offset-4"
+																	>@{challenge.solve.user.discord.globalUsername}</a
+																>
 															{:else}
 																{challenge.solve.user.email}
 															{/if}
@@ -333,11 +338,13 @@
 									<HoverCard.Trigger>
 										<Avatar.Root class="h-8 w-8 border-4">
 											<Avatar.Image
-												src={challenge.author.image}
-												alt={`@${challenge.author.username}`}
+												src={challenge.authorDiscord.image}
+												alt={`@${challenge.authorDiscord.username}`}
 											/>
 											<Avatar.Fallback
-												>{challenge.author.username.substring(0, 2).toUpperCase()}</Avatar.Fallback
+												>{challenge.authorDiscord.username
+													.substring(0, 2)
+													.toUpperCase()}</Avatar.Fallback
 											>
 										</Avatar.Root>
 									</HoverCard.Trigger>
@@ -345,21 +352,26 @@
 										<div class="flex items-center gap-4 text-left">
 											<Avatar.Root class="h-10 w-10 border-4">
 												<Avatar.Image
-													src={challenge.author.image}
-													alt={`@${challenge.author.username}`}
+													src={challenge.authorDiscord.image}
+													alt={`@${challenge.authorDiscord.username}`}
 												/>
 												<Avatar.Fallback
-													>{challenge.author.username
+													>{challenge.authorDiscord.username
 														.substring(0, 2)
 														.toUpperCase()}</Avatar.Fallback
 												>
 											</Avatar.Root>
 											<div>
 												<p>
-													{challenge.author.username}
+													{challenge.authorDiscord.username}
 												</p>
 												<p class="text-sm text-muted-foreground">
-													@{challenge.author.globalUsername}
+													<a
+														href={`https://discord.com/users/${challenge.authorDiscord.id}`}
+														target="_blank"
+														class="underline underline-offset-4"
+														>@{challenge.authorDiscord.globalUsername}</a
+													>
 												</p>
 											</div>
 										</div>

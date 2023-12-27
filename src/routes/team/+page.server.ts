@@ -27,8 +27,20 @@ export const load = async ({ locals }) => {
 					users: {
 						select: {
 							id: true,
-							discord: { select: { username: true, globalUsername: true, image: true } },
-							emails: { select: { email: true }, take: 1 },
+							discord: {
+								select: {
+									id: true,
+									username: true,
+									globalUsername: true,
+									image: true
+								}
+							},
+							emails: {
+								select: {
+									email: true
+								},
+								take: 1
+							},
 							solves: {
 								select: {
 									time: true,

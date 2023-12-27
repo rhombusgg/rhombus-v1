@@ -50,7 +50,11 @@
 								</a>
 								<p class="text-sm text-muted-foreground">
 									{#if user.discord}
-										@{user.discord.globalUsername}
+										<a
+											href={`https://discord.com/users/${user.discord.id}`}
+											target="_blank"
+											class="underline underline-offset-4">@{user.discord.globalUsername}</a
+										>
 									{:else}
 										{user.email}
 									{/if}
@@ -92,7 +96,11 @@
 								</a>
 								<p class="text-sm text-muted-foreground">
 									{#if solve.user.discord}
-										@{solve.user.discord.globalUsername}
+										<a
+											href={`https://discord.com/users/${solve.user.discord.id}`}
+											target="_blank"
+											class="underline underline-offset-4">@{solve.user.discord.globalUsername}</a
+										>
 									{:else}
 										{solve.user.email}
 									{/if}

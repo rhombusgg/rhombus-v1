@@ -25,7 +25,8 @@ declare global {
 		difficulty: string;
 		issueTemplate: string | null;
 		points: number;
-		author: {
+		authorDiscord: {
+			id: string;
 			username: string;
 			globalUsername: string;
 			image: string;
@@ -34,6 +35,7 @@ declare global {
 			time: Date;
 			user: {
 				discord: {
+					id: string;
 					username: string;
 					globalUsername: string;
 					image: string;

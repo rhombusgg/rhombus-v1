@@ -1,8 +1,28 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { MoreHorizontal, ShieldAlert, Trash2 } from 'lucide-svelte';
-	export let id: string;
+	import { Mail, MoreHorizontal, ShieldAlert, Trash2, User, Users } from 'lucide-svelte';
+	import DropdownMenuItem from '$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte';
+	import { DiscordLogo } from 'radix-icons-svelte';
+
+	export let user: {
+		id: string;
+		isAdmin: boolean;
+		email: string;
+		team: {
+			name: string;
+			id: string;
+		};
+		discord:
+			| {
+					id: string;
+					username: string;
+					globalUsername: string;
+					image: string;
+			  }
+			| undefined;
+		ips: string[];
+	};
 </script>
 
 <DropdownMenu.Root>
@@ -13,9 +33,22 @@
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Item href={`challenges/challenge/${id}`}
-			><ShieldAlert class="mr-2 h-4 w-4" /> Make Admin</DropdownMenu.Item
+		<DropdownMenuItem href={`/user/${user.id}`}
+			><User class="mr-2 h-4 w-4" />Go to User profile</DropdownMenuItem
 		>
+		<DropdownMenuItem href={`/team/${user.team.id}`}
+			><Users class="mr-2 h-4 w-4" />Go to Team profile</DropdownMenuItem
+		>
+		{#if user.discord}
+			<DropdownMenuItem href={`https://discord.com/users/${user.discord.id}`}
+				><DiscordLogo class="mr-2 h-4 w-4" />Message User</DropdownMenuItem
+			>
+		{/if}
+		<DropdownMenuItem href={`mailto:${user.email}`}
+			><Mail class="mr-2 h-4 w-4" />Email User</DropdownMenuItem
+		>
+		<DropdownMenu.Separator />
+		<DropdownMenu.Item><ShieldAlert class="mr-2 h-4 w-4" /> Make Admin</DropdownMenu.Item>
 		<DropdownMenu.Item><Trash2 class="mr-2 h-4 w-4" /> Delete</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

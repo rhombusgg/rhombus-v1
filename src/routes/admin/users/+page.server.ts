@@ -25,6 +25,7 @@ export const load = async ({ locals }) => {
 			isAdmin: true,
 			discord: {
 				select: {
+					id: true,
 					image: true,
 					username: true,
 					globalUsername: true
@@ -52,13 +53,14 @@ export const load = async ({ locals }) => {
 
 	return {
 		users: users.map((user) => ({
-			id: user.id,
-			isAdmin: user.isAdmin,
-			email: { email: user.emails[0]?.email, userId: user.id },
-			team: user.team!,
-			teamId: user.team!.id,
-			discord: user.discord ? { ...user.discord, userId: user.id } : undefined,
-			ips: user.ips.map((ip) => ip.address)
+			user: {
+				id: user.id,
+				isAdmin: user.isAdmin,
+				email: user.emails[0]?.email,
+				team: user.team!,
+				discord: user.discord || undefined,
+				ips: user.ips.map((ip) => ip.address)
+			}
 		}))
 	};
 };

@@ -1,31 +1,32 @@
 <script lang="ts">
+	import { addPagination, addSortBy, addTableFilter } from 'svelte-headless-table/plugins';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
-	import { addPagination, addSortBy, addTableFilter } from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
-	import TableActions from './table-actions.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { ArrowUpDown } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
+	import { ArrowUpDown } from 'lucide-svelte';
 	import DiscordAvatar from './discord-avatar.svelte';
+	import TableActions from './table-actions.svelte';
 	import Email from './email.svelte';
 	import Team from './team.svelte';
 
 	export let users: {
-		id: string;
-		isAdmin: boolean;
-		email: { email: string; userId: string };
-		team: { name: string; id: string };
-		teamId: string;
-		discord:
-			| {
-					username: string;
-					globalUsername: string;
-					image: string;
-					userId: string;
-			  }
-			| undefined;
-		ips: string[];
+		user: {
+			id: string;
+			isAdmin: boolean;
+			email: string;
+			team: { name: string; id: string };
+			discord:
+				| {
+						id: string;
+						username: string;
+						globalUsername: string;
+						image: string;
+				  }
+				| undefined;
+			ips: string[];
+		};
 	}[];
 
 	const table = createTable(readable(users), {
@@ -38,19 +39,23 @@
 
 	const columns = table.createColumns([
 		table.column({
-			accessor: 'discord',
+			accessor: 'user',
+			id: 'discord',
 			header: 'Discord',
-			cell: ({ value }) => (value ? createRender(DiscordAvatar, value) : 'None')
+			cell: ({ value }) =>
+				value.discord ? createRender(DiscordAvatar, { ...value.discord, userId: value.id }) : 'None'
 		}),
 		table.column({
-			accessor: 'email',
+			accessor: 'user',
+			id: 'email',
 			header: 'Email',
-			cell: ({ value }) => createRender(Email, value)
+			cell: ({ value }) => createRender(Email, { email: value.email })
 		}),
 		table.column({
-			accessor: 'team',
+			accessor: 'user',
+			id: 'team',
 			header: 'Team',
-			cell: ({ value }) => createRender(Team, value),
+			cell: ({ value }) => createRender(Team, value.team),
 			plugins: {
 				sort: {
 					compareFn(left, right) {
@@ -60,15 +65,18 @@
 			}
 		}),
 		table.column({
-			accessor: 'ips',
+			accessor: 'user',
+			id: 'ips',
 			header: 'IPs',
-			cell: ({ value: ips }) =>
-				ips.filter((_, index) => index <= 1).join(', ') + (ips.length > 2 ? ', ...' : '')
+			cell: ({ value }) =>
+				value.ips.filter((_, index) => index <= 1).join(', ') +
+				(value.ips.length > 2 ? ', ...' : '')
 		}),
 		table.column({
-			accessor: 'isAdmin',
+			accessor: 'user',
+			id: 'isAdmin',
 			header: 'Admin',
-			cell: ({ value: isAdmin }) => (isAdmin ? 'Yes' : 'No'),
+			cell: ({ value }) => (value.isAdmin ? 'Yes' : 'No'),
 			plugins: {
 				sort: {
 					compareFn(left) {
@@ -78,9 +86,10 @@
 			}
 		}),
 		table.column({
-			accessor: ({ id }) => id,
+			id: 'actions',
+			accessor: 'user',
 			header: '',
-			cell: ({ value: id }) => createRender(TableActions, { id }),
+			cell: ({ value }) => createRender(TableActions, { user: value }),
 			plugins: {
 				sort: {
 					disable: true

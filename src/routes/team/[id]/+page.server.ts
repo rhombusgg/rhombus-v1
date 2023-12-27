@@ -13,6 +13,7 @@ export const load = async ({ params }) => {
 					id: true,
 					discord: {
 						select: {
+							id: true,
 							username: true,
 							globalUsername: true,
 							image: true
