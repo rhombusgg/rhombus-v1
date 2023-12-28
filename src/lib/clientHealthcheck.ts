@@ -6,11 +6,6 @@ export const healthcheckInputSchema = z.object({
 
 export type HealthcheckInput = z.infer<typeof healthcheckInputSchema>;
 
-// export const healthcheckOutputSchema = z.object({
-// 	status: z.enum(['success', 'error']),
-// 	message: z.string().optional()
-// });
-
 export const healthcheckOutputSchema = z
 	.object({
 		status: z.enum(['ran']),
