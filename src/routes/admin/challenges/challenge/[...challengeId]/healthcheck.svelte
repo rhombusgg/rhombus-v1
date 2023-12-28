@@ -5,6 +5,12 @@
 	import * as Select from '$lib/components/ui/select';
 	import { Label } from '$lib/components/ui/label';
 	import clsx from 'clsx';
+	import {
+		RhombusUtilities,
+		healthcheckOutputSchema,
+		type HealthcheckOutput
+	} from '../../api/healthcheck/common';
+	import { Loader2 } from 'lucide-svelte';
 
 	export let initial: string | null | undefined;
 
@@ -20,10 +26,10 @@
 /**
  * Called at an interval on the server with nodejs. Should
  * return true if the challenge is up. Maximum execution
- * time of 30 seconds.
+ * time of 10 seconds.
  */
 export async function health(): Promise<boolean> {
-	const result = await fetch("https://webchallenge.pwn.rhombus.gg");
+	const result = await fetch("https://webchallenge.play.rhombus.gg");
 	return result.status === 200;
 }
 `.trim() + '\n';
@@ -33,10 +39,10 @@ export async function health(): Promise<boolean> {
 /**
  * Called at an interval on the server with nodejs. Should
  * return true if the challenge is up. Maximum execution
- * time of 30 seconds.
+ * time of 10 seconds.
  */
 export async function health(): Promise<boolean> {
-	const result = await Rhombus.tcpConnect("pwn.rhombus.gg", 13377);
+	const result = await Rhombus.tcpConnect("play.rhombus.gg", 13377);
 	if (result.status === "success") {
 		return result.value.startsWith("Hello");
 	}
@@ -45,54 +51,32 @@ export async function health(): Promise<boolean> {
 `.trim() + '\n';
 
 	let content = initial === null ? '' : initial || httpTemplate;
+	let timeout: NodeJS.Timeout | undefined;
+	let healthcheck: HealthcheckOutput | undefined = undefined;
+
+	async function runHealthcheck() {
+		healthcheck = healthcheckOutputSchema.parse(
+			await (
+				await fetch('/admin/challenges/api/healthcheck', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ typescript: content })
+				})
+			).json()
+		);
+		timeout = undefined;
+	}
 
 	onMount(async () => {
+		if (initial) await runHealthcheck();
+
 		monaco = (await import('./monaco')).default;
 
-		const source = `
-namespace Rhombus {
-    const net = require('node:net');
-
-    /**
-     * Connects to a raw TCP server and returns the initial response. Roughly equivalent to
-     * running \`nc\` from the command line and looking at the first couple of lines of output.
-     * @param serverAddress The address of the server to connect to.
-     * @param serverPort The port of the server to connect to.
-     * @param timeoutMs The timeout in milliseconds.
-     */
-    export function tcpConnect(
-        serverAddress: string,
-        serverPort: number,
-        timeoutMs = 5000
-    ): Promise<
-        { status: 'success'; buffer: Buffer; value: string } | { status: 'error'; error: string }
-    > {
-        return new Promise((resolve) => {
-            const socket = net.createConnection(serverPort, serverAddress);
-            const timeout = setTimeout(() => {
-                resolve({ status: 'error', error: 'timeout' });
-                socket.end();
-            }, timeoutMs);
-
-            socket.on('data', (data) => {
-                socket.end();
-                clearTimeout(timeout);
-                resolve({ status: 'success', buffer: data, value: data.toString() });
-            });
-
-            socket.on('error', (err) => {
-                socket.end();
-                clearTimeout(timeout);
-                resolve({ status: 'error', error: err.message });
-            });
-        });
-    }
-}
-        `;
-
-		const uri = 'ts:rhombus/tcp.ts';
-		monaco.languages.typescript.javascriptDefaults.addExtraLib(source, uri);
-		monaco.editor.createModel(source, 'typescript', monaco.Uri.parse(uri));
+		const uri = 'ts:rhombus/utils.ts';
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(RhombusUtilities, uri);
+		monaco.editor.createModel(RhombusUtilities, 'typescript', monaco.Uri.parse(uri));
 
 		editor = monaco.editor.create(editorContainer);
 		model = monaco.editor.createModel(content, 'typescript');
@@ -121,6 +105,11 @@ namespace Rhombus {
 		});
 		model.onDidChangeContent(() => {
 			content = model.getValue();
+			clearTimeout(timeout);
+			timeout = undefined;
+			timeout = setTimeout(() => {
+				runHealthcheck();
+			}, 2000);
 		});
 	});
 
@@ -178,8 +167,41 @@ namespace Rhombus {
 </div>
 <div class="relative">
 	<div
-		class={clsx('h-[300px]', selected === 'none' && 'absolute -z-10 w-full opacity-0')}
+		class={clsx('h-[250px]', selected === 'none' && 'absolute -z-10 w-full opacity-0')}
 		bind:this={editorContainer}
 	/>
+</div>
+<div
+	class={clsx('rounded-md bg-primary-foreground p-2 font-mono', selected === 'none' && 'hidden')}
+>
+	{#if timeout}
+		<div class="flex items-center gap-2">
+			<Loader2 class="h-4 w-4 animate-spin" />
+			<span class="mt-1">Loading...</span>
+		</div>
+		<br />
+	{:else if healthcheck}
+		<div class="flex items-center gap-2">
+			{#if healthcheck.status === 'ran' && healthcheck.healthy}
+				<span class="flex h-4 w-4 items-center justify-center rounded-full bg-green-500" />
+				<span class="mt-1">Healthy</span>
+			{:else if healthcheck.status === 'ran' && !healthcheck.healthy}
+				<div class="h-4 w-4 rounded-full bg-red-500" />
+				<span class="mt-1">Unhealthy</span>
+			{:else}
+				<div class="h-4 w-4 rounded-full bg-red-500" />
+				<span class="mt-1">Error</span>
+			{/if}
+		</div>
+		{#if healthcheck.status === 'error'}
+			<span class="italic">{healthcheck.message}</span>
+		{:else if healthcheck.status === 'ran'}
+			{#if healthcheck.logs.length === 0}
+				<span class="text-muted-foreground">no logs...</span>
+			{:else}
+				{healthcheck.logs}
+			{/if}
+		{/if}
+	{/if}
 </div>
 <input type="hidden" name="healthcheck" bind:value={content} />

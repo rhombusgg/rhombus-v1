@@ -87,6 +87,16 @@ export const actions = {
 			return fail(400, { form });
 		}
 
+		// if (form.data.healthcheck) {
+		// 	const result = await esbuild.transform(form.data.healthcheck, {
+		// 		loader: 'ts',
+		// 		minify: true,
+		// 		sourcemap: 'inline'
+		// 	});
+		// 	console.log(result);
+		// 	return setError(form, 'healthcheck', 'Error');
+		// }
+
 		const data = {
 			name: form.data.name,
 			slug: form.data.slug,

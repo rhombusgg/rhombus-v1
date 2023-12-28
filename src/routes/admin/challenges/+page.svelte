@@ -20,7 +20,8 @@
 	<div class="flex flex-col gap-4">
 		<a href="challenges/challenge">New challenge</a>
 	</div>
-	Flag Format
+	<p>Flag Format</p>
+	<p>Round robin health checks</p>
 
 	<Table challenges={data.challenges} />
 </div>
