@@ -51,7 +51,7 @@ export async function health(): Promise<boolean> {
 `.trim() + '\n';
 
 	let content = initial === null ? '' : initial || httpTemplate;
-	let timeout: NodeJS.Timeout | undefined;
+	let timeout: number | undefined;
 	let healthcheck: HealthcheckOutput | undefined = undefined;
 
 	async function runHealthcheck() {
@@ -105,9 +105,9 @@ export async function health(): Promise<boolean> {
 		});
 		model.onDidChangeContent(() => {
 			content = model.getValue();
-			clearTimeout(timeout);
+			window.clearTimeout(timeout);
 			timeout = undefined;
-			timeout = setTimeout(() => {
+			timeout = window.setTimeout(() => {
 				runHealthcheck();
 			}, 2000);
 		});
