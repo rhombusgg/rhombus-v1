@@ -2,6 +2,7 @@ import esbuild from 'esbuild';
 import vm from 'node:vm';
 import net from 'node:net';
 import { RhombusUtilities, type HealthcheckOutput } from './clientHealthcheck';
+import prisma from './db';
 
 export async function runHealthcheck(typescript: string): Promise<HealthcheckOutput> {
 	const ts = [RhombusUtilities, typescript, 'rhombusFinalExportResult = await health();'].join(
@@ -53,3 +54,35 @@ export async function runHealthcheck(typescript: string): Promise<HealthcheckOut
 		return { status: 'error', message };
 	}
 }
+
+export const runHealthchecks = async () => {
+	const challenges = await prisma.challenge.findMany({
+		where: {
+			health: { isNot: null }
+		},
+		select: {
+			health: {
+				select: {
+					id: true,
+					script: true
+				}
+			}
+		}
+	});
+
+	console.log('Running challenge healthchecks...');
+
+	challenges.forEach(async (challenge) => {
+		const healthcheck = await runHealthcheck(challenge.health!.script);
+
+		await prisma.challengeHealth.update({
+			where: {
+				id: challenge.health!.id
+			},
+			data: {
+				healthy: healthcheck.status === 'ran' && healthcheck.healthy,
+				lastChecked: new Date()
+			}
+		});
+	});
+};

@@ -60,5 +60,5 @@
 	});
 </script>
 
-<div class="h-[400px] w-[350px]" bind:this={editorContainer} />
+<div class="h-[400px] min-w-[350px] max-w-full" bind:this={editorContainer} />
 <input type="hidden" name="content" bind:value={content} />

@@ -25,6 +25,10 @@ declare global {
 		difficulty: string;
 		issueTemplate: string | null;
 		points: number;
+		health: {
+			healthy: boolean;
+			lastChecked: Date;
+		} | null;
 		authorDiscord: {
 			id: string;
 			username: string;

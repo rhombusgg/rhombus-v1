@@ -89,7 +89,7 @@
 				<h4 class="heading">Health Check</h4>
 				<p class="subheading">Write a simple healthcheck in Typescript</p>
 			</div>
-			<Healthcheck initial={data.existingChallenge?.healthCheckTypescript} />
+			<Healthcheck initial={data.existingChallenge?.health?.script} />
 			{#if $errors.healthcheck}
 				<span class="invalid">{$errors.healthcheck}</span>
 			{/if}
@@ -198,7 +198,7 @@
 	</form>
 </div>
 
-<style>
+<style lang="postcss">
 	.heading {
 		@apply text-sm font-semibold;
 	}

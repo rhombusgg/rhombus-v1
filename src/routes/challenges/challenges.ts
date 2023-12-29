@@ -12,6 +12,12 @@ export async function getUserColumns(userId: string) {
 			difficulty: true,
 			points: true,
 			category: true,
+			health: {
+				select: {
+					healthy: true,
+					lastChecked: true
+				}
+			},
 			author: {
 				select: {
 					discord: {
@@ -166,6 +172,7 @@ export async function getUserColumns(userId: string) {
 				difficulty: challenge.difficulty,
 				issueTemplate: challenge.issueTemplate,
 				points: challenge.points || 0,
+				health: challenge.health,
 				authorDiscord: {
 					username: challenge.author.discord!.username,
 					globalUsername: challenge.author.discord!.globalUsername,

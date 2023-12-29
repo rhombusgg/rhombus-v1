@@ -24,6 +24,9 @@ export const load = async ({ locals, params }) => {
 	const existingChallenge = await prisma.challenge.findFirst({
 		where: {
 			id: params.challengeId
+		},
+		include: {
+			health: true
 		}
 	});
 
@@ -87,36 +90,65 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-		// if (form.data.healthcheck) {
-		// 	const result = await esbuild.transform(form.data.healthcheck, {
-		// 		loader: 'ts',
-		// 		minify: true,
-		// 		sourcemap: 'inline'
-		// 	});
-		// 	console.log(result);
-		// 	return setError(form, 'healthcheck', 'Error');
-		// }
-
 		const data = {
 			name: form.data.name,
 			slug: form.data.slug,
 			authorId: locals.session!.id,
 			description: form.data.description,
 			issueTemplate: form.data.issueTemplate,
-			healthCheckTypescript: form.data.healthcheck || null,
 			category: form.data.category,
 			points: form.data.points || null,
 			difficulty: form.data.difficulty,
 			flag: form.data.flag
 		};
 
-		await prisma.challenge.upsert({
-			where: {
-				id: form.data.existingChallengeId
-			},
-			create: data,
-			update: data
-		});
+		if (!form.data.existingChallengeId && !form.data.healthcheck) {
+			await prisma.challenge.create({
+				data
+			});
+		} else if (!form.data.existingChallengeId && form.data.healthcheck) {
+			await prisma.challenge.create({
+				data: {
+					...data,
+					health: {
+						create: {
+							script: form.data.healthcheck
+						}
+					}
+				}
+			});
+		} else if (form.data.existingChallengeId && !form.data.healthcheck) {
+			if (
+				await prisma.challengeHealth.findFirst({
+					where: { challengeId: form.data.existingChallengeId }
+				})
+			)
+				await prisma.challengeHealth.delete({
+					where: { challengeId: form.data.existingChallengeId }
+				});
+			await prisma.challenge.update({
+				where: { id: form.data.existingChallengeId },
+				data
+			});
+		} else if (form.data.existingChallengeId && form.data.healthcheck) {
+			await prisma.challenge.update({
+				where: { id: form.data.existingChallengeId },
+				data: {
+					...data,
+					health: {
+						upsert: {
+							where: { challengeId: form.data.existingChallengeId },
+							create: {
+								script: form.data.healthcheck
+							},
+							update: {
+								script: form.data.healthcheck
+							}
+						}
+					}
+				}
+			});
+		}
 
 		return { form };
 	}

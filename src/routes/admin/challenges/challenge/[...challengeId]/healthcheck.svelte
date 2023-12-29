@@ -172,7 +172,10 @@ export async function health(): Promise<boolean> {
 	/>
 </div>
 <div
-	class={clsx('rounded-md bg-primary-foreground p-2 font-mono', selected === 'none' && 'hidden')}
+	class={clsx(
+		'min-h-[68px] rounded-md bg-primary-foreground p-2 font-mono',
+		selected === 'none' && 'hidden'
+	)}
 >
 	{#if timeout}
 		<div class="flex items-center gap-2">

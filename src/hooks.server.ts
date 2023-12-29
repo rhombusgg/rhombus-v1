@@ -1,9 +1,23 @@
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
+import { Cron, scheduledJobs } from 'croner';
 
 import prisma from '$lib/db';
 import { getJwt } from '$lib/serverAuth';
 import { avatarFallback } from '$lib/utils';
+
+import { runHealthchecks } from '$lib/serverHealthcheck';
+
+// small sveltekit hack to have code run only once on server start (to
+// run healthchecks every so often)
+scheduledJobs.find((job) => job.name === 'healthcheck')?.stop();
+Cron(
+	'*/5 * * * *',
+	async () => {
+		await runHealthchecks();
+	},
+	{ name: 'healthcheck' }
+);
 
 const auth: Handle = async ({ event, resolve }) => {
 	const data = await getJwt(event.cookies);

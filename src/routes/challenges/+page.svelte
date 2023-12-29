@@ -16,6 +16,7 @@
 	import toast from 'svelte-french-toast';
 	import clsx from 'clsx';
 	import Editor from './editor.svelte';
+	import Time from './time.svelte';
 
 	dayjs.extend(calendar);
 
@@ -316,14 +317,29 @@
 								{/if}
 							</div>
 							<div class="flex items-center gap-4">
-								<Tooltip.Root>
-									<Tooltip.Trigger class="flex h-6 w-6 items-center justify-center">
-										<div class="h-3 w-3 rounded-full bg-green-500" />
-									</Tooltip.Trigger>
-									<Tooltip.Content>
-										<p>Last checked 1s ago and is <span class="text-green-500">up</span></p>
-									</Tooltip.Content>
-								</Tooltip.Root>
+								{#if challenge.health}
+									<Tooltip.Root>
+										<Tooltip.Trigger class="flex h-6 w-6 items-center justify-center">
+											<div
+												class={clsx(
+													'h-3 w-3 rounded-full',
+													challenge.health.healthy ? 'bg-green-500' : 'bg-red-500'
+												)}
+											/>
+										</Tooltip.Trigger>
+										<Tooltip.Content>
+											<p>
+												{#if challenge.health.healthy}
+													Last checked <Time date={challenge.health.lastChecked} /> and is
+													<span class="text-green-500">up</span>
+												{:else}
+													Last checked <Time date={challenge.health.lastChecked} /> and is
+													<span class="text-red-500">down</span>
+												{/if}
+											</p>
+										</Tooltip.Content>
+									</Tooltip.Root>
+								{/if}
 								<a href={`?ticket=${challenge.slug}`}>
 									<Tooltip.Root>
 										<Tooltip.Trigger class="flex items-center">

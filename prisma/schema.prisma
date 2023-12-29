@@ -91,20 +91,28 @@ model Team {
 }
 
 model Challenge {
-    id                    String  @id @default(cuid())
-    slug                  String  @unique
-    name                  String
-    description           String  @db.Text
-    category              String
-    difficulty            String
-    flag                  String
-    healthCheckTypescript String? @db.Text
-    healthCheckJavascript String? @db.Text
-    issueTemplate         String
-    points                Int?
-    author                User    @relation(fields: [authorId], references: [id])
-    authorId              String
-    solves                Solve[]
+    id            String           @id @default(cuid())
+    slug          String           @unique
+    name          String
+    description   String           @db.Text
+    category      String
+    difficulty    String
+    flag          String
+    issueTemplate String
+    points        Int?
+    author        User             @relation(fields: [authorId], references: [id])
+    authorId      String
+    solves        Solve[]
+    health        ChallengeHealth?
+}
+
+model ChallengeHealth {
+    id          String    @id @default(cuid())
+    challenge   Challenge @relation(fields: [challengeId], references: [id])
+    challengeId String    @unique
+    script      String    @db.Text
+    healthy     Boolean   @default(false)
+    lastChecked DateTime  @default(now())
 }
 
 model EmailVerificationToken {
