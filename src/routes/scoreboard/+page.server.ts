@@ -35,7 +35,7 @@ export const load = async () => {
 		score: team.solves.reduce((acc, solve) => acc + solve.points, 0),
 		solves: team.solves.map((solve, i) => ({
 			time: solve.time,
-			points: solve.points + (team.solves[i - 1]?.points || 0)
+			points: solve.points + team.solves.slice(0, i).reduce((acc, solve) => acc + solve.points, 0)
 		}))
 	}));
 
