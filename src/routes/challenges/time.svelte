@@ -8,12 +8,10 @@
 	export let date: Date;
 
 	$: time = dayjs(date).fromNow();
-	$: d = new Date().getTime() - date.getTime();
 
 	onMount(() => {
 		const interval = setInterval(() => {
 			time = dayjs(date).fromNow();
-			d = new Date().getTime() - date.getTime();
 		}, 1000);
 
 		return () => clearInterval(interval);
