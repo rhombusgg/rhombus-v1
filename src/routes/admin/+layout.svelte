@@ -17,6 +17,10 @@
 		{
 			title: 'Users',
 			href: '/admin/users'
+		},
+		{
+			title: 'Divisions',
+			href: '/admin/divisions'
 		}
 	];
 </script>

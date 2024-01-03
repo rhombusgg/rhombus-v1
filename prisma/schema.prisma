@@ -79,15 +79,23 @@ model UserChallenge {
 }
 
 model Team {
-    id            String @id @default(cuid())
+    id            String     @id @default(cuid())
     name          String
     discordRoleId String
+    users         User[]     @relation(name: "member")
+    owner         User       @relation(fields: [ownerId], references: [id], name: "owner", onDelete: Cascade)
+    ownerId       String     @unique
+    inviteToken   String     @unique
+    divisions     Division[]
+}
 
-    users   User[] @relation(name: "member")
-    owner   User   @relation(fields: [ownerId], references: [id], name: "owner", onDelete: Cascade)
-    ownerId String @unique
-
-    inviteToken String @unique
+model Division {
+    id         String  @id @default(cuid())
+    name       String
+    info       String
+    emailRegex String
+    isDefault  Boolean @default(false)
+    teams      Team[]
 }
 
 model Challenge {

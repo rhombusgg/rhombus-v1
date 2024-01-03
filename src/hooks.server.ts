@@ -5,7 +5,6 @@ import { Cron, scheduledJobs } from 'croner';
 import prisma from '$lib/db';
 import { getJwt } from '$lib/serverAuth';
 import { avatarFallback } from '$lib/utils';
-
 import { runHealthchecks } from '$lib/serverHealthcheck';
 
 // small sveltekit hack to have code run only once on server start (to
@@ -14,6 +13,8 @@ scheduledJobs.find((job) => job.name === 'healthcheck')?.stop();
 Cron(
 	'*/5 * * * *',
 	async () => {
+		// maybe instead of running all healthchecks at once every 5 minutes,
+		// do the oldest run healthcheck every minute?
 		await runHealthchecks();
 	},
 	{ name: 'healthcheck' }

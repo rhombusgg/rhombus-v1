@@ -68,12 +68,22 @@ export async function GET({ url, cookies }) {
 
 		const teamName = emailVerificationToken.email.split('@')[0];
 		const role = await createRole(teamName);
+		const division = await prisma.division.findFirst({
+			where: {
+				isDefault: true
+			}
+		});
 		const team = await prisma.team.create({
 			data: {
 				name: teamName,
 				inviteToken: generateInviteToken(),
 				discordRoleId: role.id,
-				ownerId: user.id
+				ownerId: user.id,
+				divisions: {
+					connect: {
+						id: division!.id
+					}
+				}
 			},
 			select: {
 				id: true
