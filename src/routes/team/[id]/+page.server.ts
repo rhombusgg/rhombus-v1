@@ -1,5 +1,5 @@
 import prisma from '$lib/db';
-import { avatarFallback } from '$lib/utils.js';
+import { avatarFallback } from '$lib/utils';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ params }) => {

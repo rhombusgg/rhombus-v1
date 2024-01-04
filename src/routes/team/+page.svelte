@@ -7,15 +7,27 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import { ClipboardCopy, Crown, LogOut, RefreshCcw } from 'lucide-svelte';
+	import { ClipboardCopy, Crown, Info, LogOut, RefreshCcw } from 'lucide-svelte';
 	import dayjs from 'dayjs';
 	import calendar from 'dayjs/plugin/calendar';
 	import toast from 'svelte-french-toast';
 	import { teamNameFormSchema } from './schema';
+	import clsx from 'clsx';
+	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import Label from '$lib/components/ui/label/label.svelte';
 
 	dayjs.extend(calendar);
 
 	export let data;
+
+	function isEligable(
+		eligability: {
+			eligable: boolean;
+			userId: string;
+		}[]
+	) {
+		return eligability.every((e) => e.eligable);
+	}
 
 	$: isOwner = data.team.ownerId === data.session?.id;
 </script>
@@ -221,10 +233,76 @@
 			</Card.Root>
 			<Card.Root>
 				<Card.Header>
-					<Card.Title>Standing</Card.Title>
-					<Card.Description>Current standing in each division</Card.Description>
+					<Card.Title>Divisions</Card.Title>
+					<Card.Description>Join your team to eligable divisions</Card.Description>
 				</Card.Header>
-				<Card.Content>A</Card.Content>
+				<Card.Content>
+					<div class="flex flex-col gap-2">
+						<div class="flex items-center justify-between">
+							<div class="text-muted-foreground">Division Name</div>
+							<div class="text-muted-foreground">Joined</div>
+						</div>
+						{#each data.divisions as division}
+							<div
+								class={clsx(
+									'flex items-center justify-between',
+									isEligable(division.eligable) || 'text-muted-foreground'
+								)}
+							>
+								<div class="flex items-center">
+									{division.name}
+									<Tooltip.Root>
+										<Tooltip.Trigger>
+											<Info class="ml-2 h-4 w-4" />
+										</Tooltip.Trigger>
+										<Tooltip.Content>
+											<p>{division.info}</p>
+										</Tooltip.Content>
+									</Tooltip.Root>
+								</div>
+								<div class="flex items-center">
+									{#if !isEligable(division.eligable)}
+										<Tooltip.Root>
+											<Tooltip.Trigger>
+												<Info class="mr-2 h-4 w-4" />
+											</Tooltip.Trigger>
+											<Tooltip.Content>
+												<p>
+													Users are ineligable: {#each division.eligable
+														.filter((e) => !e.eligable)
+														.map( (e) => data.team.users.find((user) => user.id === e.userId) ) as user, i}
+														<a
+															href={`/user/${user?.id}`}
+															class="font-medium underline underline-offset-4"
+															>{user?.discord?.username || user?.email}</a
+														>{#if i < division.eligable.filter((e) => !e.eligable).length - 1}<span
+																>,
+															</span>
+														{/if}
+													{/each}
+												</p>
+											</Tooltip.Content>
+										</Tooltip.Root>
+									{/if}
+									<form
+										use:enhance
+										method="POST"
+										action="?/toggleDivision"
+										class="flex items-center"
+									>
+										<Checkbox
+											disabled={!isOwner || !isEligable(division.eligable)}
+											checked={division.isInDivision}
+											type="submit"
+											name="isInDivision"
+										/>
+										<input type="hidden" name="divisionId" value={division.id} />
+									</form>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</Card.Content>
 			</Card.Root>
 			{#if isOwner}
 				<Card.Root>

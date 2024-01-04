@@ -73,16 +73,20 @@ export const runHealthchecks = async () => {
 	console.log('Running challenge healthchecks...');
 
 	challenges.forEach(async (challenge) => {
-		const healthcheck = await runHealthcheck(challenge.health!.script);
+		try {
+			const healthcheck = await runHealthcheck(challenge.health!.script);
 
-		await prisma.challengeHealth.update({
-			where: {
-				id: challenge.health!.id
-			},
-			data: {
-				healthy: healthcheck.status === 'ran' && healthcheck.healthy,
-				lastChecked: new Date()
-			}
-		});
+			await prisma.challengeHealth.update({
+				where: {
+					id: challenge.health!.id
+				},
+				data: {
+					healthy: healthcheck.status === 'ran' && healthcheck.healthy,
+					lastChecked: new Date()
+				}
+			});
+		} catch (e) {
+			console.error(e);
+		}
 	});
 };

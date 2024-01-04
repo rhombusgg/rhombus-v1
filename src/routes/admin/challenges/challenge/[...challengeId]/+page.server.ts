@@ -1,4 +1,4 @@
-import prisma from '$lib/db.js';
+import prisma from '$lib/db';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';

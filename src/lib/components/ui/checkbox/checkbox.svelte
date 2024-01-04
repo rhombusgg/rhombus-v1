@@ -7,6 +7,7 @@
 	type $$Events = CheckboxPrimitive.Events;
 
 	let className: $$Props['class'] = undefined;
+	export let name: $$Props['name'] = undefined;
 	export let checked: $$Props['checked'] = false;
 	export { className as class };
 </script>
@@ -32,3 +33,4 @@
 		{/if}
 	</CheckboxPrimitive.Indicator>
 </CheckboxPrimitive.Root>
+<input hidden {name} value={checked} />

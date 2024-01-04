@@ -5,7 +5,7 @@ import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
 import { setJwt, getJwt } from '$lib/serverAuth';
 import { generateInviteToken } from '$lib/team';
-import { createRole, joinUserToRole, verifyUser } from '$lib/bot.js';
+import { createRole, joinUserToRole, verifyUser } from '$lib/bot';
 
 export async function GET({ url, cookies }) {
 	if (url.searchParams.get('error')) {

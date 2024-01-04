@@ -1,4 +1,4 @@
-import prisma from '$lib/db.js';
+import prisma from '$lib/db';
 
 export const load = async (event) => {
 	const challenges = await prisma.challenge.findMany({

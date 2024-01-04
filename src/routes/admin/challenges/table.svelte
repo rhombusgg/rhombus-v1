@@ -20,8 +20,6 @@
 		category: string;
 		difficulty: string;
 		flag: string;
-		healthCheckTypescript: string | null;
-		healthCheckJavascript: string | null;
 		issueTemplate: string;
 		points: number | null;
 		authorId: string;

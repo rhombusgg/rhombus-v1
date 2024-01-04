@@ -1,5 +1,5 @@
-import { getGuilds, getRhombusRoleIds, getRoles, getTextChannels, sendPanel } from '$lib/bot.js';
-import prisma from '$lib/db.js';
+import { getGuilds, getRhombusRoleIds, getRoles, getTextChannels, sendPanel } from '$lib/bot';
+import prisma from '$lib/db';
 import { error, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 

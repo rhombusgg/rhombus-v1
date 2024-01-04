@@ -3,10 +3,10 @@ import { avatarFallback } from '$lib/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
-import { teamNameFormSchema } from './schema.js';
+import { teamNameFormSchema } from './schema';
 import { env } from '$env/dynamic/public';
-import { generateInviteToken } from '$lib/team.js';
-import { changeUsersRole, renameRole } from '$lib/bot.js';
+import { generateInviteToken } from '$lib/team';
+import { changeUsersRole, renameRole } from '$lib/bot';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -38,8 +38,7 @@ export const load = async ({ locals }) => {
 							emails: {
 								select: {
 									email: true
-								},
-								take: 1
+								}
 							},
 							solves: {
 								select: {
@@ -55,6 +54,16 @@ export const load = async ({ locals }) => {
 							}
 						}
 					}
+				}
+			}
+		}
+	});
+
+	const divisions = await prisma.division.findMany({
+		include: {
+			teams: {
+				where: {
+					id: user?.team?.id
 				}
 			}
 		}
@@ -88,6 +97,17 @@ export const load = async ({ locals }) => {
 				}
 			}))
 		),
+		divisions: divisions.map((division) => ({
+			id: division.id,
+			name: division.name,
+			info: division.info,
+			isInDivision: division.teams.length > 0,
+			eligable: user.team!.users.map((user) =>
+				user.emails.some((email) => email.email.match(`@${division.emailRegex}$`))
+					? { eligable: true, userId: user.id }
+					: { eligable: false, userId: user.id }
+			)
+		})),
 		teamNameForm: await superValidate(teamNameFormSchema)
 	};
 };
@@ -139,7 +159,7 @@ export const actions = {
 			return;
 		}
 
-		return error(401);
+		throw error(401);
 	},
 	teamName: async (event) => {
 		const form = await superValidate(event, teamNameFormSchema);
@@ -174,7 +194,7 @@ export const actions = {
 			});
 			await renameRole(team.discordRoleId, form.data.name);
 		} else {
-			return error(401);
+			throw error(401);
 		}
 
 		return {
@@ -199,6 +219,73 @@ export const actions = {
 			return;
 		}
 
-		return error(401);
+		throw error(401);
+	},
+	toggleDivision: async ({ locals, request }) => {
+		if (!locals.session) {
+			throw redirect(302, '/signin');
+		}
+		if (!locals.session.isTeamOwner) {
+			throw error(403);
+		}
+
+		const data = z
+			.object({
+				isInDivision: z.string().transform((v) => v === 'true'),
+				divisionId: z.string()
+			})
+			.parse(Object.fromEntries((await request.formData()).entries()));
+
+		const division = await prisma.division.findFirst({
+			where: {
+				id: data.divisionId
+			},
+			select: {
+				emailRegex: true
+			}
+		});
+		if (!division) throw error(404);
+
+		const team = await prisma.team.findUnique({
+			where: {
+				id: locals.session.team.id
+			},
+			select: {
+				users: {
+					select: {
+						emails: {
+							select: {
+								email: true
+							}
+						}
+					}
+				}
+			}
+		});
+		if (!team) throw error(404);
+
+		const eligable = team.users
+			.map((user) => user.emails.some((email) => email.email.match(`@${division.emailRegex}$`)))
+			.every((e) => e);
+		if (!eligable) throw error(403);
+
+		await prisma.division.update({
+			where: {
+				id: data.divisionId
+			},
+			data: {
+				teams: data.isInDivision
+					? {
+							connect: {
+								id: locals.session.team.id
+							}
+						}
+					: {
+							disconnect: {
+								id: locals.session.team.id
+							}
+						}
+			}
+		});
 	}
 };

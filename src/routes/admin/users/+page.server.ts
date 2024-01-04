@@ -1,4 +1,4 @@
-import prisma from '$lib/db.js';
+import prisma from '$lib/db';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ locals }) => {

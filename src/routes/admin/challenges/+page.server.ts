@@ -1,4 +1,4 @@
-import prisma from '$lib/db.js';
+import prisma from '$lib/db';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ locals, depends }) => {
@@ -32,8 +32,6 @@ export const load = async ({ locals, depends }) => {
 			category: challenge.category,
 			difficulty: challenge.difficulty,
 			flag: challenge.flag,
-			healthCheckTypescript: challenge.healthCheckTypescript,
-			healthCheckJavascript: challenge.healthCheckJavascript,
 			issueTemplate: challenge.issueTemplate,
 			points: challenge.points,
 			authorId: challenge.authorId
