@@ -1,9 +1,14 @@
 import prisma from '$lib/db';
-import { avatarFallback } from '$lib/utils';
+import { avatarFallback, challengeToPoints } from '$lib/utils';
 
-export async function getUserColumns(userId: string) {
+export async function getUserColumns(userId: string, teamUserIds: string[]) {
 	const dbChallenges = await prisma.challenge.findMany({
 		select: {
+			_count: {
+				select: {
+					solves: true
+				}
+			},
 			id: true,
 			slug: true,
 			name: true,
@@ -32,7 +37,9 @@ export async function getUserColumns(userId: string) {
 			},
 			solves: {
 				where: {
-					userId
+					userId: {
+						in: teamUserIds
+					}
 				},
 				select: {
 					time: true,
@@ -55,6 +62,17 @@ export async function getUserColumns(userId: string) {
 							}
 						}
 					}
+				}
+			}
+		}
+	});
+
+	const challengeSolveCounts = await prisma.challenge.findMany({
+		select: {
+			id: true,
+			_count: {
+				select: {
+					solves: true
 				}
 			}
 		}
@@ -163,6 +181,7 @@ export async function getUserColumns(userId: string) {
 		name: column.name,
 		challenges: column.challenges.map((c) => {
 			const challenge = dbChallenges.find((chall) => chall.id === c.challengeId)!;
+			const solve = challenge.solves.length > 0 ? challenge.solves[0] : null;
 			return {
 				id: challenge.id,
 				slug: challenge.slug,
@@ -171,7 +190,7 @@ export async function getUserColumns(userId: string) {
 				category: challenge.category,
 				difficulty: challenge.difficulty,
 				issueTemplate: challenge.issueTemplate,
-				points: challenge.points || 0,
+				points: challengeToPoints(challenge),
 				health: challenge.health,
 				authorDiscord: {
 					username: challenge.author.discord!.username,
@@ -179,15 +198,18 @@ export async function getUserColumns(userId: string) {
 					image: challenge.author.discord!.image,
 					id: challenge.author.discord!.id
 				},
-				solve: challenge.solves.map((solve) => ({
-					time: solve.time,
-					user: {
-						discord: solve.user!.discord,
-						email: solve.user!.discord ? undefined : solve.user!.emails[0].email,
-						avatarFallback: avatarFallback(solve.user!),
-						id: solve.user!.id
-					}
-				}))[0]
+				globalSolveCount: challengeSolveCounts.find((c) => c.id === challenge.id)!._count.solves,
+				solve: solve
+					? {
+							time: solve.time,
+							user: {
+								discord: solve.user!.discord,
+								email: solve.user!.discord ? undefined : solve.user!.emails[0].email,
+								avatarFallback: avatarFallback(solve.user!),
+								id: solve.user!.id
+							}
+						}
+					: null
 			} satisfies Challenge;
 		})
 	}));

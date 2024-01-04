@@ -35,6 +35,7 @@ declare global {
 			globalUsername: string;
 			image: string;
 		};
+		globalSolveCount: number;
 		solve: {
 			time: Date;
 			user: {

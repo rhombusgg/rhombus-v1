@@ -10,7 +10,10 @@ export const load = async ({ locals }) => {
 		throw redirect(302, '/signin');
 	}
 
-	const userColumns = await getUserColumns(locals.session.id);
+	const userColumns = await getUserColumns(
+		locals.session.id,
+		locals.session.team.users.map((user) => user.id)
+	);
 
 	const ticketForm = await superValidate(ticketSchema);
 	const flagForm = await superValidate(flagSchema);
@@ -60,6 +63,16 @@ export const actions = {
 		if (!form.valid) {
 			return fail(400, { form });
 		}
+
+		const solve = await prisma.solve.findFirst({
+			where: {
+				userId: {
+					in: locals.session.team.users.map((user) => user.id)
+				},
+				challengeId: form.data.challengeId
+			}
+		});
+		if (solve) return fail(500, { form });
 
 		const challenge = await prisma.challenge.findUnique({
 			where: { id: form.data.challengeId },

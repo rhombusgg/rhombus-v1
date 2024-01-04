@@ -142,31 +142,39 @@
 		}}
 	>
 		<Dialog.Content>
-			<div class="font-bold">
-				<span class="text-green-500">{challenge.category} / </span>
-				<span>{challenge.difficulty} / </span>
-				<span>{challenge.name}</span>
+			<div class="mr-4 flex justify-between font-bold">
+				<div>
+					<span class="text-green-500">{challenge.category} / </span>
+					<span>{challenge.difficulty} / </span>
+					<span>{challenge.name}</span>
+				</div>
+				<div>
+					{challenge.globalSolveCount} solve{challenge.globalSolveCount !== 1 ? 's' : ''} / {challenge.points}
+					pts
+				</div>
 			</div>
 			<div>
 				{challenge.description}
 			</div>
-			<form use:flagFormEnhance method="POST" action="?/flag">
-				<input type="hidden" name="challengeId" value={challenge.id} />
-				<div class="flex">
-					<Input
-						placeholder="flag..."
-						name="flag"
-						class={clsx($flagFormErrors.flag && 'border-red-500')}
-						autocomplete="off"
-					/>
-					<Button class="ml-2">Submit</Button>
-				</div>
-				{#if $flagFormErrors.flag}
-					<div class="text-red-500">
-						{$flagFormErrors.flag}
+			{#if !challenge.solve}
+				<form use:flagFormEnhance method="POST" action="?/flag">
+					<input type="hidden" name="challengeId" value={challenge.id} />
+					<div class="flex">
+						<Input
+							placeholder="flag..."
+							name="flag"
+							class={clsx($flagFormErrors.flag && 'border-red-500')}
+							autocomplete="off"
+						/>
+						<Button class="ml-2">Submit</Button>
 					</div>
-				{/if}
-			</form>
+					{#if $flagFormErrors.flag}
+						<div class="text-red-500">
+							{$flagFormErrors.flag}
+						</div>
+					{/if}
+				</form>
+			{/if}
 		</Dialog.Content>
 	</Dialog.Root>
 	<Dialog.Root
@@ -178,10 +186,16 @@
 		}}
 	>
 		<Dialog.Content class="max-w-fit">
-			<div class="font-bold">
-				<span class="text-green-500">{challenge.category} / </span>
-				<span>{challenge.difficulty} / </span>
-				<span>{challenge.name}</span>
+			<div class="mr-4 flex justify-between font-bold">
+				<div>
+					<span class="text-green-500">{challenge.category} / </span>
+					<span>{challenge.difficulty} / </span>
+					<span>{challenge.name}</span>
+				</div>
+				<div>
+					{challenge.globalSolveCount} solve{challenge.globalSolveCount !== 1 ? 's' : ''} / {challenge.points}
+					pts
+				</div>
 			</div>
 			<div>
 				{challenge.description}
@@ -209,7 +223,7 @@
 >
 	{#each userColumns as column (column.id)}
 		<div
-			class="flex w-full flex-col rounded-md lg:w-[500px] lg:min-w-[500px]"
+			class="flex w-full flex-col rounded-md lg:w-[700px] lg:min-w-[700px]"
 			animate:flip={{ duration: flipDurationMs }}
 		>
 			<div
@@ -317,6 +331,10 @@
 								{/if}
 							</div>
 							<div class="flex items-center gap-4">
+								<div class="font-bold">
+									{challenge.globalSolveCount} solve{challenge.globalSolveCount !== 1 ? 's' : ''} / {challenge.points}
+									pts
+								</div>
 								{#if challenge.health}
 									<Tooltip.Root>
 										<Tooltip.Trigger class="flex h-6 w-6 items-center justify-center">
