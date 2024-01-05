@@ -1,16 +1,34 @@
 import prisma from '$lib/db';
+import { challengeToPoints } from '$lib/utils';
 
-export const load = async () => {
-	const dbTeams = await prisma.team.findMany({
+export const load = async ({ depends }) => {
+	depends('scoreboard');
+
+	const dbDivisions = await prisma.division.findMany({
 		select: {
 			name: true,
 			id: true,
-			users: {
+			teams: {
 				select: {
-					solves: {
+					name: true,
+					id: true,
+					users: {
 						select: {
-							time: true,
-							challenge: { select: { points: true } }
+							solves: {
+								select: {
+									time: true,
+									challenge: {
+										select: {
+											points: true,
+											_count: {
+												select: {
+													solves: true
+												}
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -18,28 +36,22 @@ export const load = async () => {
 		}
 	});
 
-	const teams = dbTeams.map((team) => ({
-		name: team.name,
-		id: team.id,
-		solves: team.users.flatMap((user) =>
-			user.solves.map((solve) => ({
-				time: solve.time,
-				points: solve.challenge.points || 0
-			}))
-		)
-	}));
-
-	const teamScores = teams.map((team) => ({
-		name: team.name,
-		id: team.id,
-		score: team.solves.reduce((acc, solve) => acc + solve.points, 0),
-		solves: team.solves.map((solve, i) => ({
-			time: solve.time,
-			points: solve.points + team.solves.slice(0, i).reduce((acc, solve) => acc + solve.points, 0)
+	const divisions = dbDivisions.map((division) => ({
+		name: division.name,
+		id: division.id,
+		teams: division.teams.map((team) => ({
+			id: team.id,
+			name: team.name,
+			solves: team.users.flatMap((user) =>
+				user.solves.map((solve) => ({
+					time: solve.time,
+					points: challengeToPoints(solve.challenge)
+				}))
+			)
 		}))
 	}));
 
 	return {
-		teamScores
+		divisions
 	};
 };

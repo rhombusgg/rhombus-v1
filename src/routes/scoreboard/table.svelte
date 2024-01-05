@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
-	import { readable } from 'svelte/store';
+	import { writable } from 'svelte/store';
 	import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
 	import { Button } from '$lib/components/ui/button';
@@ -15,7 +15,9 @@
 		score: number;
 	}[];
 
-	const table = createTable(readable(teams), {
+	const tstore = writable(teams);
+	$: $tstore = teams;
+	const table = createTable(tstore, {
 		page: addPagination(),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())

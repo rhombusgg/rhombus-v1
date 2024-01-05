@@ -1,36 +1,65 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
-	import { chartable, type EChartsOptions } from '$lib/components/chart';
-	// import * as Table from '$lib/components/ui/table';
-	import type { LineSeriesOption } from 'echarts';
+	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import dayjs from 'dayjs';
+	import type * as echarts from 'echarts';
+	import { slug } from 'github-slugger';
+	import * as Card from '$lib/components/ui/card';
+	import * as Select from '$lib/components/ui/select';
 	import Table from './table.svelte';
 
 	export let data;
 
-	let chartElement: HTMLElement;
+	$: divisions = data.divisions.map((division) => ({
+		name: division.name,
+		id: division.id,
+		teams: division.teams
+			.map((team) => ({
+				id: team.id,
+				name: team.name,
+				score: team.solves.reduce((acc, solve) => acc + solve.points, 0),
+				scores: team.solves.map((solve, i) => ({
+					time: solve.time,
+					points:
+						solve.points + team.solves.slice(0, i).reduce((acc, solve) => acc + solve.points, 0)
+				}))
+			}))
+			.sort((a, b) => b.score - a.score)
+	}));
 
-	let series: LineSeriesOption[];
-	$: series = data.teamScores
-		.toSorted((a, b) => b.score - a.score)
-		.slice(0, 10)
-		.map((team) => ({
-			type: 'line',
-			name: team.name,
-			data: team.solves.map((solve) => ({
-				value: [solve.time.getTime(), solve.points]
-			})),
-			emphasis: {
-				focus: 'series'
-			},
-			lineStyle: {
-				width: 4
-			},
-			symbolSize: 20,
-			smooth: false
-		}));
+	$: divisionParam = $page.url.searchParams.get('division');
 
-	let options: EChartsOptions;
+	const divisionId = writable<string>();
+	$: if (!$divisionId) {
+		const foundDivision = divisions.find((division) => slug(division.name) === divisionParam);
+		if (foundDivision) {
+			$divisionId = foundDivision.id;
+		} else {
+			$divisionId = divisions[0].id;
+		}
+	}
+	$: selectedDivision = divisions.find((division) => division.id === $divisionId)!;
+
+	let series: echarts.LineSeriesOption[];
+	$: series = selectedDivision.teams.slice(0, 10).map((team) => ({
+		type: 'line',
+		name: team.name,
+		data: team.scores.map((score) => ({
+			value: [score.time.getTime(), score.points]
+		})),
+		emphasis: {
+			focus: 'series'
+		},
+		lineStyle: {
+			width: 4
+		},
+		symbolSize: 20,
+		smooth: false
+	}));
+
+	let options: echarts.EChartsOption;
 	$: options = {
 		tooltip: {
 			trigger: 'axis'
@@ -75,6 +104,28 @@
 		},
 		series
 	};
+
+	let chartElement: HTMLElement;
+	let echartsInstance: echarts.ECharts;
+	onMount(async () => {
+		const echarts = await import('echarts');
+		echartsInstance = echarts.init(chartElement, undefined, { renderer: 'svg' });
+		echartsInstance.setOption(options);
+	});
+	$: echartsInstance?.setOption(options);
+
+	function divisionChange(option: unknown) {
+		const selected = option as { value: string; label: string };
+
+		$divisionId = selected.value;
+		echartsInstance.clear();
+		goto(`?division=${slug(selected.label.trim())}`);
+	}
+
+	divisionId.subscribe((_) => {
+		echartsInstance?.clear();
+		echartsInstance?.setOption(options);
+	});
 </script>
 
 <svelte:head>
@@ -82,15 +133,44 @@
 	<meta name="description" content="Scoreboard" />
 </svelte:head>
 
-<svelte:document on:focus={() => invalidateAll()} />
+<svelte:document
+	on:focus={async () => {
+		await invalidate('scoreboard');
+		echartsInstance.setOption(options);
+	}}
+/>
 
 <div class="w-full">
-	<div class="mb-4 h-[32rem] bg-background" bind:this={chartElement} use:chartable={{ options }} />
-	<div class="container">
-		<Table
-			teams={data.teamScores
-				.map((team) => ({ display: { id: team.id, name: team.name }, score: team.score }))
-				.toSorted((a, b) => b.score - a.score)}
-		/>
+	<div class="mb-4 h-[32rem] bg-background" bind:this={chartElement} />
+	<div class="container flex flex-col gap-2 lg:flex-row">
+		<Card.Root class="flex-1 lg:max-w-md">
+			<Card.Header>
+				<Card.Title>Division</Card.Title>
+				<Card.Description>Select a division to focus the scoreboard to</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				<Select.Root
+					selected={{ label: selectedDivision.name, value: selectedDivision.id }}
+					onSelectedChange={(v) => divisionChange(v)}
+				>
+					<Select.Trigger>
+						<Select.Value placeholder="division..." />
+					</Select.Trigger>
+					<Select.Content>
+						{#each divisions as division}
+							<Select.Item value={division.id}>{division.name}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</Card.Content>
+		</Card.Root>
+		<div class="flex-1">
+			<Table
+				teams={selectedDivision.teams.map((team) => ({
+					display: { id: team.id, name: team.name },
+					score: team.score
+				}))}
+			/>
+		</div>
 	</div>
 </div>

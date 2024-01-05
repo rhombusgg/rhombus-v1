@@ -14,7 +14,6 @@
 	import { teamNameFormSchema } from './schema';
 	import clsx from 'clsx';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
 
 	dayjs.extend(calendar);
 

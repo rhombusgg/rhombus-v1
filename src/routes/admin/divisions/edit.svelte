@@ -3,10 +3,9 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Form from '$lib/components/ui/form';
 	import { formSchema, type FormSchema } from './schema';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import toast from 'svelte-french-toast';
-	import { page } from '$app/stores';
 
 	export let open: boolean;
 	export let form: SuperValidated<FormSchema>;
