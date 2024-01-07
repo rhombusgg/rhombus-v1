@@ -29,31 +29,55 @@ const geoSchema = z.object({
 
 type Geo = Omit<z.infer<typeof geoSchema>, 'error'> | undefined;
 
-export const renderSignInEmail = async ({ authLink, ip }: { authLink: string; ip: string }) => {
+export const renderVerificationEmail = async ({
+	verifyLink,
+	ip,
+	username,
+	email
+}: {
+	verifyLink: string;
+	ip: string;
+	username: string;
+	email: string;
+}) => {
 	const geoRequest = geoSchema.parse(await (await fetch(`https://ipapi.co/${ip}/json`)).json());
 	const geo = geoRequest.error ? undefined : geoRequest;
 
 	return {
-		html: render(<SignInEmail authLink={authLink} ip={ip} geo={geo} />),
+		html: render(
+			<SignInEmail verifyLink={verifyLink} ip={ip} username={username} email={email} geo={geo} />
+		),
 		text: `
-Hello Participant,
+Hello ${username},
 
-To sign in with this email for Rhombus CTF, follow the link below. If you already have a Discord account, it is strongly encouraged that you sign in with that account instead.
+To verify this email (${email}) for Rhombus CTF, follow the link below.
 
-${authLink}
+${verifyLink}
 
-This sign in came from ${ip}${
+This verification request came from ${ip}${
 			geo ? ` located in ${geo.city}, ${geo.region} ${geo.postal}, ${geo.country_name}` : ''
-		}. If you were not expecting this sign in, you can safely ignore this email. If you are concerned about your account's safety, contact an admin or email us at nextcloud@mbund.org.
+		}. If you were not expecting this verification request, you can safely ignore this email. If you are concerned about your account's safety, contact an admin or email us at nextcloud@mbund.org.
 `.trim()
 	};
 };
 
-const SignInEmail = ({ authLink, ip, geo }: { authLink: string; ip: string; geo: Geo }) => {
+const SignInEmail = ({
+	verifyLink,
+	ip,
+	username,
+	email,
+	geo
+}: {
+	verifyLink: string;
+	ip: string;
+	username: string;
+	email: string;
+	geo: Geo;
+}) => {
 	return (
 		<Html>
 			<Head />
-			<Preview>Sign in to Rhombus CTF</Preview>
+			<Preview>Verify Email for Rhombus CTF</Preview>
 			<Tailwind>
 				<Body className="mx-auto my-auto bg-white font-sans">
 					<Container className="mx-auto my-[40px] w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">
@@ -61,31 +85,30 @@ const SignInEmail = ({ authLink, ip, geo }: { authLink: string; ip: string; geo:
 							<Img src={rhombus} width="64" className="mx-auto my-0" />
 						</Section>
 						<Heading className="mx-0 my-[30px] p-0 text-center text-[24px] font-normal text-black">
-							Sign in to <strong>Rhombus CTF</strong>
+							Verify Email for <strong>Rhombus CTF</strong>
 						</Heading>
-						<Text className="text-[14px] leading-[24px] text-black">Hello Participant,</Text>
+						<Text className="text-[14px] leading-[24px] text-black">Hello {username},</Text>
 						<Text className="text-[14px] leading-[24px] text-black">
-							To sign in with this email for Rhombus CTF, click the button below. If you already
-							have a Discord account, it is strongly encouraged that you sign in with that account
-							instead.
+							To verify this email (<Link href={`mailto:${email}`}>{email}</Link>) for Rhombus CTF,
+							click the button below.
 						</Text>
 						<Section className="mb-[32px] mt-[32px] text-center">
 							<Button
 								className="rounded bg-[#000000] px-5 py-3 text-center text-[12px] font-semibold text-white no-underline"
-								href={authLink}
+								href={verifyLink}
 							>
-								Sign In
+								Verify Email
 							</Button>
 						</Section>
 						<Text className="text-[14px] leading-[24px] text-black">
 							or copy and paste this URL into your browser:{' '}
-							<Link href={authLink} className="break-all text-blue-600 no-underline">
-								{authLink}
+							<Link href={verifyLink} className="break-all text-blue-600 no-underline">
+								{verifyLink}
 							</Link>
 						</Text>
 						<Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
 						<Text className="text-[12px] leading-[24px] text-[#666666]">
-							This sign in came from <span className="text-black">{ip}</span>
+							This verification request came from <span className="text-black">{ip}</span>
 							{geo ? (
 								<>
 									{' '}
@@ -98,9 +121,9 @@ const SignInEmail = ({ authLink, ip, geo }: { authLink: string; ip: string; geo:
 							) : (
 								''
 							)}
-							. If you were not expecting this sign in, you can safely ignore this email. If you are
-							concerned about your account's safety, contact an admin or email us at{' '}
-							<Link href="mailto:nextcloud@mbund.org">nextcloud@mbund.org</Link>.
+							. If you were not expecting this verification request, you can safely ignore this
+							email. If you are concerned about your account's safety, contact an admin or email us
+							at <Link href="mailto:nextcloud@mbund.org">nextcloud@mbund.org</Link>.
 						</Text>
 					</Container>
 				</Body>

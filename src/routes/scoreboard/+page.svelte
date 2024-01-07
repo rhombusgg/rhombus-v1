@@ -122,7 +122,7 @@
 		goto(`?division=${slug(selected.label.trim())}`);
 	}
 
-	divisionId.subscribe((_) => {
+	divisionId.subscribe(() => {
 		echartsInstance?.clear();
 		echartsInstance?.setOption(options);
 	});
@@ -137,6 +137,12 @@
 	on:focus={async () => {
 		await invalidate('scoreboard');
 		echartsInstance.setOption(options);
+	}}
+/>
+
+<svelte:window
+	on:resize={() => {
+		echartsInstance.resize();
 	}}
 />
 

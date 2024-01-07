@@ -55,7 +55,7 @@ model Solve {
     challengeId String
     challenge   Challenge @relation(fields: [challengeId], references: [id])
     userId      String?
-    user        User?     @relation(fields: [userId], references: [id])
+    user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
     time        DateTime  @default(now())
 }
 
@@ -64,7 +64,7 @@ model UserColumns {
     order      Int
     name       String
     challenges UserChallenge[]
-    user       User            @relation(fields: [userId], references: [id])
+    user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId     String
 }
 
@@ -72,9 +72,9 @@ model UserChallenge {
     id          String      @id @default(cuid())
     order       Int
     challengeId String
-    column      UserColumns @relation(fields: [columnId], references: [id])
+    column      UserColumns @relation(fields: [columnId], references: [id], onDelete: Cascade)
     columnId    String
-    user        User        @relation(fields: [userId], references: [id])
+    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId      String
 }
 

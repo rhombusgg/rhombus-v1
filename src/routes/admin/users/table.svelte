@@ -15,7 +15,7 @@
 		user: {
 			id: string;
 			isAdmin: boolean;
-			email: string;
+			emails: string[];
 			team: { name: string; id: string };
 			discord:
 				| {
@@ -47,9 +47,16 @@
 		}),
 		table.column({
 			accessor: 'user',
-			id: 'email',
-			header: 'Email',
-			cell: ({ value }) => createRender(Email, { email: value.email })
+			id: 'emails',
+			header: 'Emails',
+			cell: ({ value }) => createRender(Email, { emails: value.emails }),
+			plugins: {
+				filter: {
+					getFilterValue(value) {
+						return value.emails.join(' ');
+					}
+				}
+			}
 		}),
 		table.column({
 			accessor: 'user',

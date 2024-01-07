@@ -1,5 +1,11 @@
+import { fail, redirect } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms/server';
+import { env as publicEnv } from '$env/dynamic/public';
 import { isUserInGuild } from '$lib/bot';
-import { redirect } from '@sveltejs/kit';
+import prisma from '$lib/db';
+import { newEmailSchema } from './schema';
+import { renderVerificationEmail } from './email';
+import { sendEmail } from '$lib/email.server';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -12,6 +18,49 @@ export const load = async ({ locals }) => {
 	}
 
 	return {
-		inGuild
+		inGuild,
+		newEmailForm: await superValidate(newEmailSchema)
 	};
+};
+
+export const actions = {
+	addEmail: async (event) => {
+		if (!event.locals.session) {
+			throw redirect(302, '/signin');
+		}
+
+		const form = await superValidate(event, newEmailSchema);
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+
+		const verificationToken = await prisma.emailVerificationToken.create({
+			data: {
+				email: form.data.email,
+				expires: new Date(Date.now() + 1000 * 60 * 10)
+			},
+			select: {
+				token: true
+			}
+		});
+
+		const email = await renderVerificationEmail({
+			verifyLink: `${publicEnv.PUBLIC_LOCATION_URL}/api/email/verify?token=${verificationToken.token}`,
+			ip: event.getClientAddress(),
+			username: event.locals.session.discord?.username ?? event.locals.session.emails[0],
+			email: form.data.email
+		});
+
+		await sendEmail({
+			...email,
+			to: form.data.email,
+			subject: 'Rhombus CTF Email Verification'
+		});
+
+		return {
+			form
+		};
+	}
 };

@@ -20,7 +20,6 @@ export const load = async ({ locals, params }) => {
 				}
 			},
 			emails: {
-				take: 1,
 				select: {
 					email: true
 				}
@@ -59,7 +58,8 @@ export const load = async ({ locals, params }) => {
 		solves: user.solves,
 		admin: locals.session?.isAdmin
 			? {
-					ips: user.ips.map((ip) => ip.address)
+					ips: user.ips.map((ip) => ip.address),
+					emails: user.emails.map((email) => email.email)
 				}
 			: undefined
 	};

@@ -32,7 +32,6 @@ export const load = async ({ locals }) => {
 				}
 			},
 			emails: {
-				take: 1,
 				select: {
 					email: true
 				}
@@ -56,7 +55,7 @@ export const load = async ({ locals }) => {
 			user: {
 				id: user.id,
 				isAdmin: user.isAdmin,
-				email: user.emails[0]?.email,
+				emails: user.emails.map((email) => email.email),
 				team: user.team!,
 				discord: user.discord || undefined,
 				ips: user.ips.map((ip) => ip.address)

@@ -7,12 +7,19 @@
 	dayjs.extend(calendar);
 
 	export let data;
+
+	$: name = data.display.type === 'discord' ? data.display.username : data.display.email;
 </script>
+
+<svelte:head>
+	<title>User {name}</title>
+	<meta name="description" content={`${name} public user profile`} />
+</svelte:head>
 
 <div class="container">
 	<div class="mb-4 mt-4 space-y-0.5">
 		<h2 class="text-2xl font-bold tracking-tight">
-			User {data.display.type === 'discord' ? data.display.username : data.display.email}
+			User {name}
 		</h2>
 		<p class="text-muted-foreground">
 			Public user profile.
@@ -51,7 +58,26 @@
 	</div>
 
 	{#if data.admin}
-		<div class="mt-4 font-mono text-xl font-medium text-red-500">Admin Only ▼</div>
-		<Map ips={data.admin.ips} />
+		<div class="mt-4 flex flex-col gap-4">
+			<div class="font-mono text-xl font-medium text-red-500">Admin Only ▼</div>
+			<div class="grid h-fit gap-6 md:grid-cols-2 lg:grid-cols-3">
+				<Card.Root>
+					<Card.Header>
+						<Card.Title>Emails</Card.Title>
+						<Card.Description>Emails this user has verified</Card.Description>
+					</Card.Header>
+					<Card.Content>
+						{#each data.admin.emails as email}
+							<div>
+								<a class="font-medium underline underline-offset-4" href={`mailto:${email}`}
+									>{email}</a
+								>
+							</div>
+						{/each}
+					</Card.Content>
+				</Card.Root>
+			</div>
+			<Map ips={data.admin.ips} />
+		</div>
 	{/if}
 </div>

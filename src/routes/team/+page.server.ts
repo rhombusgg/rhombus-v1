@@ -108,7 +108,7 @@ export const load = async ({ locals }) => {
 					: { eligable: false, userId: user.id }
 			)
 		})),
-		teamNameForm: await superValidate(teamNameFormSchema)
+		teamNameForm: await superValidate({ name: user.team!.name }, teamNameFormSchema)
 	};
 };
 

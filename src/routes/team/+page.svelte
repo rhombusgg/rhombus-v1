@@ -303,7 +303,7 @@
 					</div>
 				</Card.Content>
 			</Card.Root>
-			{#if isOwner}
+			<!-- {#if isOwner}
 				<Card.Root>
 					<Card.Header>
 						<Card.Title>Webhook</Card.Title>
@@ -311,12 +311,14 @@
 					</Card.Header>
 					<Card.Content>A</Card.Content>
 				</Card.Root>
-			{/if}
+			{/if} -->
 			{#if isOwner}
 				<Card.Root>
 					<Card.Header>
-						<Card.Title>Settings</Card.Title>
-						<Card.Description>Manage team settings</Card.Description>
+						<Card.Title>Team Captain Settings</Card.Title>
+						<Card.Description
+							>Manage team settings only available to you as a Team Captain</Card.Description
+						>
 					</Card.Header>
 					<Card.Content>
 						<Form.Root
@@ -338,7 +340,7 @@
 									<Form.Label>Team Name</Form.Label>
 									<Form.Validation />
 									<div class="flex gap-2">
-										<Form.Input placeholder={data.team.name} autocomplete="off" />
+										<Form.Input placeholder="new team name..." autocomplete="off" />
 										<Form.Button>Change Name</Form.Button>
 									</div>
 								</Form.Item>

@@ -2,12 +2,10 @@ import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { formSchema } from './schema';
 import { renderSignInEmail } from './email';
-import nodemailer from 'nodemailer';
-import { env as privateEnv } from '$env/dynamic/private';
-import { z } from 'zod';
 import { env as publicEnv } from '$env/dynamic/public';
 import prisma from '$lib/db';
 import { changeUsersRole } from '$lib/bot';
+import { sendEmail } from '$lib/email.server';
 
 export const load = async ({ url, cookies, locals }) => {
 	const inviteToken = url.searchParams.get('invite');
@@ -88,21 +86,10 @@ export const actions = {
 			ip: event.getClientAddress()
 		});
 
-		const transporter = nodemailer.createTransport({
-			host: privateEnv.SMTP_HOST,
-			port: z.coerce.number().parse(privateEnv.SMTP_PORT),
-			auth: {
-				user: privateEnv.SMTP_USER,
-				pass: privateEnv.SMTP_PASSWORD
-			}
-		});
-
-		await transporter.sendMail({
-			from: privateEnv.SMTP_FROM,
+		await sendEmail({
+			...email,
 			to: form.data.email,
-			subject: 'Rhombus CTF Sign In',
-			html: email.html,
-			text: email.text
+			subject: 'Rhombus CTF Sign In'
 		});
 
 		return {

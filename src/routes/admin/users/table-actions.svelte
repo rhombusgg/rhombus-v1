@@ -1,14 +1,14 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { Mail, MoreHorizontal, ShieldAlert, Trash2, User, Users } from 'lucide-svelte';
+	import { MoreHorizontal, ShieldAlert, Trash2, User, Users } from 'lucide-svelte';
 	import DropdownMenuItem from '$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte';
 	import { DiscordLogo } from 'radix-icons-svelte';
 
 	export let user: {
 		id: string;
 		isAdmin: boolean;
-		email: string;
+		emails: string[];
 		team: {
 			name: string;
 			id: string;
@@ -44,9 +44,6 @@
 				><DiscordLogo class="mr-2 h-4 w-4" />Message User</DropdownMenuItem
 			>
 		{/if}
-		<DropdownMenuItem href={`mailto:${user.email}`}
-			><Mail class="mr-2 h-4 w-4" />Email User</DropdownMenuItem
-		>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item><ShieldAlert class="mr-2 h-4 w-4" /> Make Admin</DropdownMenu.Item>
 		<DropdownMenu.Item><Trash2 class="mr-2 h-4 w-4" /> Delete</DropdownMenu.Item>

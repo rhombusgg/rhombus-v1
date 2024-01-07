@@ -4,10 +4,23 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import clsx from 'clsx';
-	import { Check } from 'lucide-svelte';
+	import { Check, Loader2, Send } from 'lucide-svelte';
 	import { DiscordLogo } from 'radix-icons-svelte';
+	import * as Form from '$lib/components/ui/form';
+	import { newEmailSchema } from './schema.js';
+	import toast from 'svelte-french-toast';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	export let data;
+
+	$: error = $page.url.searchParams.get('error');
+	$: {
+		if (error) {
+			toast.error(error);
+			if (browser) goto('/account');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -79,35 +92,84 @@
 					</div>
 				</Card.Content>
 			</Card.Root>
-			<Card.Root>
+			<Card.Root class="flex flex-col">
 				<Card.Header>
 					<Card.Title>Emails</Card.Title>
 					<Card.Description
 						>Manage connected emails to qualify for certain divisions</Card.Description
 					>
 				</Card.Header>
-				<Card.Content>
-					{#each $page.data.session.emails as email}
-						<div>
-							{email}
-						</div>
-					{/each}
+				<Card.Content class="flex flex-1 flex-col justify-between">
+					<div>
+						{#each $page.data.session.emails as email, i}
+							<div class={clsx('p-2', i % 2 == 0 && 'bg-accent')}>
+								{email}
+							</div>
+						{/each}
+					</div>
+					<Form.Root
+						method="POST"
+						action="?/addEmail"
+						form={data.newEmailForm}
+						options={{
+							onUpdate({ form }) {
+								if (form.message) {
+									toast.error(form.message);
+								}
+								if (form.valid) {
+									toast.success('Sent verification email!');
+								}
+							}
+						}}
+						schema={newEmailSchema}
+						let:config
+						let:submitting
+					>
+						<Form.Field {config} name="email">
+							<Form.Item>
+								<Form.Label>Verify a new email to connect it to this account</Form.Label>
+								<Form.Validation />
+								<div class="flex gap-2">
+									<Form.Input placeholder="email to verify..." autocomplete="off" />
+									<Form.Button>
+										{#if submitting}
+											<Loader2 class="animate-spin" />
+										{:else}
+											<Send />
+										{/if}
+									</Form.Button>
+								</div>
+							</Form.Item>
+						</Form.Field>
+					</Form.Root>
+					<!-- <form use:enhance method="POST" action="?/addEmail" class="flex">
+						<Input
+							name="email"
+							type="email"
+							placeholder="email to verify..."
+							required
+							autocomplete="email"
+						/>
+						<Button class="ml-2" type="submit">
+							<Send />
+						</Button>
+					</form> -->
 				</Card.Content>
 			</Card.Root>
-			<Card.Root>
+			<!-- <Card.Root>
 				<Card.Header>
 					<Card.Title>Support Tickets</Card.Title>
 					<Card.Description>Review submitted support tickets</Card.Description>
 				</Card.Header>
 				<Card.Content>A</Card.Content>
-			</Card.Root>
-			<Card.Root>
+			</Card.Root> -->
+			<!-- <Card.Root>
 				<Card.Header>
 					<Card.Title>API Tokens</Card.Title>
 					<Card.Description>Manage API tokens for the provided REST API</Card.Description>
 				</Card.Header>
 				<Card.Content>A</Card.Content>
-			</Card.Root>
+			</Card.Root> -->
 		</div>
 	</div>
 {/if}
