@@ -5,7 +5,7 @@ import { renderSignInEmail } from './email';
 import { env as publicEnv } from '$env/dynamic/public';
 import prisma from '$lib/db';
 import { changeUsersRole } from '$lib/bot';
-import { sendEmail } from '$lib/email.server';
+import { sendEmail } from '$lib/email/email.server';
 
 export const load = async ({ url, cookies, locals }) => {
 	const inviteToken = url.searchParams.get('invite');
@@ -92,7 +92,7 @@ export const actions = {
 		});
 
 		const email = await renderSignInEmail({
-			authLink: `${publicEnv.PUBLIC_LOCATION_URL}/api/email/callback?token=${verificationToken.token}`,
+			authLink: `${publicEnv.PUBLIC_LOCATION_URL}/api/email/signin?token=${verificationToken.token}`,
 			ip: event.getClientAddress()
 		});
 

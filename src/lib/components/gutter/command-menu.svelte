@@ -20,7 +20,7 @@
 		Users
 	} from 'lucide-svelte';
 	import { page } from '$app/stores';
-	import { signInDiscord, signOut } from '$lib/clientAuth';
+	import { signInDiscord, signOut } from '$lib/auth/auth';
 	import { env } from '$env/dynamic/public';
 
 	let open = false;

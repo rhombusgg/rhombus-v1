@@ -1,4 +1,7 @@
 import prisma from './db';
+import { randomBytes } from 'node:crypto';
+
+export const generateInviteToken = () => randomBytes(16).toString('hex');
 
 export const globalChallengeSolves = async (challengeIds: string[] = []) => {
 	const challengeSolves = await prisma.challenge.findMany({

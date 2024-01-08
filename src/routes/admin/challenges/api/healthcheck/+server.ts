@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { runHealthcheck } from '$lib/serverHealthcheck';
-import { healthcheckInputSchema, type HealthcheckOutput } from '$lib/clientHealthcheck';
+import { runHealthcheck } from '$lib/healthcheck/healthcheck.server';
+import { healthcheckInputSchema, type HealthcheckOutput } from '$lib/healthcheck/healthcheck';
 
 export async function POST({ request, locals }) {
 	if (!locals.session?.isAdmin) {

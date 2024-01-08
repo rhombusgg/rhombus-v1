@@ -1,8 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
-import { setJwt } from '$lib/serverAuth';
-import { generateInviteToken } from '$lib/team';
+import { setJwt } from '$lib/auth/auth.server';
 import { createRole } from '$lib/bot';
+import { generateInviteToken } from '$lib/utils.server';
 
 export async function GET({ url, cookies }) {
 	const token = url.searchParams.get('token');

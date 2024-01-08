@@ -1,5 +1,5 @@
 import prisma from '$lib/db';
-import { clearJwt, getJwt } from '$lib/serverAuth';
+import { clearJwt, getJwt } from '$lib/auth/auth.server';
 import { redirect } from '@sveltejs/kit';
 
 export async function GET({ url, cookies }) {

@@ -3,8 +3,8 @@ import { env as publicEnv } from '$env/dynamic/public';
 import { z } from 'zod';
 import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
-import { setJwt, getJwt } from '$lib/serverAuth';
-import { generateInviteToken } from '$lib/team';
+import { generateInviteToken } from '$lib/utils.server';
+import { setJwt, getJwt } from '$lib/auth/auth.server';
 import { createRole, joinUserToRole, verifyUser } from '$lib/bot';
 
 export async function GET({ url, cookies }) {

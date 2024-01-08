@@ -3,11 +3,11 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import { env } from '$env/dynamic/public';
 import prisma from '$lib/db';
-import { generateInviteToken } from '$lib/team';
 import { changeUsersRole, renameRole } from '$lib/bot';
 import { globalChallengeSolves } from '$lib/utils.server';
 import { avatarFallback, dynamicPoints } from '$lib/utils';
 import { teamNameFormSchema } from './schema';
+import { generateInviteToken } from '$lib/utils.server';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signInDiscordUrl } from '$lib/clientAuth';
+	import { signInDiscordUrl } from '$lib/auth/auth';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { DiscordLogo } from 'radix-icons-svelte';

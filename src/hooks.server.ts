@@ -3,9 +3,9 @@ import { sequence } from '@sveltejs/kit/hooks';
 import { Cron, scheduledJobs } from 'croner';
 
 import prisma from '$lib/db';
-import { getJwt } from '$lib/serverAuth';
+import { getJwt } from '$lib/auth/auth.server';
 import { avatarFallback } from '$lib/utils';
-import { runHealthchecks } from '$lib/serverHealthcheck';
+import { runHealthchecks } from '$lib/healthcheck/healthcheck.server';
 
 // small sveltekit hack to have code run only once on server start (to
 // run healthchecks every so often)

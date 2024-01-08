@@ -25,7 +25,7 @@
 	<Separator />
 
 	<div class="flex flex-col gap-4">
-		<a href="challenges/challenge">New challenge</a>
+		<a href="challenges/editor">New challenge</a>
 	</div>
 	<p>Flag Format</p>
 	<p>Round robin health checks</p>

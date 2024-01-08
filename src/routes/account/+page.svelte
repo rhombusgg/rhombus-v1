@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { signInDiscordUrl } from '$lib/clientAuth';
+	import { signInDiscordUrl } from '$lib/auth/auth';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import clsx from 'clsx';

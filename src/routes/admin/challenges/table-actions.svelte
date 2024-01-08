@@ -13,7 +13,7 @@
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Item href={`challenges/challenge/${id}`}
+		<DropdownMenu.Item href={`challenges/editor/${id}`}
 			><Pencil class="mr-2 h-4 w-4" /> Edit</DropdownMenu.Item
 		>
 		<DropdownMenu.Item href={`challenges/writeups/${id}`}

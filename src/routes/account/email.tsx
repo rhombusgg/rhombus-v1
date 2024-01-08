@@ -14,7 +14,7 @@ import {
 	Text
 } from '@react-email/components';
 import * as React from 'react';
-import { rhombus } from '$lib/encodedAssets';
+import { rhombus } from '$lib/email/encodedAssets';
 
 import { render } from '@react-email/render';
 import { z } from 'zod';

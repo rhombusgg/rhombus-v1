@@ -1,8 +1,8 @@
 import esbuild from 'esbuild';
 import vm from 'node:vm';
 import net from 'node:net';
-import { RhombusUtilities, type HealthcheckOutput } from './clientHealthcheck';
-import prisma from './db';
+import { RhombusUtilities, type HealthcheckOutput } from './healthcheck';
+import prisma from '../db';
 
 export async function runHealthcheck(typescript: string): Promise<HealthcheckOutput> {
 	const ts = [RhombusUtilities, typescript, 'rhombusFinalExportResult = await health();'].join(

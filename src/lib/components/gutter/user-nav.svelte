@@ -3,7 +3,7 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import { LogOut, User, Users } from 'lucide-svelte';
-	import { signOut } from '$lib/clientAuth';
+	import { signOut } from '$lib/auth/auth';
 	import { page } from '$app/stores';
 	import clsx from 'clsx';
 </script>

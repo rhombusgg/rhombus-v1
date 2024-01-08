@@ -5,7 +5,7 @@ import { isUserInGuild } from '$lib/bot';
 import prisma from '$lib/db';
 import { newEmailSchema } from './schema';
 import { renderVerificationEmail } from './email';
-import { sendEmail } from '$lib/email.server';
+import { sendEmail } from '$lib/email/email.server';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
