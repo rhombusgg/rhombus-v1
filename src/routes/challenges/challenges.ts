@@ -63,6 +63,14 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 						}
 					}
 				}
+			},
+			writeups: {
+				where: {
+					userId
+				},
+				select: {
+					link: true
+				}
 			}
 		}
 	});
@@ -209,7 +217,8 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 								id: solve.user!.id
 							}
 						}
-					: null
+					: null,
+				userWriteupLinks: challenge.writeups.map((writeup) => writeup.link)
 			} satisfies Challenge;
 		})
 	}));

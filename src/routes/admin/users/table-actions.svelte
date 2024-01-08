@@ -45,7 +45,11 @@
 			>
 		{/if}
 		<DropdownMenu.Separator />
-		<DropdownMenu.Item><ShieldAlert class="mr-2 h-4 w-4" /> Make Admin</DropdownMenu.Item>
+		{#if user.isAdmin}
+			<DropdownMenuItem><ShieldAlert class="mr-2 h-4 w-4" /> Revoke Admin</DropdownMenuItem>
+		{:else}
+			<DropdownMenuItem><ShieldAlert class="mr-2 h-4 w-4" /> Make Admin</DropdownMenuItem>
+		{/if}
 		<DropdownMenu.Item><Trash2 class="mr-2 h-4 w-4" /> Delete</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

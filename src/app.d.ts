@@ -50,6 +50,7 @@ declare global {
 				id: string;
 			};
 		} | null;
+		userWriteupLinks: string[];
 	}
 
 	interface Session {

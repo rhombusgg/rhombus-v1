@@ -1,36 +1,39 @@
 <script lang="ts">
+	import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
-	import { addPagination, addSortBy, addTableFilter } from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
-	import TableActions from './table-actions.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { ArrowUpDown } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
-	import Name from './name.svelte';
-	import { challengeToPoints } from '$lib/utils';
-	import Writeups from './writeups.svelte';
+	import DiscordAvatar from '../../../users/discord-avatar.svelte';
+	import Email from '../../../users/email.svelte';
+	import Team from '../../../users/team.svelte';
+	import Link from './link.svelte';
 
-	export let challenges: {
-		challenge: {
-			id: string;
-			name: string;
-			slug: string;
-			description: string;
-			category: string;
-			difficulty: string;
-			flag: string;
-			issueTemplate: string;
-			points: number | null;
-			authorId: string;
-			writeupCount: number;
-			solveCount: number;
+	export let writeups: {
+		writeup: {
+			user: {
+				discord: {
+					id: string;
+					username: string;
+					globalUsername: string;
+					image: string;
+				} | null;
+				id: string;
+				emails: {
+					email: string;
+				}[];
+				team: {
+					id: string;
+					name: string;
+				} | null;
+			};
+			link: string;
 		};
 	}[];
 
-	const table = createTable(readable(challenges), {
+	const table = createTable(readable(writeups), {
 		page: addPagination(),
-		sort: addSortBy(),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		})
@@ -38,57 +41,39 @@
 
 	const columns = table.createColumns([
 		table.column({
-			id: 'name',
-			accessor: 'challenge',
-			header: 'Name',
-			cell: ({ value }) => createRender(Name, { name: value.name, slug: value.slug })
-		}),
-		table.column({
-			id: 'description',
-			accessor: 'challenge',
-			header: 'Description',
+			accessor: 'writeup',
+			id: 'discord',
+			header: 'Discord',
 			cell: ({ value }) =>
-				value.description.length > 50 ? value.description.slice(0, 50) + '...' : value.description
+				value.user.discord
+					? createRender(DiscordAvatar, { ...value.user.discord, userId: value.user.id })
+					: 'None'
 		}),
 		table.column({
-			id: 'category',
-			accessor: 'challenge',
-			header: 'Category',
-			cell: ({ value }) => value.category
-		}),
-		table.column({
-			id: 'difficulty',
-			accessor: 'challenge',
-			header: 'Difficulty',
-			cell: ({ value }) => value.difficulty
-		}),
-		table.column({
-			id: 'points',
-			accessor: 'challenge',
-			header: 'Points',
+			accessor: 'writeup',
+			id: 'emails',
+			header: 'Emails',
 			cell: ({ value }) =>
-				challengeToPoints({ _count: { solves: value.solveCount }, points: value.points }) +
-				(value.points ? '' : ' (dynamic)')
-		}),
-		table.column({
-			id: 'writeups',
-			accessor: 'challenge',
-			header: 'Writeups',
-			cell: ({ value }) => createRender(Writeups, value)
-		}),
-		table.column({
-			id: 'actions',
-			accessor: 'challenge',
-			header: '',
-			cell: ({ value }) => createRender(TableActions, value),
+				createRender(Email, { emails: value.user.emails.map((email) => email.email) }),
 			plugins: {
-				sort: {
-					disable: true
-				},
 				filter: {
-					exclude: true
+					getFilterValue(value) {
+						return value.user.emails.join(' ');
+					}
 				}
 			}
+		}),
+		table.column({
+			accessor: 'writeup',
+			id: 'team',
+			header: 'Team',
+			cell: ({ value }) => createRender(Team, value.user.team!)
+		}),
+		table.column({
+			accessor: 'writeup',
+			id: 'link',
+			header: 'Link',
+			cell: ({ value }) => createRender(Link, value)
 		})
 	]);
 
@@ -112,14 +97,7 @@
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
-										{#if ['name', 'description', 'category', 'difficulty', 'points', 'writeups'].includes(cell.id)}
-											<Button variant="ghost" on:click={props.sort.toggle}>
-												<Render of={cell.render()} />
-												<ArrowUpDown class={'ml-2 h-4 w-4'} />
-											</Button>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
+										<Render of={cell.render()} />
 									</Table.Head>
 								</Subscribe>
 							{/each}

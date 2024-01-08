@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { MoreHorizontal, Pencil, Trash2 } from 'lucide-svelte';
+	import { MoreHorizontal, Pencil, ScrollText, Trash2 } from 'lucide-svelte';
 	export let id: string;
 </script>
 
@@ -15,6 +15,9 @@
 	<DropdownMenu.Content>
 		<DropdownMenu.Item href={`challenges/challenge/${id}`}
 			><Pencil class="mr-2 h-4 w-4" /> Edit</DropdownMenu.Item
+		>
+		<DropdownMenu.Item href={`challenges/writeups/${id}`}
+			><ScrollText class="mr-2 h-4 w-4" /> View Writeups</DropdownMenu.Item
 		>
 		<DropdownMenu.Item><Trash2 class="mr-2 h-4 w-4" /> Delete</DropdownMenu.Item>
 	</DropdownMenu.Content>

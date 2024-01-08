@@ -48,14 +48,24 @@ model User {
     isAdmin            Boolean         @default(false)
     tickets            Ticket[]
     solves             Solve[]
+    writeups           Writeup[]
+}
+
+model Writeup {
+    id          String    @id @default(cuid())
+    user        User      @relation(fields: [userId], references: [id])
+    userId      String
+    challenge   Challenge @relation(fields: [challengeId], references: [id])
+    challengeId String
+    link        String
 }
 
 model Solve {
     id          String    @id @default(cuid())
     challengeId String
     challenge   Challenge @relation(fields: [challengeId], references: [id])
-    userId      String?
-    user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId      String
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     time        DateTime  @default(now())
 }
 
@@ -112,6 +122,7 @@ model Challenge {
     authorId      String
     solves        Solve[]
     health        ChallengeHealth?
+    writeups      Writeup[]
 }
 
 model ChallengeHealth {

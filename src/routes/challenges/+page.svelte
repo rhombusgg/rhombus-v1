@@ -38,8 +38,18 @@
 			if (form.valid) {
 				toast.success('Challenge solved!');
 				await goto(`/challenges`);
-			} else if (form.errors.flag) {
-				// toast.error(form.errors.flag.join(' '));
+			}
+			// else if (form.errors.flag) {
+			// toast.error(form.errors.flag.join(' '));
+			// }
+		}
+	});
+
+	const { enhance: writeupFormEnhance, errors: writeupFormErrors } = superForm(data.writeupForm, {
+		async onUpdated({ form }) {
+			if (form.valid) {
+				toast.success('Writeup submitted!');
+				await goto(`/challenges`);
 			}
 		}
 	});
@@ -174,6 +184,40 @@
 						</div>
 					{/if}
 				</form>
+			{:else}
+				<form use:writeupFormEnhance method="POST" action="?/writeup">
+					<input type="hidden" name="challengeId" value={challenge.id} />
+					<div class="flex">
+						<Input
+							placeholder="writeup link..."
+							name="link"
+							class={clsx($writeupFormErrors.link && 'border-red-500')}
+							autocomplete="off"
+						/>
+						<Button class="ml-2">Submit</Button>
+					</div>
+					{#if $writeupFormErrors.link}
+						<div class="text-red-500">
+							{$writeupFormErrors.link}
+						</div>
+					{/if}
+				</form>
+				{#if challenge.userWriteupLinks.length > 0}
+					<div>
+						<div class="text-lg">Submitted Writeups</div>
+						{#each challenge.userWriteupLinks as writeupLink}
+							<div>
+								<a
+									href={writeupLink}
+									target="_blank"
+									class="font-medium underline underline-offset-4"
+								>
+									{writeupLink}
+								</a>
+							</div>
+						{/each}
+					</div>
+				{/if}
 			{/if}
 		</Dialog.Content>
 	</Dialog.Root>

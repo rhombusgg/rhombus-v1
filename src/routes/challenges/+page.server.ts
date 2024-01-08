@@ -15,12 +15,10 @@ export const load = async ({ locals }) => {
 		locals.session.team.users.map((user) => user.id)
 	);
 
-	const ticketForm = await superValidate(ticketSchema);
-	const flagForm = await superValidate(flagSchema);
-
 	return {
-		ticketForm,
-		flagForm,
+		ticketForm: await superValidate(ticketSchema),
+		flagForm: await superValidate(flagSchema),
+		writeupForm: await superValidate(writeupSchema),
 		userColumns
 	};
 };
@@ -33,6 +31,11 @@ const ticketSchema = z.object({
 const flagSchema = z.object({
 	challengeId: z.string(),
 	flag: z.string()
+});
+
+const writeupSchema = z.object({
+	challengeId: z.string(),
+	link: z.string().url()
 });
 
 export const actions = {
@@ -86,6 +89,36 @@ export const actions = {
 			data: {
 				challengeId: form.data.challengeId,
 				userId: locals.session.id
+			}
+		});
+
+		return { form };
+	},
+	writeup: async ({ request, locals }) => {
+		if (!locals.session) {
+			return fail(401);
+		}
+
+		const form = await superValidate(request, writeupSchema);
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		const solve = await prisma.solve.findFirst({
+			where: {
+				userId: {
+					in: locals.session.team.users.map((user) => user.id)
+				},
+				challengeId: form.data.challengeId
+			}
+		});
+		if (!solve) return fail(500, { form });
+
+		await prisma.writeup.create({
+			data: {
+				challengeId: form.data.challengeId,
+				userId: locals.session.id,
+				link: form.data.link
 			}
 		});
 

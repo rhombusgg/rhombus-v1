@@ -3,6 +3,13 @@
 	import Table from './table.svelte';
 
 	export let data;
+
+	$: challenges = data.challenges.map((challenge) => ({
+		challenge: {
+			...challenge,
+			isDeletable: data.challenges.length > 1
+		}
+	}));
 </script>
 
 <svelte:head>
@@ -23,5 +30,5 @@
 	<p>Flag Format</p>
 	<p>Round robin health checks</p>
 
-	<Table challenges={data.challenges} />
+	<Table {challenges} />
 </div>
