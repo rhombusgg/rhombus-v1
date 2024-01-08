@@ -14,7 +14,10 @@ export const load = async ({ depends }) => {
 					name: true,
 					id: true,
 					solves: {
-						distinct: ['teamId'],
+						distinct: ['challengeId'],
+						orderBy: {
+							time: 'asc'
+						},
 						select: {
 							time: true,
 							challenge: {

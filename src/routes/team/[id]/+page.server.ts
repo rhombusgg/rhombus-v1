@@ -29,7 +29,7 @@ export const load = async ({ params }) => {
 				}
 			},
 			solves: {
-				distinct: ['teamId'],
+				distinct: ['challengeId'],
 				orderBy: {
 					time: 'asc'
 				},

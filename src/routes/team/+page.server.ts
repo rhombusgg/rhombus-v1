@@ -44,7 +44,7 @@ export const load = async ({ locals }) => {
 						}
 					},
 					solves: {
-						distinct: ['teamId'],
+						distinct: ['challengeId'],
 						orderBy: {
 							time: 'asc'
 						},

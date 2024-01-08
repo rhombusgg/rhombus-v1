@@ -156,6 +156,7 @@
 					<span>{challenge.difficulty} / </span>
 					<span>{challenge.name}</span>
 				</div>
+				<div class="ml-4" />
 				<div>
 					{challenge.globalSolveCount} solve{challenge.globalSolveCount !== 1 ? 's' : ''} / {challenge.points}
 					pts
@@ -234,6 +235,7 @@
 					<span>{challenge.difficulty} / </span>
 					<span>{challenge.name}</span>
 				</div>
+				<div class="ml-4" />
 				<div>
 					{challenge.globalSolveCount} solve{challenge.globalSolveCount !== 1 ? 's' : ''} / {challenge.points}
 					pts

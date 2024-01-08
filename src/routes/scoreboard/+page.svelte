@@ -9,6 +9,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Select from '$lib/components/ui/select';
 	import Table from './table.svelte';
+	import clsx from 'clsx';
 
 	export let data;
 
@@ -26,7 +27,16 @@
 						solve.points + team.solves.slice(0, i).reduce((acc, solve) => acc + solve.points, 0)
 				}))
 			}))
-			.sort((a, b) => b.score - a.score)
+			.sort((a, b) => {
+				const scoreDifference = b.score - a.score;
+				if (scoreDifference !== 0) {
+					return scoreDifference;
+				}
+				return (
+					a.scores[a.scores.length - 1].time.getTime() -
+					b.scores[b.scores.length - 1].time.getTime()
+				);
+			})
 	}));
 
 	$: divisionParam = $page.url.searchParams.get('division');
@@ -145,7 +155,16 @@
 />
 
 <div class="w-full">
-	<div class="mb-4 h-[32rem] bg-background" bind:this={chartElement} />
+	<div class="relative mb-4 h-[32rem] bg-background" bind:this={chartElement}>
+		<div
+			class={clsx(
+				'absolute z-10 flex h-full w-full items-center justify-center',
+				selectedDivision.teams.length !== 0 && 'hidden'
+			)}
+		>
+			<span class="text-2xl font-semibold"> No solves yet! </span>
+		</div>
+	</div>
 	<div class="container flex flex-col gap-2 lg:flex-row">
 		<Card.Root class="flex-1 lg:max-w-md">
 			<Card.Header>
