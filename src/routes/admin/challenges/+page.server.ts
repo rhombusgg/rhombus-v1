@@ -1,5 +1,6 @@
-import prisma from '$lib/db';
 import { redirect } from '@sveltejs/kit';
+import prisma from '$lib/db';
+import { dynamicPoints } from '$lib/utils';
 
 export const load = async ({ locals, depends }) => {
 	if (!locals.session) {
@@ -22,11 +23,26 @@ export const load = async ({ locals, depends }) => {
 	depends('app:admin:challenges');
 
 	const challenges = await prisma.challenge.findMany({
-		include: {
+		select: {
+			id: true,
+			name: true,
+			slug: true,
+			description: true,
+			category: true,
+			difficulty: true,
+			flag: true,
+			issueTemplate: true,
+			points: true,
+			authorId: true,
 			_count: {
 				select: {
-					solves: true,
 					writeups: true
+				}
+			},
+			solves: {
+				distinct: ['teamId'],
+				select: {
+					id: true
 				}
 			}
 		}
@@ -42,10 +58,11 @@ export const load = async ({ locals, depends }) => {
 			difficulty: challenge.difficulty,
 			flag: challenge.flag,
 			issueTemplate: challenge.issueTemplate,
-			points: challenge.points,
+			points: challenge.points || dynamicPoints(challenge.solves.length),
+			isDynamicScoring: !challenge.points,
 			authorId: challenge.authorId,
 			writeupCount: challenge._count.writeups,
-			solveCount: challenge._count.solves
+			solveCount: challenge.solves.length
 		}))
 	};
 };

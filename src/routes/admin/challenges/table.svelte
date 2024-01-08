@@ -8,7 +8,6 @@
 	import { ArrowUpDown } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Name from './name.svelte';
-	import { dynamicPoints } from '$lib/utils';
 	import Writeups from './writeups.svelte';
 
 	export let challenges: {
@@ -21,7 +20,8 @@
 			difficulty: string;
 			flag: string;
 			issueTemplate: string;
-			points: number | null;
+			points: number;
+			isDynamicScoring: boolean;
 			authorId: string;
 			writeupCount: number;
 			solveCount: number;
@@ -63,10 +63,17 @@
 			cell: ({ value }) => value.difficulty
 		}),
 		table.column({
+			id: 'solves',
+			accessor: 'challenge',
+			header: 'Solves',
+			cell: ({ value }) => value.solveCount
+		}),
+		table.column({
 			id: 'points',
 			accessor: 'challenge',
 			header: 'Points',
-			cell: ({ value }) => value.points || 'Dynamic'
+			cell: ({ value }) =>
+				value.isDynamicScoring ? `${value.points} (dynamic)` : `${value.points}`
 		}),
 		table.column({
 			id: 'writeups',
@@ -110,7 +117,7 @@
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
-										{#if ['name', 'description', 'category', 'difficulty', 'points', 'writeups'].includes(cell.id)}
+										{#if ['name', 'category', 'difficulty', 'solves', 'points', 'writeups'].includes(cell.id)}
 											<Button variant="ghost" on:click={props.sort.toggle}>
 												<Render of={cell.render()} />
 												<ArrowUpDown class={'ml-2 h-4 w-4'} />

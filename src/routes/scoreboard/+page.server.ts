@@ -1,7 +1,6 @@
 import prisma from '$lib/db';
 import { dynamicPoints } from '$lib/utils';
 import { globalChallengeSolves } from '$lib/utils.server';
-import { teamNameFormSchema } from '../team/schema.js';
 
 export const load = async ({ depends }) => {
 	depends('scoreboard');
