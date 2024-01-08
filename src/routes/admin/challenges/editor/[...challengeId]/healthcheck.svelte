@@ -9,7 +9,7 @@
 		RhombusUtilities,
 		healthcheckOutputSchema,
 		type HealthcheckOutput
-	} from '$lib/clientHealthcheck';
+	} from '$lib/healthcheck/healthcheck';
 	import { Loader2 } from 'lucide-svelte';
 
 	export let initial: string | null | undefined;
