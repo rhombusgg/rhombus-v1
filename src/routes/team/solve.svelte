@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import dayjs from 'dayjs';
 	import calendar from 'dayjs/plugin/calendar';
-	import * as Avatar from '$lib/components/ui/avatar';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 
 	dayjs.extend(calendar);
 
@@ -38,35 +37,5 @@
 			/ {solve.challenge.points} points / {dayjs(solve.time).calendar(dayjs())}</span
 		>
 	</div>
-	<div class="flex items-center gap-4">
-		<div class="text-right">
-			<a class="font-medium underline underline-offset-4" href={`/user/${user.id}`}>
-				{#if user.discord}
-					{user.discord.username}
-				{:else}
-					{user.email}
-				{/if}
-			</a>
-			<p class="text-sm text-muted-foreground">
-				{#if user.discord}
-					<a
-						href={`https://discord.com/users/${user.discord.id}`}
-						target="_blank"
-						class="underline underline-offset-4">@{user.discord.globalUsername}</a
-					>
-				{:else}
-					{user.email}
-				{/if}
-				{#if user.id === $page.data.session?.id}
-					(You)
-				{/if}
-			</p>
-		</div>
-		<Avatar.Root class="h-10 w-10 border-4">
-			{#if user.discord}
-				<Avatar.Image src={user.discord.image} alt={`@${user.discord.globalUsername}`} />
-			{/if}
-			<Avatar.Fallback>{user.avatarFallback}</Avatar.Fallback>
-		</Avatar.Root>
-	</div>
+	<UserAvatar {...user} direction="right" />
 </div>

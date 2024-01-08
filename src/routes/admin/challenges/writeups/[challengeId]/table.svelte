@@ -5,10 +5,10 @@
 	import * as Table from '$lib/components/ui/table';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import DiscordAvatar from '../../../users/discord-avatar.svelte';
-	import Email from '../../../users/email.svelte';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 	import Team from '../../../users/team.svelte';
 	import Link from './link.svelte';
+	import { avatarFallback } from '$lib/utils';
 
 	export let writeups: {
 		writeup: {
@@ -42,26 +42,15 @@
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'writeup',
-			id: 'discord',
-			header: 'Discord',
+			id: 'user',
+			header: 'User',
 			cell: ({ value }) =>
-				value.user.discord
-					? createRender(DiscordAvatar, { ...value.user.discord, userId: value.user.id })
-					: 'None'
-		}),
-		table.column({
-			accessor: 'writeup',
-			id: 'emails',
-			header: 'Emails',
-			cell: ({ value }) =>
-				createRender(Email, { emails: value.user.emails.map((email) => email.email) }),
-			plugins: {
-				filter: {
-					getFilterValue(value) {
-						return value.user.emails.join(' ');
-					}
-				}
-			}
+				createRender(UserAvatar, {
+					discord: value.user.discord,
+					id: value.user.id,
+					email: value.user.emails[0].email,
+					avatarFallback: avatarFallback(value.user)
+				})
 		}),
 		table.column({
 			accessor: 'writeup',

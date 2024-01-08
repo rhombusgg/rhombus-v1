@@ -47,6 +47,7 @@ export const load = async ({ locals, params }) => {
 								}
 							},
 							emails: {
+								take: 1,
 								select: {
 									email: true
 								}

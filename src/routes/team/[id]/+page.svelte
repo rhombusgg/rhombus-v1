@@ -1,9 +1,9 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import * as Avatar from '$lib/components/ui/avatar';
 	import dayjs from 'dayjs';
 	import calendar from 'dayjs/plugin/calendar';
 	import Solve from '../solve.svelte';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 
 	dayjs.extend(calendar);
 
@@ -33,39 +33,7 @@
 			</Card.Header>
 			<Card.Content class="flex flex-col gap-6">
 				{#each data.users as user}
-					<div class="flex items-center justify-between">
-						<div class="flex items-center gap-4">
-							<Avatar.Root class="h-10 w-10 border-4">
-								{#if user.discord}
-									<Avatar.Image src={user.discord.image} alt={`@${user.discord.globalUsername}`} />
-								{/if}
-								<Avatar.Fallback>{user.avatarFallback}</Avatar.Fallback>
-							</Avatar.Root>
-							<div>
-								<a class="font-medium underline underline-offset-4" href={`/user/${user.id}`}>
-									{#if user.discord}
-										{user.discord.username}
-									{:else}
-										{user.email}
-									{/if}
-								</a>
-								<p class="text-sm text-muted-foreground">
-									{#if user.discord}
-										<a
-											href={`https://discord.com/users/${user.discord.id}`}
-											target="_blank"
-											class="underline underline-offset-4">@{user.discord.globalUsername}</a
-										>
-									{:else}
-										{user.email}
-									{/if}
-									{#if user.id === data.session?.id}
-										(You)
-									{/if}
-								</p>
-							</div>
-						</div>
-					</div>
+					<UserAvatar {...user} />
 				{/each}
 			</Card.Content>
 		</Card.Root>

@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import * as Card from '$lib/components/ui/card';
-	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Form from '$lib/components/ui/form';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { Input } from '$lib/components/ui/input';
@@ -13,6 +12,7 @@
 	import clsx from 'clsx';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Solve from './solve.svelte';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 
 	export let data;
 
@@ -98,39 +98,7 @@
 						</div>
 						{#each data.team.users as user}
 							<div class="flex items-center justify-between">
-								<div class="flex items-center gap-4">
-									<Avatar.Root class="h-10 w-10 border-4">
-										{#if user.discord}
-											<Avatar.Image
-												src={user.discord.image}
-												alt={`@${user.discord.globalUsername}`}
-											/>
-										{/if}
-										<Avatar.Fallback>{user.avatarFallback}</Avatar.Fallback>
-									</Avatar.Root>
-									<div>
-										<a class="font-medium underline underline-offset-4" href={`/user/${user.id}`}>
-											{#if user.discord}
-												{user.discord.username}
-											{:else}
-												{user.email}
-											{/if}
-										</a>
-										<p class="text-sm text-muted-foreground">
-											{#if user.discord}
-												<a
-													href={`https://discord.com/users/${user.discord.id}`}
-													target="_blank"
-													class="underline underline-offset-4">@{user.discord.globalUsername}</a
-												>
-											{:else}
-												{user.email}
-											{/if}
-											{#if user.id === data.session?.id}
-												(You)
-											{/if}
-										</p>
-									</div>
+								<UserAvatar {...user}>
 									{#if user.id === data.team.ownerId}
 										<Tooltip.Root>
 											<Tooltip.Trigger><Crown /></Tooltip.Trigger>
@@ -139,7 +107,7 @@
 											</Tooltip.Content>
 										</Tooltip.Root>
 									{/if}
-								</div>
+								</UserAvatar>
 								{#if isOwner !== (user.id === data.session?.id)}
 									<Tooltip.Root>
 										<Tooltip.Trigger>

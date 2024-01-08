@@ -3,12 +3,13 @@
 	import dayjs from 'dayjs';
 	import calendar from 'dayjs/plugin/calendar';
 	import Map from './map.svelte';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 
 	dayjs.extend(calendar);
 
 	export let data;
 
-	$: name = data.display.type === 'discord' ? data.display.username : data.display.email;
+	$: name = data.user.discord?.username ?? data.user.email;
 </script>
 
 <svelte:head>
@@ -17,7 +18,7 @@
 </svelte:head>
 
 <div class="container">
-	<div class="mb-4 mt-4 space-y-0.5">
+	<div class="my-4">
 		<h2 class="text-2xl font-bold tracking-tight">
 			User {name}
 		</h2>
@@ -33,6 +34,15 @@
 		</p>
 	</div>
 	<div class="grid h-fit gap-6 md:grid-cols-2 lg:grid-cols-3">
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Profile</Card.Title>
+				<Card.Description>This user's public profile</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				<UserAvatar {...data.user} />
+			</Card.Content>
+		</Card.Root>
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Solves</Card.Title>

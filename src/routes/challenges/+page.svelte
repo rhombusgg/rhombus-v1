@@ -17,6 +17,7 @@
 	import clsx from 'clsx';
 	import Editor from './editor.svelte';
 	import Time from './time.svelte';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 
 	dayjs.extend(calendar);
 
@@ -39,9 +40,6 @@
 				toast.success('Challenge solved!');
 				await goto(`/challenges`);
 			}
-			// else if (form.errors.flag) {
-			// toast.error(form.errors.flag.join(' '));
-			// }
 		}
 	});
 
@@ -328,44 +326,7 @@
 												</Avatar.Root>
 											</HoverCard.Trigger>
 											<HoverCard.Content class="w-fit">
-												<div class="flex items-center gap-4 text-left">
-													<Avatar.Root class="h-10 w-10 border-4">
-														{#if challenge.solve.user.discord}
-															<Avatar.Image
-																src={challenge.solve.user.discord.image}
-																alt={`@${challenge.solve.user.discord.globalUsername}`}
-															/>
-														{/if}
-														<Avatar.Fallback>{challenge.solve.user.avatarFallback}</Avatar.Fallback>
-													</Avatar.Root>
-													<div>
-														<a
-															class="font-medium underline underline-offset-4"
-															href={`/user/${challenge.solve.user.id}`}
-														>
-															{#if challenge.solve.user.discord}
-																{challenge.solve.user.discord.username}
-															{:else}
-																{challenge.solve.user.email}
-															{/if}
-														</a>
-														<p class="text-sm text-muted-foreground">
-															{#if challenge.solve.user.discord}
-																<a
-																	href={`https://discord.com/users/${challenge.solve.user.discord.id}`}
-																	target="_blank"
-																	class="underline underline-offset-4"
-																	>@{challenge.solve.user.discord.globalUsername}</a
-																>
-															{:else}
-																{challenge.solve.user.email}
-															{/if}
-															{#if challenge.solve.user.id === data.session?.id}
-																(You)
-															{/if}
-														</p>
-													</div>
-												</div>
+												<UserAvatar class="text-left" {...challenge.solve.user} />
 												<div class="mt-1 text-sm text-muted-foreground">
 													solved {uncapitalizeString(dayjs(challenge.solve.time).calendar(dayjs()))}
 												</div>
@@ -427,32 +388,7 @@
 										</Avatar.Root>
 									</HoverCard.Trigger>
 									<HoverCard.Content class="w-fit">
-										<div class="flex items-center gap-4 text-left">
-											<Avatar.Root class="h-10 w-10 border-4">
-												<Avatar.Image
-													src={challenge.authorDiscord.image}
-													alt={`@${challenge.authorDiscord.username}`}
-												/>
-												<Avatar.Fallback
-													>{challenge.authorDiscord.username
-														.substring(0, 2)
-														.toUpperCase()}</Avatar.Fallback
-												>
-											</Avatar.Root>
-											<div>
-												<p>
-													{challenge.authorDiscord.username}
-												</p>
-												<p class="text-sm text-muted-foreground">
-													<a
-														href={`https://discord.com/users/${challenge.authorDiscord.id}`}
-														target="_blank"
-														class="underline underline-offset-4"
-														>@{challenge.authorDiscord.globalUsername}</a
-													>
-												</p>
-											</div>
-										</div>
+										<UserAvatar class="text-left" discord={challenge.authorDiscord} />
 										<div class="mt-1 text-sm text-muted-foreground">challenge author</div>
 									</HoverCard.Content>
 								</HoverCard.Root>

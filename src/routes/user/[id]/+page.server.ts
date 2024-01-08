@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
-import { globalChallengeSolves } from '$lib/utils.server';
 import prisma from '$lib/db';
+import { globalChallengeSolves } from '$lib/utils.server';
 import { avatarFallback, dynamicPoints } from '$lib/utils';
 
 export const load = async ({ locals, params }) => {
@@ -15,6 +15,7 @@ export const load = async ({ locals, params }) => {
 			},
 			discord: {
 				select: {
+					id: true,
 					username: true,
 					globalUsername: true,
 					image: true
@@ -54,13 +55,11 @@ export const load = async ({ locals, params }) => {
 	const globalSolves = await globalChallengeSolves();
 
 	return {
-		display: user.discord
-			? { type: 'discord' as const, ...user.discord }
-			: {
-					type: 'email' as const,
-					email: user.emails[0]?.email
-				},
-		fallback: avatarFallback(user),
+		user: {
+			discord: user.discord,
+			email: user.discord ? undefined : user.emails[0]?.email,
+			avatarFallback: avatarFallback(user)
+		},
 		team: user.team!,
 		solves: user.solves.map((solve) => ({
 			time: solve.time,

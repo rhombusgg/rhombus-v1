@@ -6,10 +6,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { ArrowUpDown } from 'lucide-svelte';
-	import DiscordAvatar from './discord-avatar.svelte';
 	import TableActions from './table-actions.svelte';
 	import Email from './email.svelte';
 	import Team from './team.svelte';
+	import UserAvatar from '$lib/components/user-avatar.svelte';
 
 	export let users: {
 		user: {
@@ -43,7 +43,12 @@
 			id: 'discord',
 			header: 'Discord',
 			cell: ({ value }) =>
-				value.discord ? createRender(DiscordAvatar, { ...value.discord, userId: value.id }) : 'None'
+				value.discord
+					? createRender(UserAvatar, {
+							discord: value.discord,
+							id: value.id
+						})
+					: 'None'
 		}),
 		table.column({
 			accessor: 'user',
