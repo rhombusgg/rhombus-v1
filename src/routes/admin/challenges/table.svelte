@@ -8,7 +8,7 @@
 	import { ArrowUpDown } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Name from './name.svelte';
-	import { challengeToPoints } from '$lib/utils';
+	import { dynamicPoints } from '$lib/utils';
 	import Writeups from './writeups.svelte';
 
 	export let challenges: {
@@ -66,9 +66,7 @@
 			id: 'points',
 			accessor: 'challenge',
 			header: 'Points',
-			cell: ({ value }) =>
-				challengeToPoints({ _count: { solves: value.solveCount }, points: value.points }) +
-				(value.points ? '' : ' (dynamic)')
+			cell: ({ value }) => value.points || 'Dynamic'
 		}),
 		table.column({
 			id: 'writeups',

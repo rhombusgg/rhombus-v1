@@ -75,6 +75,7 @@
 		yAxis: {
 			type: 'value',
 			min: 0,
+			minInterval: 1,
 			axisLabel: {
 				formatter: '{value} pts'
 			}
@@ -133,14 +134,11 @@
 	<meta name="description" content="Scoreboard" />
 </svelte:head>
 
-<svelte:document
+<svelte:window
 	on:focus={async () => {
 		await invalidate('scoreboard');
 		echartsInstance.setOption(options);
 	}}
-/>
-
-<svelte:window
 	on:resize={() => {
 		echartsInstance.resize();
 	}}

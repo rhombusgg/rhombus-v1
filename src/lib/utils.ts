@@ -63,19 +63,11 @@ export const avatarFallback = (user: {
 	return user.emails[0].email.match(/^([^@]{0,2})/)![0].toUpperCase();
 };
 
-export const challengeToPoints = (challenge: {
-	_count: {
-		solves: number;
-	};
-	points: number | null;
-}) => {
-	if (challenge.points) return challenge.points;
-
+export const dynamicPoints = (solveCount: number) => {
 	const minimum = 100;
 	const initial = 500;
 	const decay = 50;
-	const solves = challenge._count.solves;
 
-	const value = Math.ceil(((minimum - initial) / decay ** 2) * solves ** 2 + initial);
+	const value = Math.ceil(((minimum - initial) / decay ** 2) * solveCount ** 2 + initial);
 	return value;
 };

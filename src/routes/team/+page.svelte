@@ -8,14 +8,11 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { ClipboardCopy, Crown, Info, LogOut, RefreshCcw } from 'lucide-svelte';
-	import dayjs from 'dayjs';
-	import calendar from 'dayjs/plugin/calendar';
 	import toast from 'svelte-french-toast';
 	import { teamNameFormSchema } from './schema';
 	import clsx from 'clsx';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-
-	dayjs.extend(calendar);
+	import Solve from './solve.svelte';
 
 	export let data;
 
@@ -177,56 +174,14 @@
 					<Card.Title>Solves</Card.Title>
 					<Card.Description>Challenges your team has solved</Card.Description>
 				</Card.Header>
-				<Card.Content class="flex flex-col gap-2">
+				<Card.Content>
 					{#each data.solves as solve}
-						<div class="flex items-center justify-between">
-							<div>
-								<a
-									class="font-medium underline underline-offset-4"
-									href={`/challenges?challenge=${solve.challenge.slug}`}>{solve.challenge.name}</a
-								>
-								<span class="text-sm text-muted-foreground">
-									/ {solve.challenge.points} points / {dayjs(solve.time).calendar(dayjs())}</span
-								>
-							</div>
-							<div class="flex items-center gap-4">
-								<div class="text-right">
-									<a
-										class="font-medium underline underline-offset-4"
-										href={`/user/${solve.user.id}`}
-									>
-										{#if solve.user.discord}
-											{solve.user.discord.username}
-										{:else}
-											{solve.user.email}
-										{/if}
-									</a>
-									<p class="text-sm text-muted-foreground">
-										{#if solve.user.discord}
-											<a
-												href={`https://discord.com/users/${solve.user.discord.id}`}
-												target="_blank"
-												class="underline underline-offset-4">@{solve.user.discord.globalUsername}</a
-											>
-										{:else}
-											{solve.user.email}
-										{/if}
-										{#if solve.user.id === data.session?.id}
-											(You)
-										{/if}
-									</p>
-								</div>
-								<Avatar.Root class="h-10 w-10 border-4">
-									{#if solve.user.discord}
-										<Avatar.Image
-											src={solve.user.discord.image}
-											alt={`@${solve.user.discord.globalUsername}`}
-										/>
-									{/if}
-									<Avatar.Fallback>{solve.user.avatarFallback}</Avatar.Fallback>
-								</Avatar.Root>
-							</div>
-						</div>
+						<!-- svelte hack to declare a let binding -->
+						{#each [data.team.users.find((user) => user.id === solve.userId)] as user}
+							{#if user}
+								<Solve {solve} {user} />
+							{/if}
+						{/each}
 					{/each}
 				</Card.Content>
 			</Card.Root>

@@ -1,12 +1,13 @@
-import prisma from '$lib/db';
-import { avatarFallback } from '$lib/utils';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
-import { teamNameFormSchema } from './schema';
 import { env } from '$env/dynamic/public';
+import prisma from '$lib/db';
 import { generateInviteToken } from '$lib/team';
 import { changeUsersRole, renameRole } from '$lib/bot';
+import { globalChallengeSolves } from '$lib/utils.server';
+import { avatarFallback, dynamicPoints } from '$lib/utils';
+import { teamNameFormSchema } from './schema';
 
 export const load = async ({ locals }) => {
 	if (!locals.session) {
@@ -39,17 +40,27 @@ export const load = async ({ locals }) => {
 								select: {
 									email: true
 								}
-							},
-							solves: {
+							}
+						}
+					},
+					solves: {
+						distinct: ['teamId'],
+						orderBy: {
+							time: 'asc'
+						},
+						select: {
+							time: true,
+							challenge: {
 								select: {
-									time: true,
-									challenge: {
-										select: {
-											name: true,
-											slug: true,
-											points: true
-										}
-									}
+									id: true,
+									name: true,
+									slug: true,
+									points: true
+								}
+							},
+							user: {
+								select: {
+									id: true
 								}
 							}
 						}
@@ -58,6 +69,8 @@ export const load = async ({ locals }) => {
 			}
 		}
 	});
+
+	const globalSolves = await globalChallengeSolves();
 
 	const divisions = await prisma.division.findMany({
 		include: {
@@ -86,17 +99,15 @@ export const load = async ({ locals }) => {
 				id: user.id
 			}))
 		},
-		solves: user.team!.users.flatMap((user) =>
-			user.solves.map((solve) => ({
-				...solve,
-				user: {
-					discord: user.discord,
-					email: user.discord ? undefined : user.emails[0].email,
-					avatarFallback: avatarFallback(user),
-					id: user.id
-				}
-			}))
-		),
+		solves: user.team!.solves.map((solve) => ({
+			time: solve.time,
+			userId: solve.user.id,
+			challenge: {
+				slug: solve.challenge.slug,
+				name: solve.challenge.name,
+				points: solve.challenge.points || dynamicPoints(globalSolves[solve.challenge.id])
+			}
+		})),
 		divisions: divisions.map((division) => ({
 			id: division.id,
 			name: division.name,
@@ -143,7 +154,17 @@ export const actions = {
 			await prisma.user.update({
 				where: { id: data.userId },
 				data: {
-					teamId: user?.ownerTeamId
+					teamId: user?.ownerTeamId,
+					solves: {
+						updateMany: {
+							data: {
+								teamId: user!.ownerTeamId!
+							},
+							where: {
+								userId: data.userId
+							}
+						}
+					}
 				}
 			});
 			return;
@@ -153,7 +174,17 @@ export const actions = {
 			await prisma.user.update({
 				where: { id: data.userId },
 				data: {
-					teamId: user?.ownerTeamId
+					teamId: user?.ownerTeamId,
+					solves: {
+						updateMany: {
+							data: {
+								teamId: user.ownerTeamId!
+							},
+							where: {
+								userId: data.userId
+							}
+						}
+					}
 				}
 			});
 			return;

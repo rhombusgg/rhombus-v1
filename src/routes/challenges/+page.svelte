@@ -141,7 +141,7 @@
 	<meta name="description" content="Challenges" />
 </svelte:head>
 
-<svelte:document on:focus={() => invalidateAll()} />
+<svelte:window on:focus={() => invalidateAll()} />
 
 {#each challenges as challenge}
 	<Dialog.Root

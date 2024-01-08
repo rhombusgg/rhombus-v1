@@ -67,6 +67,8 @@ model Solve {
     userId      String
     user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     time        DateTime  @default(now())
+    team        Team      @relation(fields: [teamId], references: [id])
+    teamId      String
 }
 
 model UserColumns {
@@ -97,6 +99,7 @@ model Team {
     ownerId       String     @unique
     inviteToken   String     @unique
     divisions     Division[]
+    solves        Solve[]
 }
 
 model Division {

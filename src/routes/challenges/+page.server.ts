@@ -88,7 +88,8 @@ export const actions = {
 		await prisma.solve.create({
 			data: {
 				challengeId: form.data.challengeId,
-				userId: locals.session.id
+				userId: locals.session.id,
+				teamId: locals.session.team.id
 			}
 		});
 

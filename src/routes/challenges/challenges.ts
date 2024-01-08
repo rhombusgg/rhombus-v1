@@ -1,5 +1,6 @@
 import prisma from '$lib/db';
-import { avatarFallback, challengeToPoints } from '$lib/utils';
+import { avatarFallback, dynamicPoints } from '$lib/utils';
+import { globalChallengeSolves } from '$lib/utils.server';
 
 export async function getUserColumns(userId: string, teamUserIds: string[]) {
 	const dbChallenges = await prisma.challenge.findMany({
@@ -41,6 +42,10 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 						in: teamUserIds
 					}
 				},
+				orderBy: {
+					time: 'asc'
+				},
+				take: 1,
 				select: {
 					time: true,
 					user: {
@@ -75,16 +80,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 		}
 	});
 
-	const challengeSolveCounts = await prisma.challenge.findMany({
-		select: {
-			id: true,
-			_count: {
-				select: {
-					solves: true
-				}
-			}
-		}
-	});
+	const globalSolves = await globalChallengeSolves();
 
 	const categories = dbChallenges
 		.map((challenge) => challenge.category)
@@ -190,6 +186,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 		challenges: column.challenges.map((c) => {
 			const challenge = dbChallenges.find((chall) => chall.id === c.challengeId)!;
 			const solve = challenge.solves.length > 0 ? challenge.solves[0] : null;
+			const globalSolveCount = globalSolves[challenge.id];
 			return {
 				id: challenge.id,
 				slug: challenge.slug,
@@ -198,7 +195,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 				category: challenge.category,
 				difficulty: challenge.difficulty,
 				issueTemplate: challenge.issueTemplate,
-				points: challengeToPoints(challenge),
+				points: challenge.points || dynamicPoints(globalSolveCount),
 				health: challenge.health,
 				authorDiscord: {
 					username: challenge.author.discord!.username,
@@ -206,7 +203,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 					image: challenge.author.discord!.image,
 					id: challenge.author.discord!.id
 				},
-				globalSolveCount: challengeSolveCounts.find((c) => c.id === challenge.id)!._count.solves,
+				globalSolveCount,
 				solve: solve
 					? {
 							time: solve.time,

@@ -95,7 +95,7 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
 									<Table.Head {...attrs}>
 										<Render of={cell.render()} />
 									</Table.Head>

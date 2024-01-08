@@ -1,6 +1,7 @@
-import prisma from '$lib/db';
 import { error } from '@sveltejs/kit';
-import { avatarFallback } from '$lib/utils';
+import { globalChallengeSolves } from '$lib/utils.server';
+import prisma from '$lib/db';
+import { avatarFallback, dynamicPoints } from '$lib/utils';
 
 export const load = async ({ locals, params }) => {
 	const user = await prisma.user.findFirst({
@@ -25,10 +26,14 @@ export const load = async ({ locals, params }) => {
 				}
 			},
 			solves: {
+				orderBy: {
+					time: 'asc'
+				},
 				select: {
 					time: true,
 					challenge: {
 						select: {
+							id: true,
 							name: true,
 							slug: true,
 							points: true
@@ -46,6 +51,8 @@ export const load = async ({ locals, params }) => {
 
 	if (!user) throw error(404);
 
+	const globalSolves = await globalChallengeSolves();
+
 	return {
 		display: user.discord
 			? { type: 'discord' as const, ...user.discord }
@@ -55,7 +62,14 @@ export const load = async ({ locals, params }) => {
 				},
 		fallback: avatarFallback(user),
 		team: user.team!,
-		solves: user.solves,
+		solves: user.solves.map((solve) => ({
+			time: solve.time,
+			challenge: {
+				name: solve.challenge.name,
+				slug: solve.challenge.slug,
+				points: solve.challenge.points || dynamicPoints(globalSolves[solve.challenge.id])
+			}
+		})),
 		admin: locals.session?.isAdmin
 			? {
 					ips: user.ips.map((ip) => ip.address),

@@ -7,7 +7,7 @@
 	import { Check, Loader2, Send } from 'lucide-svelte';
 	import { DiscordLogo } from 'radix-icons-svelte';
 	import * as Form from '$lib/components/ui/form';
-	import { newEmailSchema } from './schema.js';
+	import { newEmailSchema } from './schema';
 	import toast from 'svelte-french-toast';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';

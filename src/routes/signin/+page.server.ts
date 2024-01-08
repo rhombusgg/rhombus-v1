@@ -41,7 +41,17 @@ export const load = async ({ url, cookies, locals }) => {
 						id: locals.session.id
 					},
 					data: {
-						teamId: team.id
+						teamId: team.id,
+						solves: {
+							updateMany: {
+								data: {
+									teamId: team.id
+								},
+								where: {
+									userId: locals.session.id
+								}
+							}
+						}
 					}
 				});
 

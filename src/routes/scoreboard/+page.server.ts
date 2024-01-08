@@ -1,5 +1,7 @@
 import prisma from '$lib/db';
-import { challengeToPoints } from '$lib/utils';
+import { dynamicPoints } from '$lib/utils';
+import { globalChallengeSolves } from '$lib/utils.server';
+import { teamNameFormSchema } from '../team/schema.js';
 
 export const load = async ({ depends }) => {
 	depends('scoreboard');
@@ -12,21 +14,14 @@ export const load = async ({ depends }) => {
 				select: {
 					name: true,
 					id: true,
-					users: {
+					solves: {
+						distinct: ['teamId'],
 						select: {
-							solves: {
+							time: true,
+							challenge: {
 								select: {
-									time: true,
-									challenge: {
-										select: {
-											points: true,
-											_count: {
-												select: {
-													solves: true
-												}
-											}
-										}
-									}
+									points: true,
+									id: true
 								}
 							}
 						}
@@ -36,19 +31,22 @@ export const load = async ({ depends }) => {
 		}
 	});
 
+	const globalSolves = await globalChallengeSolves();
+
 	const divisions = dbDivisions.map((division) => ({
 		name: division.name,
 		id: division.id,
-		teams: division.teams.map((team) => ({
-			id: team.id,
-			name: team.name,
-			solves: team.users.flatMap((user) =>
-				user.solves.map((solve) => ({
+		teams: division.teams.flatMap((team) => {
+			if (team.solves.length === 0) return [];
+			return {
+				id: team.id,
+				name: team.name,
+				solves: team.solves.map((solve) => ({
 					time: solve.time,
-					points: challengeToPoints(solve.challenge)
+					points: solve.challenge.points || dynamicPoints(globalSolves[solve.challenge.id])
 				}))
-			)
-		}))
+			};
+		})
 	}));
 
 	return {

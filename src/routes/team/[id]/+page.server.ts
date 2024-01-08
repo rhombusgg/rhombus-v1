@@ -1,6 +1,7 @@
-import prisma from '$lib/db';
-import { avatarFallback } from '$lib/utils';
 import { error } from '@sveltejs/kit';
+import prisma from '$lib/db';
+import { avatarFallback, dynamicPoints } from '$lib/utils';
+import { globalChallengeSolves } from '$lib/utils.server';
 
 export const load = async ({ params }) => {
 	const team = await prisma.team.findFirst({
@@ -24,17 +25,27 @@ export const load = async ({ params }) => {
 						select: {
 							email: true
 						}
-					},
-					solves: {
+					}
+				}
+			},
+			solves: {
+				distinct: ['teamId'],
+				orderBy: {
+					time: 'asc'
+				},
+				select: {
+					time: true,
+					challenge: {
 						select: {
-							time: true,
-							challenge: {
-								select: {
-									name: true,
-									slug: true,
-									points: true
-								}
-							}
+							id: true,
+							name: true,
+							slug: true,
+							points: true
+						}
+					},
+					user: {
+						select: {
+							id: true
 						}
 					}
 				}
@@ -44,19 +55,19 @@ export const load = async ({ params }) => {
 
 	if (!team) throw error(404);
 
+	const globalSolves = await globalChallengeSolves();
+
 	return {
 		team: { id: team.id, name: team.name },
-		solves: team.users.flatMap((user) =>
-			user.solves.map((solve) => ({
-				...solve,
-				user: {
-					discord: user.discord,
-					email: user.discord ? undefined : user.emails[0].email,
-					avatarFallback: avatarFallback(user),
-					id: user.id
-				}
-			}))
-		),
+		solves: team.solves.map((solve) => ({
+			time: solve.time,
+			userId: solve.user.id,
+			challenge: {
+				slug: solve.challenge.slug,
+				name: solve.challenge.name,
+				points: solve.challenge.points || dynamicPoints(globalSolves[solve.challenge.id])
+			}
+		})),
 		users: team.users.map((user) => ({
 			discord: user.discord,
 			email: user.discord ? undefined : user.emails[0].email,
