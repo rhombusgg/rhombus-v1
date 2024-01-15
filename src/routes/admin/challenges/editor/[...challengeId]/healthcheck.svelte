@@ -2,24 +2,26 @@
 	import { onDestroy, onMount } from 'svelte';
 	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
 	import { mode } from 'mode-watcher';
+	import { Loader2 } from 'lucide-svelte';
+	import clsx from 'clsx';
 	import * as Select from '$lib/components/ui/select';
 	import { Label } from '$lib/components/ui/label';
-	import clsx from 'clsx';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 	import {
 		RhombusUtilities,
 		healthcheckOutputSchema,
 		type HealthcheckOutput
 	} from '$lib/healthcheck/healthcheck';
-	import { Loader2 } from 'lucide-svelte';
 
-	export let initial: string | null | undefined;
+	export let initialScript: string | undefined;
+	let enabled = !!initialScript;
 
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let model: Monaco.editor.ITextModel;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
-	type Value = 'http' | 'tcp' | 'none';
-	let selected: Value = initial === null ? 'none' : 'http';
+	type Template = 'http' | 'tcp';
+	let selectedTemplate: Template = 'http';
 
 	const httpTemplate =
 		`
@@ -50,7 +52,7 @@ export async function health(): Promise<boolean> {
 }
 `.trim() + '\n';
 
-	let content = initial === null ? '' : initial || httpTemplate;
+	let content = initialScript || httpTemplate;
 	let timeout: number | undefined;
 	let healthcheck: HealthcheckOutput | undefined = undefined;
 
@@ -69,9 +71,9 @@ export async function health(): Promise<boolean> {
 		timeout = undefined;
 	}
 
-	onMount(async () => {
-		if (initial) await runHealthcheck();
+	$: if (enabled) runHealthcheck();
 
+	onMount(async () => {
 		monaco = (await import('./monaco')).default;
 
 		const uri = 'ts:rhombus/utils.ts';
@@ -126,56 +128,65 @@ export async function health(): Promise<boolean> {
 		editor?.dispose();
 	});
 
-	function selectChange(option: unknown) {
-		selected = (option as { value: Value; label: string }).value;
-		if (selected === 'http') {
+	function onSelectedChange(option: unknown) {
+		selectedTemplate = (option as { value: Template; label: string }).value;
+		if (selectedTemplate === 'http') {
 			content = httpTemplate;
-		} else if (selected === 'tcp') {
+		} else if (selectedTemplate === 'tcp') {
 			content = tcpTemplate;
-		} else if (selected === 'none') {
-			content = '';
 		}
 		model.setValue(content);
 	}
 </script>
 
 <div class="flex items-center gap-x-2">
-	<Select.Root
-		onSelectedChange={selectChange}
-		selected={selected === 'http'
-			? { value: 'http', label: 'HTTP' }
-			: selected === 'none'
-				? { value: 'none', label: 'No healthcheck' }
-				: undefined}
-	>
-		<Select.Trigger class="w-[180px]" id="healthcheck">
-			<Select.Value placeholder="Select a template..." />
-		</Select.Trigger>
-		<Select.Content>
-			<Select.Item class="cursor-pointer" value="http">HTTP</Select.Item>
-			<Select.Item class="cursor-pointer" value="tcp">TCP/Netcat</Select.Item>
-			<Select.Item class="cursor-pointer" value="none">No healthcheck</Select.Item>
-		</Select.Content>
-	</Select.Root>
+	<Checkbox
+		id="enable-healthcheck"
+		aria-labelledby="enable-healthcheck-label"
+		bind:checked={enabled}
+	/>
 	<Label
-		id="healthcheck-label"
-		for="healthcheck"
+		id="enable-healthcheck-label"
+		for="enable-healthcheck"
 		class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 	>
-		Healthcheck Template
+		Enable Healthcheck
 	</Label>
 </div>
+
+{#if enabled}
+	<div class="flex items-center gap-x-2">
+		<Select.Root
+			{onSelectedChange}
+			selected={selectedTemplate === 'http'
+				? { value: 'http', label: 'HTTP' }
+				: { value: 'none', label: 'No healthcheck' }}
+		>
+			<Select.Trigger class="w-[180px]" id="healthcheck">
+				<Select.Value placeholder="Select a template..." />
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Item class="cursor-pointer" value="http">HTTP</Select.Item>
+				<Select.Item class="cursor-pointer" value="tcp">TCP/Netcat</Select.Item>
+			</Select.Content>
+		</Select.Root>
+		<Label
+			id="healthcheck-label"
+			for="healthcheck"
+			class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+		>
+			Healthcheck Template
+		</Label>
+	</div>
+{/if}
 <div class="relative">
 	<div
-		class={clsx('h-[250px]', selected === 'none' && 'absolute -z-10 w-full opacity-0')}
+		class={clsx('h-[250px]', !enabled && 'absolute -z-10 w-full opacity-0')}
 		bind:this={editorContainer}
 	/>
 </div>
 <div
-	class={clsx(
-		'min-h-[68px] rounded-md bg-primary-foreground p-2 font-mono',
-		selected === 'none' && 'hidden'
-	)}
+	class={clsx('min-h-[68px] rounded-md bg-primary-foreground p-2 font-mono', !enabled && 'hidden')}
 >
 	{#if timeout}
 		<div class="flex items-center gap-2">
@@ -207,4 +218,4 @@ export async function health(): Promise<boolean> {
 		{/if}
 	{/if}
 </div>
-<input type="hidden" name="healthcheck" bind:value={content} />
+<input type="hidden" name="healthcheck" value={enabled ? content : ''} />

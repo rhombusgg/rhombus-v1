@@ -61,7 +61,7 @@ const challengeSchema = z.object({
 	slug: z.string(),
 	description: z.string().min(1, 'You must provide a description'),
 	healthcheck: z.string().optional(),
-	issueTemplate: z.string(),
+	ticketTemplate: z.string(),
 	difficulty: z.string().min(1, 'You must select a difficulty level'),
 	points: z.number().positive().optional(),
 	category: z.string().min(1, 'You must select a category'),
@@ -74,16 +74,15 @@ export const actions = {
 
 		const form = await superValidate(request, challengeSchema);
 
-		if (!form.data.existingChallengeId) {
-			const existingChallenge = await prisma.challenge.findFirst({
-				where: {
-					slug: form.data.slug
-				}
-			});
-
-			if (existingChallenge) {
-				return setError(form, 'slug', 'Challnge with slug already exists');
+		const existingChallenge = await prisma.challenge.findFirst({
+			where: {
+				id: { not: form.data.existingChallengeId },
+				slug: form.data.slug
 			}
+		});
+
+		if (existingChallenge) {
+			return setError(form, 'slug', 'Challenge with slug already exists');
 		}
 
 		if (!form.valid) {
@@ -95,7 +94,7 @@ export const actions = {
 			slug: form.data.slug,
 			authorId: locals.session!.id,
 			description: form.data.description,
-			issueTemplate: form.data.issueTemplate,
+			ticketTemplate: form.data.ticketTemplate,
 			category: form.data.category,
 			points: form.data.points || null,
 			difficulty: form.data.difficulty,

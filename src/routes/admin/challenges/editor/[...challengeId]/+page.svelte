@@ -89,25 +89,25 @@
 				<h4 class="heading">Health Check</h4>
 				<p class="subheading">Write a simple healthcheck in Typescript</p>
 			</div>
-			<Healthcheck initial={data.existingChallenge?.health?.script} />
+			<Healthcheck initialScript={data.existingChallenge?.health?.script} />
 			{#if $errors.healthcheck}
 				<span class="invalid">{$errors.healthcheck}</span>
 			{/if}
 		</div>
 		<div class="setting">
 			<div>
-				<h4 class="heading">Issue Template</h4>
+				<h4 class="heading">Ticket Template</h4>
 				<p class="subheading">
-					A markdown template for players to fill out when they submit an issue
+					A markdown template for players to fill out when they submit an ticket
 				</p>
 			</div>
 			<MarkdownEditor
-				name="issueTemplate"
-				initial={data.existingChallenge?.issueTemplate}
+				name="ticketTemplate"
+				initial={data.existingChallenge?.ticketTemplate}
 				none={`# Describe the issue with the challenge\n\n`}
 			/>
-			{#if $errors.issueTemplate}
-				<span class="invalid">{$errors.issueTemplate}</span>
+			{#if $errors.ticketTemplate}
+				<span class="invalid">{$errors.ticketTemplate}</span>
 			{/if}
 		</div>
 		<div class="setting">

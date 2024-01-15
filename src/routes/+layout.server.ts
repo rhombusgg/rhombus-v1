@@ -7,7 +7,7 @@ export const load = async (event) => {
 			slug: true,
 			name: true,
 			description: true,
-			issueTemplate: true,
+			ticketTemplate: true,
 			difficulty: true,
 			points: true,
 			category: true,

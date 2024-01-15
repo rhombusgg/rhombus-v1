@@ -31,7 +31,7 @@ export const load = async ({ locals, depends }) => {
 			category: true,
 			difficulty: true,
 			flag: true,
-			issueTemplate: true,
+			ticketTemplate: true,
 			points: true,
 			authorId: true,
 			_count: {
@@ -57,7 +57,7 @@ export const load = async ({ locals, depends }) => {
 			category: challenge.category,
 			difficulty: challenge.difficulty,
 			flag: challenge.flag,
-			issueTemplate: challenge.issueTemplate,
+			ticketTemplate: challenge.ticketTemplate,
 			points: challenge.points || dynamicPoints(challenge.solves.length),
 			isDynamicScoring: !challenge.points,
 			authorId: challenge.authorId,

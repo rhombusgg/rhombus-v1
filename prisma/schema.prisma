@@ -112,20 +112,20 @@ model Division {
 }
 
 model Challenge {
-    id            String           @id @default(cuid())
-    slug          String           @unique
-    name          String
-    description   String           @db.Text
-    category      String
-    difficulty    String
-    flag          String
-    issueTemplate String
-    points        Int?
-    author        User             @relation(fields: [authorId], references: [id])
-    authorId      String
-    solves        Solve[]
-    health        ChallengeHealth?
-    writeups      Writeup[]
+    id             String           @id @default(cuid())
+    slug           String           @unique
+    name           String
+    description    String           @db.Text
+    category       String
+    difficulty     String
+    flag           String
+    ticketTemplate String
+    points         Int?
+    author         User             @relation(fields: [authorId], references: [id])
+    authorId       String
+    solves         Solve[]
+    health         ChallengeHealth?
+    writeups       Writeup[]
 }
 
 model ChallengeHealth {

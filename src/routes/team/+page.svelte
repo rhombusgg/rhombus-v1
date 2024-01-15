@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	import toast from 'svelte-french-toast';
+	import clsx from 'clsx';
+	import { ClipboardCopy, Crown, Info, LogOut, RefreshCcw } from 'lucide-svelte';
 	import * as Card from '$lib/components/ui/card';
 	import * as Form from '$lib/components/ui/form';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import { ClipboardCopy, Crown, Info, LogOut, RefreshCcw } from 'lucide-svelte';
-	import toast from 'svelte-french-toast';
-	import { teamNameFormSchema } from './schema';
-	import clsx from 'clsx';
-	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import Solve from './solve.svelte';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 	import UserAvatar from '$lib/components/user-avatar.svelte';
+	import { teamNameFormSchema } from './schema';
+	import Solve from './solve.svelte';
 
 	export let data;
 

@@ -19,7 +19,7 @@
 			category: string;
 			difficulty: string;
 			flag: string;
-			issueTemplate: string;
+			ticketTemplate: string;
 			points: number;
 			isDynamicScoring: boolean;
 			authorId: string;

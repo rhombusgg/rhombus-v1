@@ -14,7 +14,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 			slug: true,
 			name: true,
 			description: true,
-			issueTemplate: true,
+			ticketTemplate: true,
 			difficulty: true,
 			points: true,
 			category: true,
@@ -194,7 +194,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 				description: challenge.description,
 				category: challenge.category,
 				difficulty: challenge.difficulty,
-				issueTemplate: challenge.issueTemplate,
+				ticketTemplate: challenge.ticketTemplate,
 				points: challenge.points || dynamicPoints(globalSolveCount),
 				health: challenge.health,
 				authorDiscord: {

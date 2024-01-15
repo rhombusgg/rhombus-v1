@@ -23,7 +23,7 @@ declare global {
 		description: string;
 		category: string;
 		difficulty: string;
-		issueTemplate: string | null;
+		ticketTemplate: string | null;
 		points: number;
 		health: {
 			healthy: boolean;

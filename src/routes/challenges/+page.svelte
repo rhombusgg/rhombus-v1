@@ -245,7 +245,7 @@
 				{challenge.description}
 			</div>
 			<form use:ticketForm.enhance method="POST" action="?/ticket">
-				<Editor content={challenge.issueTemplate} />
+				<Editor content={challenge.ticketTemplate} />
 				<input type="hidden" name="challengeId" value={challenge.id} />
 				<Button>Submit</Button>
 			</form>
@@ -312,7 +312,7 @@
 									<span>{challenge.name}</span>
 								</div>
 								{#if challenge.solve}
-									<div class="flex items-center justify-center">
+									<div class="relative flex items-center justify-center">
 										<Check class="pointer-events-none absolute z-10 h-5 w-5 " />
 										<HoverCard.Root>
 											<HoverCard.Trigger>
