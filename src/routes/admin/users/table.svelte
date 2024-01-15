@@ -70,8 +70,8 @@
 			cell: ({ value }) => createRender(Team, value.team),
 			plugins: {
 				sort: {
-					compareFn(left, right) {
-						return left.name < right.name ? -1 : left.name > right.name ? 1 : 0;
+					getSortValue(value) {
+						return value.team.name;
 					}
 				}
 			}
@@ -91,8 +91,8 @@
 			cell: ({ value }) => (value.isAdmin ? 'Yes' : 'No'),
 			plugins: {
 				sort: {
-					compareFn(left) {
-						return left ? 1 : -1;
+					getSortValue(value) {
+						return value.isAdmin;
 					}
 				}
 			}

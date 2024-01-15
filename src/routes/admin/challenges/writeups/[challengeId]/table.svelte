@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
+	import { addPagination, addSortBy, addTableFilter } from 'svelte-headless-table/plugins';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
 	import * as Table from '$lib/components/ui/table';
@@ -9,6 +9,7 @@
 	import Team from '../../../users/team.svelte';
 	import Link from './link.svelte';
 	import { avatarFallback } from '$lib/utils';
+	import { ArrowUpDown } from 'lucide-svelte';
 
 	export let writeups: {
 		writeup: {
@@ -34,6 +35,7 @@
 
 	const table = createTable(readable(writeups), {
 		page: addPagination(),
+		sort: addSortBy(),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		})
@@ -56,7 +58,14 @@
 			accessor: 'writeup',
 			id: 'team',
 			header: 'Team',
-			cell: ({ value }) => createRender(Team, value.user.team!)
+			cell: ({ value }) => createRender(Team, value.user.team!),
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.user.team!.name;
+					}
+				}
+			}
 		}),
 		table.column({
 			accessor: 'writeup',
@@ -84,9 +93,16 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
-										<Render of={cell.render()} />
+										{#if ['team'].includes(cell.id)}
+											<Button variant="ghost" on:click={props.sort.toggle}>
+												<Render of={cell.render()} />
+												<ArrowUpDown class={'ml-2 h-4 w-4'} />
+											</Button>
+										{:else}
+											<Render of={cell.render()} />
+										{/if}
 									</Table.Head>
 								</Subscribe>
 							{/each}

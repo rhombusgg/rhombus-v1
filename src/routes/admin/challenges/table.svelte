@@ -41,7 +41,14 @@
 			id: 'name',
 			accessor: 'challenge',
 			header: 'Name',
-			cell: ({ value }) => createRender(Name, { name: value.name, slug: value.slug })
+			cell: ({ value }) => createRender(Name, { name: value.name, slug: value.slug }),
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.name;
+					}
+				}
+			}
 		}),
 		table.column({
 			id: 'description',
@@ -54,32 +61,67 @@
 			id: 'category',
 			accessor: 'challenge',
 			header: 'Category',
-			cell: ({ value }) => value.category
+			cell: ({ value }) => value.category,
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.category;
+					}
+				}
+			}
 		}),
 		table.column({
 			id: 'difficulty',
 			accessor: 'challenge',
 			header: 'Difficulty',
-			cell: ({ value }) => value.difficulty
+			cell: ({ value }) => value.difficulty,
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.difficulty;
+					}
+				}
+			}
 		}),
 		table.column({
 			id: 'solves',
 			accessor: 'challenge',
 			header: 'Solves',
-			cell: ({ value }) => value.solveCount
+			cell: ({ value }) => value.solveCount,
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.solveCount;
+					}
+				}
+			}
 		}),
 		table.column({
 			id: 'points',
 			accessor: 'challenge',
 			header: 'Points',
 			cell: ({ value }) =>
-				value.isDynamicScoring ? `${value.points} (dynamic)` : `${value.points}`
+				value.isDynamicScoring ? `${value.points} (dynamic)` : `${value.points}`,
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.points;
+					}
+				}
+			}
 		}),
 		table.column({
 			id: 'writeups',
 			accessor: 'challenge',
 			header: 'Writeups',
-			cell: ({ value }) => createRender(Writeups, value)
+			cell: ({ value }) => createRender(Writeups, value),
+			plugins: {
+				sort: {
+					getSortValue(value) {
+						return value.writeupCount;
+					}
+				}
+			}
 		}),
 		table.column({
 			id: 'actions',
