@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
-	import { readable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { addPagination, addSortBy, addTableFilter } from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
 	import TableActions from './table-actions.svelte';
@@ -9,6 +9,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import Name from './name.svelte';
 	import Writeups from './writeups.svelte';
+	import Category from './category.svelte';
 
 	export let challenges: {
 		challenge: {
@@ -16,7 +17,11 @@
 			name: string;
 			slug: string;
 			description: string;
-			category: string;
+			category: {
+				id: string;
+				name: string;
+				color: string;
+			};
 			difficulty: string;
 			flag: string;
 			ticketTemplate: string;
@@ -28,7 +33,19 @@
 		};
 	}[];
 
-	const table = createTable(readable(challenges), {
+	export let dialogOpen: Writable<boolean>;
+	export let categoryStore: Writable<
+		| {
+				id: string;
+				name: string;
+				color: string;
+		  }
+		| undefined
+	>;
+
+	const dstore = writable(challenges);
+	$: $dstore = challenges;
+	const table = createTable(dstore, {
 		page: addPagination(),
 		sort: addSortBy(),
 		filter: addTableFilter({
@@ -61,11 +78,12 @@
 			id: 'category',
 			accessor: 'challenge',
 			header: 'Category',
-			cell: ({ value }) => value.category,
+			cell: ({ value }) =>
+				createRender(Category, { category: value.category, dialogOpen, categoryStore }),
 			plugins: {
 				sort: {
 					getSortValue(value) {
-						return value.category;
+						return value.category.name;
 					}
 				}
 			}

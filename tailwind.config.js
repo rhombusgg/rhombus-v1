@@ -57,6 +57,9 @@ const config = {
 			},
 			fontFamily: {
 				sans: [...fontFamily.sans]
+			},
+			transitionProperty: {
+				width: 'width'
 			}
 		}
 	}

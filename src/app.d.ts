@@ -21,7 +21,10 @@ declare global {
 		slug: string;
 		name: string;
 		description: string;
-		category: string;
+		category: {
+			name: string;
+			color: string;
+		};
 		difficulty: string;
 		ticketTemplate: string | null;
 		points: number;

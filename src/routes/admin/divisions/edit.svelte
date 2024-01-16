@@ -18,9 +18,6 @@
 				teamCount: number;
 		  }
 		| undefined;
-
-	// $: edit = $page.url.searchParams.get('division');
-	// $: open = !!edit;
 </script>
 
 <Dialog.Root bind:open onOpenChange={(isOpen) => isOpen || goto('/admin/divisions')}>

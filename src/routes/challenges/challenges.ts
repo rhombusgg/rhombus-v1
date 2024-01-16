@@ -90,15 +90,15 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 		where: { userId },
 		select: {
 			challenges: { select: { challengeId: true } },
-			name: true,
+			categoryId: true,
 			id: true
 		}
 	});
 	const newCategories = categories.filter(
-		(category) => !board.some((column) => column.name === category)
+		(category) => !board.some((column) => column.categoryId === category.id)
 	);
 	const deletedCategories = board.filter(
-		(column) => !categories.some((category) => category === column.name)
+		(column) => !categories.some((category) => column.categoryId === category.id)
 	);
 	const userChallenges = board.flatMap((column) => column.challenges);
 	const newChallenges = dbChallenges.filter(
@@ -113,15 +113,15 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 	await prisma.userColumns.createMany({
 		data: newCategories.map((category) => ({
 			userId,
-			name: category,
-			order: 0
+			order: 0,
+			categoryId: category.id
 		}))
 	});
 	const updatedColumns = await prisma.userColumns.findMany({
 		where: { userId },
 		select: {
-			name: true,
-			id: true
+			id: true,
+			categoryId: true
 		}
 	});
 
@@ -133,7 +133,8 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 				createMany: {
 					data: newChallenges.map((challenge) => ({
 						challengeId: challenge.id,
-						columnId: updatedColumns.find((column) => column.name === challenge.category)!.id,
+						columnId: updatedColumns.find((column) => column.categoryId === challenge.category.id)!
+							.id,
 						order: 0
 					}))
 				},
@@ -145,7 +146,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 						return {
 							where: { challengeId: challenge.challengeId },
 							data: {
-								columnId: updatedColumns.find((c) => c.name === category)!.id
+								columnId: updatedColumns.find((c) => c.categoryId === category.id)!.id
 							}
 						};
 					})
@@ -165,7 +166,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 	await prisma.userColumns.deleteMany({
 		where: {
 			userId,
-			name: { in: deletedCategories.map((column) => column.name) }
+			categoryId: { in: deletedCategories.map((column) => column.categoryId) }
 		}
 	});
 
@@ -174,7 +175,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 		where: { userId },
 		select: {
 			challenges: { select: { challengeId: true }, orderBy: { order: 'asc' } },
-			name: true,
+			category: { select: { name: true, color: true } },
 			id: true
 		},
 		orderBy: { order: 'asc' }
@@ -182,7 +183,8 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 
 	const userColumns = columns.map((column) => ({
 		id: column.id,
-		name: column.name,
+		name: column.category.name,
+		color: column.category.color,
 		challenges: column.challenges.map((c) => {
 			const challenge = dbChallenges.find((chall) => chall.id === c.challengeId)!;
 			const solve = challenge.solves.length > 0 ? challenge.solves[0] : null;
@@ -192,7 +194,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 				slug: challenge.slug,
 				name: challenge.name,
 				description: challenge.description,
-				category: challenge.category,
+				category: { name: challenge.category.name, color: challenge.category.color },
 				difficulty: challenge.difficulty,
 				ticketTemplate: challenge.ticketTemplate,
 				points: challenge.points || dynamicPoints(globalSolveCount),

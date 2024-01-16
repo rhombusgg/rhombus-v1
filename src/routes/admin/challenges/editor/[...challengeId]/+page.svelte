@@ -10,6 +10,8 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
+	import CategorySelector from './categorySelector.svelte';
+	import { writable } from 'svelte/store';
 
 	export let data;
 	const { enhance, errors } = superForm(data.challengeForm, {
@@ -29,7 +31,14 @@
 		value: difficulty
 	}));
 
-	let category: string | undefined = undefined;
+	let category = writable<
+		| {
+				id: string;
+				name: string;
+				color: string;
+		  }
+		| undefined
+	>(undefined);
 	let difficulty: string | undefined = undefined;
 </script>
 
@@ -125,7 +134,7 @@
 					create: 'Create new difficulty level',
 					dialog: {
 						title: 'Create New Difficulty Level',
-						description: 'Add a new category for this challenge.'
+						description: 'Add a new difficulty for this challenge.'
 					}
 				}}
 				onChange={(c) => {
@@ -154,28 +163,16 @@
 				<h4 class="heading">Category</h4>
 				<p class="subheading">The category of the challenge</p>
 			</div>
-			<Selector
-				options={categoryOptions}
+			<CategorySelector
+				categories={data.categories}
 				initial={data.existingChallenge?.category}
-				ui={{
-					prompt: 'Select a category ...',
-					placeholder: 'Search categories...',
-					none: 'No categories found.',
-					create: 'Create new category',
-					dialog: {
-						title: 'Create New Category',
-						description: 'Add a new category for this challenge.'
-					}
-				}}
-				onChange={(c) => {
-					category = c.value;
-				}}
+				{category}
 			/>
-			{#if category}
-				<input type="hidden" name="category" value={category} />
+			{#if $category}
+				<input type="hidden" name="categoryId" value={$category.id} />
 			{/if}
-			{#if $errors.category}
-				<span class="invalid">{$errors.category}</span>
+			{#if $errors.categoryId}
+				<span class="invalid">{$errors.categoryId}</span>
 			{/if}
 		</div>
 		<div class="setting">

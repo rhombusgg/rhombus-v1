@@ -154,7 +154,7 @@ export async function health(): Promise<boolean> {
 	</Label>
 </div>
 
-{#if enabled}
+{#if enabled && !initialScript}
 	<div class="flex items-center gap-x-2">
 		<Select.Root
 			{onSelectedChange}

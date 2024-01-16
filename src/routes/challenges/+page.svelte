@@ -80,7 +80,6 @@
 			oldUserColumns = [...userColumns];
 			const columns = oldUserColumns.map((column) => ({
 				id: column.id,
-				name: column.name,
 				items: column.challenges.map((challenge) => ({ challengeId: challenge.id }))
 			}));
 			fetch('/challenges/board', {
@@ -152,7 +151,7 @@
 		<Dialog.Content>
 			<div class="mr-4 flex justify-between font-bold">
 				<div>
-					<span class="text-green-500">{challenge.category} / </span>
+					<span style:color={challenge.category.color}>{challenge.category.name} / </span>
 					<span>{challenge.difficulty} / </span>
 					<span>{challenge.name}</span>
 				</div>
@@ -231,7 +230,7 @@
 		<Dialog.Content class="max-w-fit">
 			<div class="mr-4 flex justify-between font-bold">
 				<div>
-					<span class="text-green-500">{challenge.category} / </span>
+					<span style:color={challenge.category.color}>{challenge.category.name} / </span>
 					<span>{challenge.difficulty} / </span>
 					<span>{challenge.name}</span>
 				</div>
@@ -271,11 +270,14 @@
 			animate:flip={{ duration: flipDurationMs }}
 		>
 			<div
-				class="flex justify-between rounded-md bg-blue-500 p-4 font-bold"
+				class={clsx(
+					'flex cursor-grab justify-between rounded-md p-4 font-bold',
+					dragDisabled || 'cursor-grabbing'
+				)}
+				style:background-color={column.color}
 				tabindex={dragDisabled ? 0 : -1}
 				role="button"
 				aria-label="drag-handle"
-				style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
 				on:mousedown|preventDefault={() => {
 					dragDisabled = false;
 				}}
@@ -301,13 +303,14 @@
 			>
 				{#each column.challenges as challenge (challenge.id)}
 					<div
-						class="border-l-4 border-blue-500 bg-card p-4"
+						class="border-l-4 bg-card p-4"
+						style:border-color={challenge.category.color}
 						animate:flip={{ duration: flipDurationMs }}
 					>
 						<div class="mb-2 flex justify-between">
 							<div class="flex items-center gap-4">
 								<div class="font-bold">
-									<span class="text-blue-500">{challenge.category} / </span>
+									<span style:color={challenge.category.color}>{challenge.category.name} / </span>
 									<span>{challenge.difficulty} / </span>
 									<span>{challenge.name}</span>
 								</div>
@@ -398,7 +401,6 @@
 									tabindex={dragDisabled ? 0 : -1}
 									role="button"
 									aria-label="drag-handle"
-									style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
 									on:mousedown|preventDefault={() => {
 										dragDisabled = false;
 									}}
@@ -410,7 +412,12 @@
 									}}
 								>
 									<Tooltip.Root>
-										<Tooltip.Trigger class="flex items-center">
+										<Tooltip.Trigger
+											class={clsx(
+												'flex cursor-grab items-center',
+												dragDisabled || 'cursor-grabbing'
+											)}
+										>
 											<GripVertical />
 										</Tooltip.Trigger>
 										<Tooltip.Content>

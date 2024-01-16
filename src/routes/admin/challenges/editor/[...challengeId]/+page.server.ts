@@ -1,7 +1,8 @@
-import prisma from '$lib/db';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
+import prisma from '$lib/db';
+import { runHealthcheck } from '$lib/healthcheck/healthcheck.server';
 
 export const load = async ({ locals, params }) => {
 	if (!locals.session) {
@@ -26,7 +27,8 @@ export const load = async ({ locals, params }) => {
 			id: params.challengeId
 		},
 		include: {
-			health: true
+			health: true,
+			category: true
 		}
 	});
 
@@ -37,9 +39,7 @@ export const load = async ({ locals, params }) => {
 		}
 	});
 
-	const categories = challenges
-		.map((challenge) => challenge.category)
-		.filter((value, index, array) => array.indexOf(value) === index);
+	const categories = await prisma.category.findMany();
 
 	const difficulties = challenges
 		.map((challenge) => challenge.difficulty)
@@ -64,7 +64,7 @@ const challengeSchema = z.object({
 	ticketTemplate: z.string(),
 	difficulty: z.string().min(1, 'You must select a difficulty level'),
 	points: z.number().positive().optional(),
-	category: z.string().min(1, 'You must select a category'),
+	categoryId: z.string().min(1, 'You must select a category'),
 	flag: z.string().min(1, 'You must set a flag')
 });
 
@@ -95,7 +95,7 @@ export const actions = {
 			authorId: locals.session!.id,
 			description: form.data.description,
 			ticketTemplate: form.data.ticketTemplate,
-			category: form.data.category,
+			categoryId: form.data.categoryId,
 			points: form.data.points || null,
 			difficulty: form.data.difficulty,
 			flag: form.data.flag
@@ -106,12 +106,15 @@ export const actions = {
 				data
 			});
 		} else if (!form.data.existingChallengeId && form.data.healthcheck) {
+			const healthcheck = await runHealthcheck(form.data.healthcheck);
+
 			await prisma.challenge.create({
 				data: {
 					...data,
 					health: {
 						create: {
-							script: form.data.healthcheck
+							script: form.data.healthcheck,
+							healthy: healthcheck.status === 'ran' && healthcheck.healthy
 						}
 					}
 				}
@@ -130,6 +133,8 @@ export const actions = {
 				data
 			});
 		} else if (form.data.existingChallengeId && form.data.healthcheck) {
+			const healthcheck = await runHealthcheck(form.data.healthcheck);
+
 			await prisma.challenge.update({
 				where: { id: form.data.existingChallengeId },
 				data: {
@@ -138,10 +143,12 @@ export const actions = {
 						upsert: {
 							where: { challengeId: form.data.existingChallengeId },
 							create: {
-								script: form.data.healthcheck
+								script: form.data.healthcheck,
+								healthy: healthcheck.status === 'ran' && healthcheck.healthy
 							},
 							update: {
-								script: form.data.healthcheck
+								script: form.data.healthcheck,
+								healthy: healthcheck.status === 'ran' && healthcheck.healthy
 							}
 						}
 					}

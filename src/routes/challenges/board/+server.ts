@@ -11,7 +11,6 @@ export async function PUT({ locals, request }) {
 		.array(
 			z.object({
 				id: z.string(),
-				name: z.string(),
 				items: z.array(z.object({ challengeId: z.string() }))
 			})
 		)
@@ -22,7 +21,7 @@ export async function PUT({ locals, request }) {
 		data: {
 			columns: {
 				updateMany: columns.map((column, i) => ({
-					where: { name: column.name },
+					where: { id: column.id },
 					data: {
 						order: i
 					}

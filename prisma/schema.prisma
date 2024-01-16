@@ -74,7 +74,8 @@ model Solve {
 model UserColumns {
     id         String          @id @default(cuid())
     order      Int
-    name       String
+    category   Category        @relation(fields: [categoryId], references: [id])
+    categoryId String
     challenges UserChallenge[]
     user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId     String
@@ -111,12 +112,21 @@ model Division {
     teams      Team[]
 }
 
+model Category {
+    id          String        @id @default(cuid())
+    name        String
+    color       String
+    Challenge   Challenge[]
+    UserColumns UserColumns[]
+}
+
 model Challenge {
     id             String           @id @default(cuid())
     slug           String           @unique
     name           String
     description    String           @db.Text
-    category       String
+    category       Category         @relation(fields: [categoryId], references: [id])
+    categoryId     String
     difficulty     String
     flag           String
     ticketTemplate String
