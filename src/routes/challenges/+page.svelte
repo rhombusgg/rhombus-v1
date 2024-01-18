@@ -4,6 +4,7 @@
 	import { flip } from 'svelte/animate';
 	import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
 	import { Check, GripVertical, Maximize2, Ticket } from 'lucide-svelte';
+	import SvelteMarkdown from 'svelte-markdown';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -161,8 +162,8 @@
 					pts
 				</div>
 			</div>
-			<div>
-				{challenge.description}
+			<div class="prose-base mr-2">
+				<SvelteMarkdown source={challenge.description} />
 			</div>
 			{#if !challenge.solve}
 				<form use:flagFormEnhance method="POST" action="?/flag">
@@ -240,8 +241,8 @@
 					pts
 				</div>
 			</div>
-			<div>
-				{challenge.description}
+			<div class="prose-base mr-2">
+				<SvelteMarkdown source={challenge.description} />
 			</div>
 			<form use:ticketForm.enhance method="POST" action="?/ticket">
 				<Editor content={challenge.ticketTemplate} />
@@ -428,7 +429,9 @@
 							</div>
 						</div>
 						<div class="relative">
-							{challenge.description}
+							<div class="prose-base mr-2">
+								<SvelteMarkdown source={challenge.description} />
+							</div>
 
 							<a href={`?challenge=${challenge.slug}`} class="absolute bottom-0 right-0 h-6 w-6">
 								<Tooltip.Root>

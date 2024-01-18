@@ -71,9 +71,8 @@ export async function health(): Promise<boolean> {
 		timeout = undefined;
 	}
 
-	$: if (enabled) runHealthcheck();
-
 	onMount(async () => {
+		if (enabled) runHealthcheck();
 		monaco = (await import('./monaco')).default;
 
 		const uri = 'ts:rhombus/utils.ts';
