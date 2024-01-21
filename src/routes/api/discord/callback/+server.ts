@@ -5,7 +5,7 @@ import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
 import { generateInviteToken } from '$lib/utils.server';
 import { setJwt, getJwt } from '$lib/auth/auth.server';
-import { createRole, joinUserToRole, verifyUser } from '$lib/bot';
+import { verifyUser } from '$lib/bot';
 
 export async function GET({ url, cookies }) {
 	if (url.searchParams.get('error')) {
@@ -184,7 +184,6 @@ export async function GET({ url, cookies }) {
 		});
 
 		const teamName = profile.username;
-		const role = await createRole(teamName);
 		const division = await prisma.division.findFirst({
 			where: {
 				isDefault: true
@@ -194,7 +193,6 @@ export async function GET({ url, cookies }) {
 			data: {
 				name: teamName,
 				inviteToken: generateInviteToken(),
-				discordRoleId: role.id,
 				ownerId: user.id,
 				divisions: {
 					connect: {
@@ -207,7 +205,6 @@ export async function GET({ url, cookies }) {
 			}
 		});
 
-		await joinUserToRole(profile.id, role.id);
 		await verifyUser(profile.id);
 
 		await prisma.user.update({
@@ -220,7 +217,7 @@ export async function GET({ url, cookies }) {
 
 		const inviteToken = cookies.get('inviteToken');
 		if (inviteToken) {
-			cookies.delete('inviteToken');
+			cookies.delete('inviteToken', { path: '/' });
 			const invitedTeam = await prisma.team.findUnique({
 				where: {
 					inviteToken

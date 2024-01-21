@@ -3,7 +3,6 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import { env } from '$env/dynamic/public';
 import prisma from '$lib/db';
-import { changeUsersRole, renameRole } from '$lib/bot';
 import { globalChallengeSolves } from '$lib/utils.server';
 import { avatarFallback, dynamicPoints } from '$lib/utils';
 import { teamNameFormSchema } from './schema';
@@ -137,18 +136,9 @@ export const actions = {
 			where: { id: data.userId },
 			select: {
 				ownerTeamId: true,
-				ownerTeam: { select: { discordRoleId: true } },
-				teamId: true,
-				team: { select: { discordRoleId: true } }
+				teamId: true
 			}
 		});
-
-		if (locals.session.discord)
-			await changeUsersRole(
-				locals.session.discord.id,
-				user!.team!.discordRoleId,
-				user!.ownerTeam!.discordRoleId
-			);
 
 		if (locals.session?.id === data.userId) {
 			await prisma.user.update({
@@ -205,7 +195,7 @@ export const actions = {
 				where: {
 					name: form.data.name
 				},
-				select: { id: true, discordRoleId: true }
+				select: { id: true }
 			});
 			if (existingTeam) {
 				if (existingTeam.id === event.locals.session.team.id) {
@@ -214,16 +204,14 @@ export const actions = {
 				return message(form, 'A team with that name already exists.', { status: 400 });
 			}
 
-			const team = await prisma.team.update({
+			await prisma.team.update({
 				where: {
 					id: event.locals.session.team.id
 				},
 				data: {
 					name: form.data.name
-				},
-				select: { discordRoleId: true }
+				}
 			});
-			await renameRole(team.discordRoleId, form.data.name);
 		} else {
 			throw error(401);
 		}

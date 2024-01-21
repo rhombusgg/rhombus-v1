@@ -1,7 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import prisma from '$lib/db';
 import { setJwt } from '$lib/auth/auth.server';
-import { createRole } from '$lib/bot';
 import { generateInviteToken } from '$lib/utils.server';
 
 export async function GET({ url, cookies }) {
@@ -67,7 +66,6 @@ export async function GET({ url, cookies }) {
 		});
 
 		const teamName = emailVerificationToken.email.split('@')[0];
-		const role = await createRole(teamName);
 		const division = await prisma.division.findFirst({
 			where: {
 				isDefault: true
@@ -77,7 +75,6 @@ export async function GET({ url, cookies }) {
 			data: {
 				name: teamName,
 				inviteToken: generateInviteToken(),
-				discordRoleId: role.id,
 				ownerId: user.id,
 				divisions: {
 					connect: {

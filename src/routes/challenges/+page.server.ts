@@ -50,7 +50,7 @@ export const actions = {
 		}
 
 		await createSupportThread({
-			discordId: locals.session.discord?.id,
+			discordId: locals.session.discord!.id,
 			challengeId: form.data.challengeId,
 			content: form.data.content
 		});

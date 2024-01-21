@@ -25,7 +25,6 @@
 		}
 	});
 
-	$: categoryOptions = data.categories.map((category) => ({ label: category, value: category }));
 	$: difficultyOptions = data.difficulties.map((difficulty) => ({
 		label: difficulty,
 		value: difficulty

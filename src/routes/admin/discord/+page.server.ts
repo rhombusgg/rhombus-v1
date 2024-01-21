@@ -1,4 +1,4 @@
-import { getGuilds, getRhombusRoleIds, getRoles, getTextChannels, sendPanel } from '$lib/bot';
+import { getGuilds, getRoles, getTextChannels, sendPanel } from '$lib/bot';
 import prisma from '$lib/db';
 import { error, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -24,18 +24,15 @@ export const load = async ({ locals, depends }) => {
 	depends('app:admin:discord');
 
 	const discordBot = await prisma.discordBot.findFirst();
-
-	const rhombusRoleIds = await getRhombusRoleIds();
+	if (!discordBot) throw error(500, 'No bot found');
 
 	return {
 		guilds: (await getGuilds()).map((guild) => ({ label: guild.name, value: guild.id })),
-		textChannels: (await getTextChannels())?.map((channel) => ({
+		textChannels: (await getTextChannels(discordBot.guildId))?.map((channel) => ({
 			label: `#${channel.name}`,
 			value: channel.id
 		})),
-		roles: (await getRoles())
-			?.filter((channel) => !rhombusRoleIds.includes(channel.id))
-			.map((role) => ({ label: `@${role.name}`, value: role.id })),
+		roles: await getRoles(discordBot.guildId),
 		botSettings: discordBot
 	};
 };

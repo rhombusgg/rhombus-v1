@@ -7,6 +7,18 @@
 	import Selector from './selector.svelte';
 
 	export let data;
+
+	$: assignableRoleOptions = data.roles
+		.filter((role) => role.editable)
+		.map((role) => ({
+			label: `@${role.name}`,
+			value: role.id
+		}));
+
+	$: allRoles = data.roles.map((role) => ({
+		label: `@${role.name}`,
+		value: role.id
+	}));
 </script>
 
 <svelte:head>
@@ -93,8 +105,60 @@
 			<h4 class="text-sm font-semibold">Verified Role</h4>
 			<p class="text-sm text-muted-foreground">Select the role to assign linked users to</p>
 			<Selector
-				options={data.roles}
+				options={assignableRoleOptions}
 				value={data.botSettings?.verifiedRoleId}
+				ui={{
+					prompt: 'Select a role ...',
+					placeholder: 'Search roles...',
+					none: 'No roles found.'
+				}}
+				onChange={async (role) => {
+					await fetch('/admin/discord?/verifiedRoleId', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: new URLSearchParams({
+							verifiedRoleId: `${role.value}`
+						})
+					});
+					await invalidate('app:admin:discord');
+				}}
+			/>
+		</div>
+		<div class="flex flex-col gap-2">
+			<h4 class="text-sm font-semibold">Author Role</h4>
+			<p class="text-sm text-muted-foreground">Role to identify challenge authors</p>
+			<Selector
+				options={allRoles}
+				value={data.botSettings?.authorRoleId}
+				ui={{
+					prompt: 'Select a role ...',
+					placeholder: 'Search roles...',
+					none: 'No roles found.'
+				}}
+				onChange={async (role) => {
+					await fetch('/admin/discord?/verifiedRoleId', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: new URLSearchParams({
+							verifiedRoleId: `${role.value}`
+						})
+					});
+					await invalidate('app:admin:discord');
+				}}
+			/>
+		</div>
+		<div class="flex flex-col gap-2">
+			<h4 class="text-sm font-semibold">Admin Role</h4>
+			<p class="text-sm text-muted-foreground">
+				Role to identify admin users. Warning: these users will have admin access to the CTF site.
+			</p>
+			<Selector
+				options={allRoles}
+				value={data.botSettings?.adminRoleId}
 				ui={{
 					prompt: 'Select a role ...',
 					placeholder: 'Search roles...',

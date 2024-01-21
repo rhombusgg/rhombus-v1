@@ -47,21 +47,10 @@ client.on(Events.GuildCreate, async (guild) => {
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
-	const user = await prisma.discord.findUnique({
-		where: { id: member.id },
-		select: { user: { select: { team: { select: { discordRoleId: true } } } } }
-	});
-	if (!user?.user.team) return;
-
 	const discordBot = await prisma.discordBot.findFirst();
 	if (!discordBot) return;
 
 	if (discordBot.verifiedRoleId) await member.roles.add(discordBot.verifiedRoleId);
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
-	const teamRole = await guild.roles.fetch(user.user.team.discordRoleId);
-	if (!teamRole) return;
-	await member.roles.add(teamRole);
 });
 
 client.login(env.DISCORD_TOKEN);
@@ -81,11 +70,8 @@ export async function getGuilds() {
 	return guilds;
 }
 
-export async function getTextChannels() {
-	const discordBot = await prisma.discordBot.findFirst();
-	if (!discordBot) return undefined;
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
+export async function getTextChannels(guildId: string) {
+	const guild = await client.guilds.fetch(guildId);
 	const channels = await guild.channels.fetch();
 	return channels
 		.filter(
@@ -98,74 +84,14 @@ export async function getTextChannels() {
 		.map((channel) => channel as NonThreadGuildBasedChannel);
 }
 
-export async function getRoles() {
-	const discordBot = await prisma.discordBot.findFirst();
-	if (!discordBot) return undefined;
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
+export async function getRoles(guildId: string) {
+	const guild = await client.guilds.fetch(guildId);
 	const roles = await guild.roles.fetch();
-	return roles.filter(
-		(role) => guild.roles.everyone.id !== role.id && role && role.client.user && role.editable
-	);
-}
+	const botRole = guild.roles.botRoleFor(guild.client.user!);
 
-export async function getRhombusRoleIds() {
-	const teams = await prisma.team.findMany({
-		select: { discordRoleId: true }
-	});
-
-	return teams.flatMap((team) => team.discordRoleId);
-}
-
-export async function createRole(name: string) {
-	const discordBot = await prisma.discordBot.findFirst();
-	if (!discordBot) throw new Error('No discord bot found');
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
-	const role = await guild.roles.create({
-		name: name,
-		color: 'Blurple',
-		reason: `rhombus-managed team`
-	});
-	return role;
-}
-
-export async function renameRole(roleId: string, name: string) {
-	const discordBot = await prisma.discordBot.findFirst();
-	if (!discordBot) throw new Error('No discord bot found');
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
-	const role = await guild.roles.fetch(roleId);
-	if (!role) return;
-	await role.edit({ name });
-}
-
-export async function changeUsersRole(userId: string, oldRoleId: string, newRoleId: string) {
-	const discordBot = await prisma.discordBot.findFirst();
-	if (!discordBot) throw new Error('No discord bot found');
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
-	const member = await guild.members.fetch(userId);
-	const oldRole = await guild.roles.fetch(oldRoleId);
-	const newRole = await guild.roles.fetch(newRoleId);
-	if (!oldRole || !newRole) return;
-	await member.roles.remove(oldRole);
-	await member.roles.add(newRole);
-}
-
-export async function joinUserToRole(userId: string, roleId: string) {
-	const discordBot = await prisma.discordBot.findFirst();
-	if (!discordBot) throw new Error('No discord bot found');
-
-	const guild = await client.guilds.fetch(discordBot.guildId);
-	try {
-		const member = await guild.members.fetch(userId);
-		const role = await guild.roles.fetch(roleId);
-		if (!role) return;
-		await member.roles.add(role);
-	} catch {
-		// user not in guild
-	}
+	return roles
+		.filter((role) => role && guild.roles.everyone.id !== role.id && botRole?.id !== role.id)
+		.map((role) => ({ name: role.name, id: role.id, editable: role.editable }));
 }
 
 export async function verifyUser(userId: string) {
@@ -195,7 +121,8 @@ export async function sendPanel(supportChannelId: string) {
 			{
 				color: 0x0099ff,
 				title: 'Support',
-				description: 'Your support tickets will appear here.'
+				description:
+					'Submit a ticket for a challenge from the CTF website by clicking on the :tickets: button in the header of the challenge in question.'
 			}
 		],
 		components: [
@@ -203,10 +130,10 @@ export async function sendPanel(supportChannelId: string) {
 				type: ComponentType.ActionRow,
 				components: [
 					{
-						label: 'Create Ticket',
-						customId: 'create-ticket',
 						type: ComponentType.Button,
-						style: ButtonStyle.Primary
+						style: ButtonStyle.Link,
+						label: 'Go to Challenges',
+						url: 'http://localhost:5173/challenges'
 					}
 				]
 			}
@@ -219,7 +146,7 @@ export async function createSupportThread({
 	challengeId,
 	content
 }: {
-	discordId: string | undefined;
+	discordId: string;
 	challengeId: string;
 	content: string;
 }) {
@@ -231,10 +158,20 @@ export async function createSupportThread({
 		where: { id: challengeId },
 		select: {
 			name: true,
-			author: { select: { discord: { select: { id: true } } } }
+			author: { select: { discord: { select: { id: true } } } },
+			category: { select: { name: true } },
+			slug: true
 		}
 	});
 	if (!challenge) return undefined;
+
+	const user = await prisma.user.findFirstOrThrow({
+		where: { discord: { id: discordId } },
+		select: {
+			team: { select: { name: true, id: true } },
+			id: true
+		}
+	});
 
 	const ticketNumber = await prisma.discordBot.update({
 		where: { id: discordBot.id },
@@ -247,8 +184,63 @@ export async function createSupportThread({
 	const guild = await client.guilds.fetch(discordBot.guildId);
 	const channel = (await guild.channels.fetch(discordBot.supportChannelId)) as TextChannel;
 	const thread = await channel.threads.create({
-		name: `ticket-${ticketNumber.ticketNumber}`,
+		name: `${ticketNumber.ticketNumber}-${challenge.name}-${user.team!.name}`,
 		type: ChannelType.PrivateThread
+	});
+
+	await thread.send({
+		embeds: [
+			{
+				color: 0x0099ff,
+				title: 'Ticket',
+				fields: [
+					{
+						name: ':identification_card: Opened By',
+						value: `<@${discordId}> [:link:](http://localhost:5173/user/${user.id})`,
+						inline: true
+					},
+					{
+						name: ':red_square: Team',
+						value: `[${user.team!.name}](http://localhost:5173/team/${user.team!.id})`,
+						inline: true
+					},
+					{
+						name: ':watch: Opened',
+						value: `<t:${Math.floor(new Date().getTime() / 1000)}:F>`,
+						inline: true
+					},
+					{
+						name: ':crossed_swords: Challenge',
+						value: `[${challenge.name}](http://localhost:5173/challenges?challenge=${challenge.slug})`,
+						inline: true
+					},
+					{
+						name: ':bookmark: Author',
+						value: `<@${challenge.author.discord!.id}>`,
+						inline: true
+					},
+					{
+						name: '',
+						value: '',
+						inline: true
+					}
+				]
+			}
+		],
+		components: [
+			{
+				type: ComponentType.ActionRow,
+				components: [
+					{
+						label: 'Close Ticket',
+						customId: 'close-ticket',
+						type: ComponentType.Button,
+						style: ButtonStyle.Primary,
+						emoji: '🔒'
+					}
+				]
+			}
+		]
 	});
 
 	await thread.send(content);

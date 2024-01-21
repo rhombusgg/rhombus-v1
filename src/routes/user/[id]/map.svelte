@@ -3,6 +3,7 @@
 	import { browser } from '$app/environment';
 	import type * as L from 'leaflet';
 	import { z } from 'zod';
+	import 'leaflet/dist/leaflet.css';
 
 	export let ips: string[];
 
@@ -60,7 +61,3 @@
 </script>
 
 <div class="h-[600px]" bind:this={mapElement}></div>
-
-<style>
-	@import 'leaflet/dist/leaflet.css';
-</style>

@@ -92,15 +92,14 @@ model UserChallenge {
 }
 
 model Team {
-    id            String     @id @default(cuid())
-    name          String
-    discordRoleId String
-    users         User[]     @relation(name: "member")
-    owner         User       @relation(fields: [ownerId], references: [id], name: "owner", onDelete: Cascade)
-    ownerId       String     @unique
-    inviteToken   String     @unique
-    divisions     Division[]
-    solves        Solve[]
+    id          String     @id @default(cuid())
+    name        String
+    users       User[]     @relation(name: "member")
+    owner       User       @relation(fields: [ownerId], references: [id], name: "owner", onDelete: Cascade)
+    ownerId     String     @unique
+    inviteToken String     @unique
+    divisions   Division[]
+    solves      Solve[]
 }
 
 model Division {
@@ -164,6 +163,8 @@ model DiscordBot {
     ticketNumber     Int     @default(1)
     supportChannelId String?
     verifiedRoleId   String?
+    authorRoleId     String?
+    adminRoleId      String?
 }
 
 model Ticket {

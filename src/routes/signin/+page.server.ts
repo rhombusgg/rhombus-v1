@@ -4,7 +4,6 @@ import { formSchema } from './schema';
 import { renderSignInEmail } from './email';
 import { env as publicEnv } from '$env/dynamic/public';
 import prisma from '$lib/db';
-import { changeUsersRole } from '$lib/bot';
 import { sendEmail } from '$lib/email/email.server';
 
 export const load = async ({ url, cookies, locals }) => {
@@ -16,26 +15,11 @@ export const load = async ({ url, cookies, locals }) => {
 			},
 			select: {
 				id: true,
-				name: true,
-				discordRoleId: true
+				name: true
 			}
 		});
 		if (team) {
 			if (locals.session) {
-				const oldTeam = await prisma.user.findFirst({
-					where: {
-						id: locals.session.id
-					},
-					select: { team: { select: { discordRoleId: true } } }
-				});
-				if (oldTeam) {
-					await changeUsersRole(
-						locals.session.discord!.id,
-						oldTeam.team!.discordRoleId,
-						team.discordRoleId
-					);
-				}
-
 				await prisma.user.update({
 					where: {
 						id: locals.session.id
@@ -58,7 +42,7 @@ export const load = async ({ url, cookies, locals }) => {
 				throw redirect(302, '/team');
 			}
 
-			cookies.set('inviteToken', inviteToken);
+			cookies.set('inviteToken', inviteToken, { path: '/' });
 			return {
 				teamName: team.name,
 				form: await superValidate(formSchema)

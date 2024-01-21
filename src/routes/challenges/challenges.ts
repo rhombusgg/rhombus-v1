@@ -82,9 +82,7 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 
 	const globalSolves = await globalChallengeSolves();
 
-	const categories = dbChallenges
-		.map((challenge) => challenge.category)
-		.filter((v, i, a) => a.indexOf(v) === i);
+	const categories = await prisma.category.findMany();
 
 	const board = await prisma.userColumns.findMany({
 		where: { userId },
@@ -140,8 +138,9 @@ export async function getUserColumns(userId: string, teamUserIds: string[]) {
 				},
 				updateMany: deletedCategories.flatMap((column) =>
 					column.challenges.flatMap((challenge) => {
-						const category = dbChallenges.find((chall) => chall.id === challenge.challengeId)
-							?.category;
+						const category = dbChallenges.find(
+							(chall) => chall.id === challenge.challengeId
+						)?.category;
 						if (!category) return [];
 						return {
 							where: { challengeId: challenge.challengeId },
