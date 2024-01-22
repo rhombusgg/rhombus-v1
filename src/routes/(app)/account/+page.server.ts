@@ -47,7 +47,7 @@ export const actions = {
 		});
 
 		const email = await renderVerificationEmail({
-			verifyLink: `${publicEnv.PUBLIC_LOCATION_URL}/api/email/verify?token=${verificationToken.token}`,
+			verifyLink: `${publicEnv.PUBLIC_LOCATION_URL}/callback/email/verify?token=${verificationToken.token}`,
 			ip: event.getClientAddress(),
 			username: event.locals.session.discord?.username ?? event.locals.session.emails[0],
 			email: form.data.email

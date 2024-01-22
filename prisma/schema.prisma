@@ -49,6 +49,7 @@ model User {
     tickets            Ticket[]
     solves             Solve[]
     writeups           Writeup[]
+    apiTokens          APIToken[]
 }
 
 model Writeup {
@@ -173,4 +174,12 @@ model Ticket {
     user    User   @relation(fields: [userId], references: [id])
     userId  String
     content String
+}
+
+model APIToken {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    token     String   @unique
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String
 }

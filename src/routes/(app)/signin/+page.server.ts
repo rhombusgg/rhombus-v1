@@ -76,7 +76,7 @@ export const actions = {
 		});
 
 		const email = await renderSignInEmail({
-			authLink: `${publicEnv.PUBLIC_LOCATION_URL}/api/email/signin?token=${verificationToken.token}`,
+			authLink: `${publicEnv.PUBLIC_LOCATION_URL}/callback/email/signin?token=${verificationToken.token}`,
 			ip: event.getClientAddress()
 		});
 

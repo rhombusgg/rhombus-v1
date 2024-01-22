@@ -7,6 +7,11 @@ import { getJwt } from '$lib/auth/auth.server';
 import { avatarFallback } from '$lib/utils';
 import { runHealthchecks } from '$lib/healthcheck/healthcheck.server';
 
+import { createContext } from '$lib/trpc/context';
+import { router } from '$lib/trpc/router';
+import { createTRPCHandle } from 'trpc-sveltekit';
+import { openapiHandler } from '$lib/openapi/openapiHandler';
+
 // small sveltekit hack to have code run only once on server start (to
 // run healthchecks every so often)
 scheduledJobs.find((job) => job.name === 'healthcheck')?.stop();
@@ -132,4 +137,8 @@ const ip: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle = sequence(auth, ip);
+const trpc = createTRPCHandle({ router, createContext });
+
+const openapi: Handle = openapiHandler();
+
+export const handle = sequence(auth, ip, trpc, openapi);

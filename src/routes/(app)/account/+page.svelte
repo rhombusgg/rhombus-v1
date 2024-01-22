@@ -163,13 +163,16 @@
 				</Card.Header>
 				<Card.Content>A</Card.Content>
 			</Card.Root> -->
-			<!-- <Card.Root>
+			<Card.Root>
 				<Card.Header>
-					<Card.Title>API Tokens</Card.Title>
+					<Card.Title>API</Card.Title>
 					<Card.Description>Manage API tokens for the provided REST API</Card.Description>
 				</Card.Header>
-				<Card.Content>A</Card.Content>
-			</Card.Root> -->
+				<Card.Content>
+					<a href="/api/docs" class="font-medium underline underline-offset-4">View documentation</a
+					>
+				</Card.Content>
+			</Card.Root>
 		</div>
 	</div>
 {/if}

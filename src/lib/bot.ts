@@ -90,7 +90,10 @@ export async function getRoles(guildId: string) {
 	const botRole = guild.roles.botRoleFor(guild.client.user!);
 
 	return roles
-		.filter((role) => role && guild.roles.everyone.id !== role.id && botRole?.id !== role.id)
+		.filter(
+			(role) =>
+				role && role.client.user && guild.roles.everyone.id !== role.id && botRole?.id !== role.id
+		)
 		.map((role) => ({ name: role.name, id: role.id, editable: role.editable }));
 }
 

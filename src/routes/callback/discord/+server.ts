@@ -27,7 +27,7 @@ export async function GET({ url, cookies }) {
 			client_id: publicEnv.PUBLIC_DISCORD_CLIENT_ID!,
 			client_secret: privateEnv.DISCORD_CLIENT_SECRET!,
 			grant_type: 'authorization_code',
-			redirect_uri: `${publicEnv.PUBLIC_LOCATION_URL}/api/discord/callback`,
+			redirect_uri: `${publicEnv.PUBLIC_LOCATION_URL}/callback/discord`,
 			code
 		})
 	});

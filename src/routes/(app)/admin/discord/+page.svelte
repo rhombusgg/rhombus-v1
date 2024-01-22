@@ -1,9 +1,11 @@
 <script lang="ts">
+	import toast from 'svelte-french-toast';
+	import { RefreshCcw } from 'lucide-svelte';
 	import { invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { trpc } from '$lib/trpc/client';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
-	import { RefreshCcw } from 'lucide-svelte';
-	import toast from 'svelte-french-toast';
 	import Selector from './selector.svelte';
 
 	export let data;
@@ -138,15 +140,9 @@
 					none: 'No roles found.'
 				}}
 				onChange={async (role) => {
-					await fetch('/admin/discord?/verifiedRoleId', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						},
-						body: new URLSearchParams({
-							verifiedRoleId: `${role.value}`
-						})
-					});
+					const x = await trpc($page).greeting.query();
+					console.log(x);
+
 					await invalidate('app:admin:discord');
 				}}
 			/>

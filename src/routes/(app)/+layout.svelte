@@ -1,5 +1,5 @@
 <script>
-	import '../app.css';
+	import '../../app.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from 'svelte-french-toast';
 	import SiteHeader from '$lib/components/gutter/site-header.svelte';
